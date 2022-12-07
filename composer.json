@@ -21,7 +21,8 @@
     "slevomat/coding-standard": "^6.3",
     "squizlabs/php_codesniffer": "^3.5",
     "vimeo/psalm": "^4.3",
-    "captainhook/captainhook": "^5.4"
+    "captainhook/captainhook": "^5.4",
+    "phpmd/phpmd" : "^2.13"
   },
   "config": {
     "sort-packages": true,
@@ -45,13 +46,16 @@
     "fl:test:unit:coverage:ci": "phpunit --coverage-clover build/logs/clover.xml",
     "fl:test:unit": "phpunit",
     "fl:psalm": "psalm",
+    "fl:phpmd": "phpmd src ansi phpmd.xml",
     "fl:check": [
       "@fl:lint",
+      "@fl:phpmd",
       "@fl:psalm",
       "@fl:test:unit"
     ],
     "pre-commit": [
       "@fl:lint",
+      "@fl:phpmd",
       "@fl:psalm"
     ],
     "pre-push": [
@@ -63,6 +67,7 @@
     "fl:phpcbf": "Поправляет весь исходный код на соответсвие стандартам.",
     "fl:test:unit:coverage:ci": "Запускает все модульные тесты и генериреут отчет покрытия Clover.",
     "fl:psalm": "Статический анализ",
+    "fl:phpmd": "PHP Mess Detector",
     "fl:check": "Полная проверка кода",
     "fl:test:unit": "Модульное тестирование"
   }
