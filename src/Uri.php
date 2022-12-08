@@ -64,7 +64,7 @@ class Uri implements UriInterface
      */
     private $fragment;
 
-    public function __construct(string $uri)
+    public function __construct(string $uri = '')
     {
         $parsed = parse_url($uri);
         $this->withScheme($parsed['scheme'] ?? 'https')

@@ -14,6 +14,16 @@ use PHPUnit\Framework\TestCase;
 class UriTest extends TestCase
 {
     /**
+     * Пустой объект
+     */
+    public function testEmptyUri(): void
+    {
+        $uri = new Uri();
+        $this->assertEquals('https', $uri->getScheme());
+        $this->assertEquals('', $uri->getHost());
+    }
+
+    /**
      * Схема
      */
     public function testGetEmptyScheme(): void

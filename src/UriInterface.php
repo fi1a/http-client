@@ -9,7 +9,7 @@ namespace Fi1a\HttpClient;
  */
 interface UriInterface
 {
-    public function __construct(string $uri);
+    public function __construct(string $uri = '');
 
     /**
      * Схема
