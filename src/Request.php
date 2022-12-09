@@ -174,7 +174,7 @@ class Request extends Message implements RequestInterface
      */
     public function withExpectedType(?string $mime = null)
     {
-        $this->expectedType = $mime ? $this->mime->getMime($mime) : null;
+        $this->expectedType = $mime ? Mime::getMime($mime) : null;
 
         return $this;
     }

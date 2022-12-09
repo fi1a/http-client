@@ -24,14 +24,8 @@ class Message implements MessageInterface
      */
     private $contentType;
 
-    /**
-     * @var MimeInterface
-     */
-    protected $mime;
-
     public function __construct()
     {
-        $this->mime = new Mime();
         $this->headers = new HeaderCollection();
     }
 
@@ -127,7 +121,7 @@ class Message implements MessageInterface
      */
     public function withContentType(?string $mime = null)
     {
-        $this->contentType = $mime ? $this->mime->getMime($mime) : null;
+        $this->contentType = $mime ? Mime::getMime($mime) : null;
 
         return $this;
     }

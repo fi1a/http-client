@@ -86,6 +86,6 @@ class ParserRegistry implements ParserRegistryInterface
      */
     private static function getParserKey(string $contentType): string
     {
-        return (new Mime())->getMime(mb_strtolower($contentType));
+        return Mime::getMime(mb_strtolower($contentType));
     }
 }

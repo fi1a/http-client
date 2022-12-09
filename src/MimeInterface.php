@@ -23,5 +23,5 @@ interface MimeInterface
     /**
      * Возвращает mime
      */
-    public function getMime(string $shortcut): string;
+    public static function getMime(string $shortcut): string;
 }

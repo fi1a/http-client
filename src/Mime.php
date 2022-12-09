@@ -32,12 +32,12 @@ class Mime implements MimeInterface
     /**
      * @inheritDoc
      */
-    public function getMime(string $shortcut): string
+    public static function getMime(string $shortcut): string
     {
         if (!$shortcut) {
             throw new InvalidArgumentException('Mime не может быть пустым');
         }
 
-        return self::$shortcuts[$shortcut] ?? $shortcut;
+        return static::$shortcuts[$shortcut] ?? $shortcut;
     }
 }

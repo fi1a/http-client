@@ -19,9 +19,8 @@ class MimeTest extends TestCase
      */
     public function testGetMime(): void
     {
-        $mime = new Mime();
-        $this->assertEquals(MimeInterface::JSON, $mime->getMime('json'));
-        $this->assertEquals('unknown', $mime->getMime('unknown'));
+        $this->assertEquals(MimeInterface::JSON, Mime::getMime('json'));
+        $this->assertEquals('unknown', Mime::getMime('unknown'));
     }
 
     /**
@@ -30,7 +29,6 @@ class MimeTest extends TestCase
     public function testException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $mime = new Mime();
-        $mime->getMime('');
+        Mime::getMime('');
     }
 }
