@@ -7,7 +7,7 @@ namespace Fi1a\HttpClient;
 /**
  * Объект запроса
  */
-interface RequestInterface
+interface RequestInterface extends MessageInterface
 {
     /**
      * Создать объект запроса
@@ -112,18 +112,6 @@ interface RequestInterface
      * @return $this
      */
     public function withMime(?string $mime = null);
-
-    /**
-     * Устанавливаем content type
-     *
-     * @return $this
-     */
-    public function withContentType(?string $mime = null);
-
-    /**
-     * Content type
-     */
-    public function getContentType(): ?string;
 
     /**
      * Устанавливаем expected type

@@ -7,7 +7,7 @@ namespace Fi1a\HttpClient;
 /**
  * Объект запроса
  */
-class Request implements RequestInterface
+class Request extends Message implements RequestInterface
 {
     /**
      * @var string
@@ -24,11 +24,6 @@ class Request implements RequestInterface
     /**
      * @var string|null
      */
-    private $contentType;
-
-    /**
-     * @var string|null
-     */
     private $expectedType;
 
     /**
@@ -36,14 +31,9 @@ class Request implements RequestInterface
      */
     private $payload;
 
-    /**
-     * @var MimeInterface
-     */
-    private $mime;
-
     protected function __construct()
     {
-        $this->mime = new Mime();
+        parent::__construct();
         $this->withMethod(HttpInterface::GET)
             ->withUri(new Uri());
     }
@@ -177,24 +167,6 @@ class Request implements RequestInterface
     {
         return $this->withContentType($mime)
             ->withExpectedType($mime);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withContentType(?string $mime = null)
-    {
-        $this->contentType = $mime ? $this->mime->getMime($mime) : null;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getContentType(): ?string
-    {
-        return $this->contentType;
     }
 
     /**
