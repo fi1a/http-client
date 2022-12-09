@@ -13,6 +13,7 @@
   ],
   "require": {
     "php": "^7.3 || ^8",
+    "ext-json": "*",
     "fi1a/collection": "^2.0"
   },
   "suggest": {
@@ -34,7 +35,10 @@
   "autoload": {
     "psr-4": {
       "Fi1a\\HttpClient\\": "src"
-    }
+    },
+    "files": [
+      "src/configure.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {

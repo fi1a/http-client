@@ -17,14 +17,14 @@ interface ResponseInterface extends MessageInterface
     /**
      * Текст причины ассоциированный с кодом статуса
      */
-    public function getReasonPhrase(): string;
+    public function getReasonPhrase(): ?string;
 
     /**
      * Установить код статуса
      *
      * @return $this
      */
-    public function withStatus(int $code, string $reasonPhrase = '');
+    public function withStatus(int $statusCode, string $reasonPhrase = '');
 
     /**
      * Запрос выполнен с ошибкой или нет
@@ -34,11 +34,9 @@ interface ResponseInterface extends MessageInterface
     /**
      * Установить тело ответа
      *
-     * @param mixed $body
-     *
      * @return $this
      */
-    public function withBody($body);
+    public function withBody(string $rawBody, ?string $mime = null);
 
     /**
      * Есть тело ответа или нет
@@ -56,9 +54,4 @@ interface ResponseInterface extends MessageInterface
      * Возвращает тело ответа без примененного преобразования
      */
     public function getRawBody(): string;
-
-    /**
-     * Возвращает тип содержимого
-     */
-    public function getContentType(): string;
 }
