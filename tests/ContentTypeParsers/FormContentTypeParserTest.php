@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient\ContentTypeParsers;
 
-use Fi1a\HttpClient\ContentTypeParsers\FormContentTypeParser;
+use Fi1a\HttpClient\ContentTypeEncodes\FormContentTypeEncode;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\LogicException;
@@ -20,7 +20,7 @@ class FormContentTypeParserTest extends TestCase
     public function testDecode(): void
     {
         $this->expectException(LogicException::class);
-        $parser = new FormContentTypeParser();
+        $parser = new FormContentTypeEncode();
         $parser->decode('');
     }
 
@@ -31,7 +31,7 @@ class FormContentTypeParserTest extends TestCase
     {
         $array = ['foo' => 'bar'];
         $query = http_build_query($array, '', '&');
-        $parser = new FormContentTypeParser();
+        $parser = new FormContentTypeEncode();
         $this->assertEquals($query, $parser->encode($array));
     }
 
@@ -42,7 +42,7 @@ class FormContentTypeParserTest extends TestCase
     {
         $array = ['foo' => 'bar'];
         $query = http_build_query($array, '', '&');
-        $parser = new FormContentTypeParser();
+        $parser = new FormContentTypeEncode();
         $this->assertEquals($query, $parser->encode($query));
     }
 
@@ -52,7 +52,7 @@ class FormContentTypeParserTest extends TestCase
     public function testEncodeException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $parser = new FormContentTypeParser();
+        $parser = new FormContentTypeEncode();
         $parser->encode($this);
     }
 }

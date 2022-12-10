@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient\ContentTypeParsers;
 
-use Fi1a\HttpClient\ContentTypeParsers\JsonContentTypeParser;
+use Fi1a\HttpClient\ContentTypeEncodes\JsonContentTypeEncode;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,7 +19,7 @@ class JsonContentTypeParserTest extends TestCase
     {
         $array = ['foo' => 'bar'];
         $json = json_encode($array);
-        $parser = new JsonContentTypeParser();
+        $parser = new JsonContentTypeEncode();
         $this->assertEquals($array, $parser->decode($json));
     }
 
@@ -30,7 +30,7 @@ class JsonContentTypeParserTest extends TestCase
     {
         $array = ['foo' => 'bar'];
         $json = json_encode($array);
-        $parser = new JsonContentTypeParser();
+        $parser = new JsonContentTypeEncode();
         $this->assertEquals($json, $parser->encode($array));
     }
 }

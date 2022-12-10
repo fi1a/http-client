@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient\Fixtures;
 
-use Fi1a\HttpClient\ContentTypeParsers\ContentTypeParserInterface;
+use Fi1a\HttpClient\ContentTypeEncodes\ContentTypeEncodeInterface;
 
 /**
  * Fixture class
  */
-class XContentTypeParser implements ContentTypeParserInterface
+class XContentTypeEncode implements ContentTypeEncodeInterface
 {
     /**
      * @inheritDoc

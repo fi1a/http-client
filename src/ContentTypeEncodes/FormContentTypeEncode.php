@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Fi1a\HttpClient\ContentTypeParsers;
+namespace Fi1a\HttpClient\ContentTypeEncodes;
 
 use InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Exception\LogicException;
 /**
  * Парсер application/x-www-form-urlencoded типа контента
  */
-class FormContentTypeParser implements ContentTypeParserInterface
+class FormContentTypeEncode implements ContentTypeEncodeInterface
 {
     /**
      * @inheritDoc

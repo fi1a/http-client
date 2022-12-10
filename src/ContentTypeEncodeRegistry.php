@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
-use Fi1a\HttpClient\ContentTypeParsers\ContentTypeParserInterface;
+use Fi1a\HttpClient\ContentTypeEncodes\ContentTypeEncodeInterface;
 use InvalidArgumentException;
 
 /**
  * Реестр парсеров типов контента
  */
-class ParserRegistry implements ParserRegistryInterface
+class ContentTypeEncodeRegistry implements ContentTypeEncodeRegistryInterface
 {
     /**
      * @var string[]
@@ -27,9 +27,9 @@ class ParserRegistry implements ParserRegistryInterface
                 'Тип контента не может быть пустым'
             );
         }
-        if (!is_subclass_of($parser, ContentTypeParserInterface::class)) {
+        if (!is_subclass_of($parser, ContentTypeEncodeInterface::class)) {
             throw new InvalidArgumentException(
-                'Парсер должен реализовывать интерфейс ' . ContentTypeParserInterface::class
+                'Парсер должен реализовывать интерфейс ' . ContentTypeEncodeInterface::class
             );
         }
         if (static::has($contentType)) {
@@ -73,7 +73,7 @@ class ParserRegistry implements ParserRegistryInterface
 
         $class = static::$parsers[static::getParserKey($contentType)];
         /**
-         * @var ContentTypeParserInterface $instance
+         * @var ContentTypeEncodeInterface $instance
          * @psalm-suppress InvalidStringClass
          */
         $instance = new $class();

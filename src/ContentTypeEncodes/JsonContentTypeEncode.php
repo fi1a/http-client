@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Fi1a\HttpClient\ContentTypeParsers;
+namespace Fi1a\HttpClient\ContentTypeEncodes;
 
 /**
  * Парсер json типа контента
  */
-class JsonContentTypeParser implements ContentTypeParserInterface
+class JsonContentTypeEncode implements ContentTypeEncodeInterface
 {
     /**
      * @inheritDoc

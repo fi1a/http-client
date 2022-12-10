@@ -73,7 +73,7 @@ class RequestBody extends AbstractBody implements RequestBodyInterface
 
         $contentType = $this->getContentType();
         if ($contentType) {
-            $parser = ParserRegistry::get($contentType);
+            $parser = ContentTypeEncodeRegistry::get($contentType);
             if ($parser) {
                 $this->body = $parser->encode($this->raw);
             }

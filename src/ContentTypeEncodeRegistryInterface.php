@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
-use Fi1a\HttpClient\ContentTypeParsers\ContentTypeParserInterface;
+use Fi1a\HttpClient\ContentTypeEncodes\ContentTypeEncodeInterface;
 
 /**
  * Реестр парсеров типов контента
  */
-interface ParserRegistryInterface
+interface ContentTypeEncodeRegistryInterface
 {
     /**
      * Добавить парсер
@@ -29,7 +29,7 @@ interface ParserRegistryInterface
     /**
      * Возвращает класс парсера типа контента
      *
-     * @return ContentTypeParserInterface|false
+     * @return ContentTypeEncodeInterface|false
      */
     public static function get(string $contentType);
 }
