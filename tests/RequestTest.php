@@ -70,8 +70,31 @@ class RequestTest extends TestCase
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             $request->getUri()->getUri()
         );
-        $this->assertEquals(MimeInterface::JSON, $request->getContentType());
+        $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
+    }
+
+    /**
+     * POST запрос
+     */
+    public function testPostDefaultContentType(): void
+    {
+        $post = ['foo' => 'bar'];
+        $request = Request::create();
+        $request->post(
+            'https://username:password@host.ru:8080/some/path/?foo=bar',
+            $post
+        );
+        $this->assertEquals(HttpInterface::POST, $request->getMethod());
+        $this->assertInstanceOf(UriInterface::class, $request->getUri());
+        $this->assertEquals(
+            'https://username:password@host.ru:8080/some/path/?foo=bar',
+            $request->getUri()->getUri()
+        );
+        $this->assertEquals(MimeInterface::FORM, $request->getBody()->getContentType());
+        $this->assertEquals(MimeInterface::FORM, $request->getExpectedType());
+        $this->assertEquals($post, $request->getBody()->getRaw());
+        $this->assertEquals(http_build_query($post, '', '&'), $request->getBody()->get());
     }
 
     /**
@@ -91,9 +114,32 @@ class RequestTest extends TestCase
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             $request->getUri()->getUri()
         );
-        $this->assertEquals(MimeInterface::JSON, $request->getContentType());
+        $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
-        $this->assertEquals(['foo' => 'bar'], $request->getPayload());
+        $this->assertEquals(['foo' => 'bar'], $request->getBody()->getRaw());
+    }
+
+    /**
+     * PUT запрос
+     */
+    public function testPutDefaultContentType(): void
+    {
+        $put = ['foo' => 'bar'];
+        $request = Request::create();
+        $request->put(
+            'https://username:password@host.ru:8080/some/path/?foo=bar',
+            $put
+        );
+        $this->assertEquals(HttpInterface::PUT, $request->getMethod());
+        $this->assertInstanceOf(UriInterface::class, $request->getUri());
+        $this->assertEquals(
+            'https://username:password@host.ru:8080/some/path/?foo=bar',
+            $request->getUri()->getUri()
+        );
+        $this->assertEquals(MimeInterface::FORM, $request->getBody()->getContentType());
+        $this->assertEquals(MimeInterface::FORM, $request->getExpectedType());
+        $this->assertEquals($put, $request->getBody()->getRaw());
+        $this->assertEquals(http_build_query($put, '', '&'), $request->getBody()->get());
     }
 
     /**
@@ -113,9 +159,9 @@ class RequestTest extends TestCase
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             $request->getUri()->getUri()
         );
-        $this->assertEquals(MimeInterface::JSON, $request->getContentType());
+        $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
-        $this->assertEquals(['foo' => 'bar'], $request->getPayload());
+        $this->assertEquals(['foo' => 'bar'], $request->getBody()->getRaw());
     }
 
     /**
@@ -135,9 +181,9 @@ class RequestTest extends TestCase
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             $request->getUri()->getUri()
         );
-        $this->assertEquals(MimeInterface::JSON, $request->getContentType());
+        $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
-        $this->assertEquals(['foo' => 'bar'], $request->getPayload());
+        $this->assertEquals(['foo' => 'bar'], $request->getBody()->getRaw());
     }
 
     /**
@@ -156,7 +202,7 @@ class RequestTest extends TestCase
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             $request->getUri()->getUri()
         );
-        $this->assertEquals(MimeInterface::JSON, $request->getContentType());
+        $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
     }
 
@@ -175,7 +221,7 @@ class RequestTest extends TestCase
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             $request->getUri()->getUri()
         );
-        $this->assertNull($request->getContentType());
+        $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
 
@@ -194,7 +240,7 @@ class RequestTest extends TestCase
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             $request->getUri()->getUri()
         );
-        $this->assertNull($request->getContentType());
+        $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
 
@@ -228,7 +274,7 @@ class RequestTest extends TestCase
     {
         $request = Request::create();
         $request->withMime('json');
-        $this->assertEquals(MimeInterface::JSON, $request->getContentType());
+        $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
     }
 
@@ -239,7 +285,7 @@ class RequestTest extends TestCase
     {
         $request = Request::create();
         $request->withMime('application/pdf');
-        $this->assertEquals('application/pdf', $request->getContentType());
+        $this->assertEquals('application/pdf', $request->getBody()->getContentType());
         $this->assertEquals('application/pdf', $request->getExpectedType());
     }
 
@@ -250,7 +296,7 @@ class RequestTest extends TestCase
     {
         $request = Request::create();
         $request->withMime('');
-        $this->assertNull($request->getContentType());
+        $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
 
@@ -261,7 +307,7 @@ class RequestTest extends TestCase
     {
         $request = Request::create();
         $request->withMime();
-        $this->assertNull($request->getContentType());
+        $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
 
@@ -271,8 +317,8 @@ class RequestTest extends TestCase
     public function testContentType(): void
     {
         $request = Request::create();
-        $request->withContentType('json');
-        $this->assertEquals(MimeInterface::JSON, $request->getContentType());
+        $request->getBody()->withContentType('json');
+        $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
 
@@ -282,8 +328,8 @@ class RequestTest extends TestCase
     public function testCustomContentType(): void
     {
         $request = Request::create();
-        $request->withContentType('application/pdf');
-        $this->assertEquals('application/pdf', $request->getContentType());
+        $request->getBody()->withContentType('application/pdf');
+        $this->assertEquals('application/pdf', $request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
 
@@ -293,8 +339,8 @@ class RequestTest extends TestCase
     public function testEmptyContentType(): void
     {
         $request = Request::create();
-        $request->withContentType('');
-        $this->assertNull($request->getContentType());
+        $request->getBody()->withContentType('');
+        $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
 
@@ -304,8 +350,8 @@ class RequestTest extends TestCase
     public function testNullContentType(): void
     {
         $request = Request::create();
-        $request->withContentType();
-        $this->assertNull($request->getContentType());
+        $request->getBody()->withContentType();
+        $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
 
@@ -317,7 +363,7 @@ class RequestTest extends TestCase
         $request = Request::create();
         $request->withExpectedType('json');
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
-        $this->assertNull($request->getContentType());
+        $this->assertNull($request->getBody()->getContentType());
     }
 
     /**
@@ -328,7 +374,7 @@ class RequestTest extends TestCase
         $request = Request::create();
         $request->withExpectedType('application/pdf');
         $this->assertEquals('application/pdf', $request->getExpectedType());
-        $this->assertNull($request->getContentType());
+        $this->assertNull($request->getBody()->getContentType());
     }
 
     /**
@@ -339,7 +385,7 @@ class RequestTest extends TestCase
         $request = Request::create();
         $request->withExpectedType('');
         $this->assertNull($request->getExpectedType());
-        $this->assertNull($request->getContentType());
+        $this->assertNull($request->getBody()->getContentType());
     }
 
     /**
@@ -350,6 +396,6 @@ class RequestTest extends TestCase
         $request = Request::create();
         $request->withExpectedType();
         $this->assertNull($request->getExpectedType());
-        $this->assertNull($request->getContentType());
+        $this->assertNull($request->getBody()->getContentType());
     }
 }

@@ -19,11 +19,6 @@ class Message implements MessageInterface
      */
     private $headers;
 
-    /**
-     * @var string|null
-     */
-    private $contentType;
-
     public function __construct()
     {
         $this->headers = new HeaderCollection();
@@ -114,23 +109,5 @@ class Message implements MessageInterface
     public function withoutHeader(string $name): bool
     {
         return $this->headers->withoutHeader($name);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withContentType(?string $mime = null)
-    {
-        $this->contentType = $mime ? Mime::getMime($mime) : null;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getContentType(): ?string
-    {
-        return $this->contentType;
     }
 }

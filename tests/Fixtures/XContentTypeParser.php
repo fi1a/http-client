@@ -14,7 +14,15 @@ class XContentTypeParser implements ContentTypeParserInterface
     /**
      * @inheritDoc
      */
-    public function parse(string $rawBody)
+    public function decode(string $rawBody)
+    {
+        return $rawBody;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function encode($rawBody): string
     {
         return $rawBody;
     }

@@ -6,6 +6,7 @@ namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Response;
+use Fi1a\HttpClient\ResponseBodyInterface;
 use Fi1a\HttpClient\ResponseInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -74,70 +75,28 @@ class ResponseTest extends TestCase
     }
 
     /**
-     * Тестирование тела ответа
+     * Значение тела ответа по умолчанию
      */
-    public function testWithBody(): void
+    public function testDefaultBody(): void
+    {
+        $response = $this->getResponse();
+        $this->assertInstanceOf(ResponseBodyInterface::class, $response->getBody());
+        $this->assertEquals(null, $response->getBody()->get());
+        $this->assertEquals('', $response->getBody()->getRaw());
+    }
+
+    /**
+     * Значение тела ответа
+     */
+    public function testBody(): void
     {
         $array = ['foo' => 'bar'];
         $json = json_encode($array);
 
         $response = $this->getResponse();
         $response->withBody($json, 'json');
-        $this->assertEquals(MimeInterface::JSON, $response->getContentType());
-        $this->assertEquals($json, $response->getRawBody());
-        $this->assertEquals($array, $response->getBody());
-    }
-
-    /**
-     * Тестирование тела ответа при пустом типе контента
-     */
-    public function testWithBodyWithoutContentType(): void
-    {
-        $content = 'content';
-        $response = $this->getResponse();
-        $response->withBody($content);
-        $this->assertEquals($content, $response->getRawBody());
-        $this->assertEquals($content, $response->getBody());
-    }
-
-    /**
-     * Тестирование тела ответа при пустом теле запроса
-     */
-    public function testWithBodyEmptyContent(): void
-    {
-        $content = '';
-        $response = $this->getResponse();
-        $response->withBody($content);
-        $this->assertEquals($content, $response->getRawBody());
-        $this->assertEquals($content, $response->getBody());
-    }
-
-    /**
-     * Наличие тела ответа по умолчанию
-     */
-    public function testHasBodyDefault(): void
-    {
-        $response = $this->getResponse();
-        $this->assertFalse($response->hasBody());
-    }
-
-    /**
-     * Наличие тела ответа
-     */
-    public function testHasBody(): void
-    {
-        $response = $this->getResponse();
-        $response->withBody('content');
-        $this->assertTrue($response->hasBody());
-    }
-
-    /**
-     * Наличие тела ответа
-     */
-    public function testHasBodyEmptyString(): void
-    {
-        $response = $this->getResponse();
-        $response->withBody('');
-        $this->assertFalse($response->hasBody());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals($json, $response->getBody()->getRaw());
+        $this->assertEquals($array, $response->getBody()->get());
     }
 }

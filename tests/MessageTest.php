@@ -8,7 +8,6 @@ use Fi1a\HttpClient\Header;
 use Fi1a\HttpClient\HeaderInterface;
 use Fi1a\HttpClient\Message;
 use Fi1a\HttpClient\MessageInterface;
-use Fi1a\HttpClient\MimeInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -128,45 +127,5 @@ class MessageTest extends TestCase
         $this->assertTrue($message->withoutHeader('CONTENT-TYPE'));
         $this->assertFalse($message->withoutHeader('CONTENT-TYPE'));
         $this->assertCount(0, $message->getHeader('Content-Type'));
-    }
-
-    /**
-     * Установить content type
-     */
-    public function testContentType(): void
-    {
-        $message = $this->getMessage();
-        $message->withContentType('json');
-        $this->assertEquals(MimeInterface::JSON, $message->getContentType());
-    }
-
-    /**
-     * Установить content type
-     */
-    public function testCustomContentType(): void
-    {
-        $message = $this->getMessage();
-        $message->withContentType('application/pdf');
-        $this->assertEquals('application/pdf', $message->getContentType());
-    }
-
-    /**
-     * Установить content type
-     */
-    public function testEmptyContentType(): void
-    {
-        $message = $this->getMessage();
-        $message->withContentType('');
-        $this->assertNull($message->getContentType());
-    }
-
-    /**
-     * Установить content type
-     */
-    public function testNullContentType(): void
-    {
-        $message = $this->getMessage();
-        $message->withContentType();
-        $this->assertNull($message->getContentType());
     }
 }

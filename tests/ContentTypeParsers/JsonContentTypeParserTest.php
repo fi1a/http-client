@@ -13,13 +13,24 @@ use PHPUnit\Framework\TestCase;
 class JsonContentTypeParserTest extends TestCase
 {
     /**
-     * Парсинг
+     * Декодирование
      */
-    public function testParse(): void
+    public function testDecode(): void
     {
         $array = ['foo' => 'bar'];
         $json = json_encode($array);
         $parser = new JsonContentTypeParser();
-        $this->assertEquals($array, $parser->parse($json));
+        $this->assertEquals($array, $parser->decode($json));
+    }
+
+    /**
+     * Кодирование
+     */
+    public function testEncode(): void
+    {
+        $array = ['foo' => 'bar'];
+        $json = json_encode($array);
+        $parser = new JsonContentTypeParser();
+        $this->assertEquals($json, $parser->encode($array));
     }
 }

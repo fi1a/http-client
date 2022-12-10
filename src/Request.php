@@ -27,13 +27,14 @@ class Request extends Message implements RequestInterface
     private $expectedType;
 
     /**
-     * @var mixed
+     * @var RequestBodyInterface
      */
-    private $payload;
+    private $body;
 
     protected function __construct()
     {
         parent::__construct();
+        $this->body = new RequestBody();
         $this->withMethod(HttpInterface::GET)
             ->withUri(new Uri());
     }
@@ -95,6 +96,10 @@ class Request extends Message implements RequestInterface
      */
     public function post($uri, $payload = null, ?string $mime = null)
     {
+        if (!$mime) {
+            $mime = 'form';
+        }
+
         $this->withMethod(HttpInterface::POST)
             ->withUri($this->createUri($uri))
             ->withBody($payload, $mime);
@@ -107,6 +112,10 @@ class Request extends Message implements RequestInterface
      */
     public function put($uri, $payload = null, ?string $mime = null)
     {
+        if (!$mime) {
+            $mime = 'form';
+        }
+
         $this->withMethod(HttpInterface::PUT)
             ->withUri($this->createUri($uri))
             ->withBody($payload, $mime);
@@ -165,8 +174,10 @@ class Request extends Message implements RequestInterface
      */
     public function withMime(?string $mime = null)
     {
-        return $this->withContentType($mime)
-            ->withExpectedType($mime);
+        $this->body->withContentType($mime);
+        $this->withExpectedType($mime);
+
+        return $this;
     }
 
     /**
@@ -190,10 +201,10 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function withBody($payload, ?string $mime = null)
+    public function withBody($rawBody, ?string $mime = null)
     {
-        $this->payload = $payload;
-        $this->withMime($mime);
+        $this->body->withBody($rawBody, $mime);
+        $this->withExpectedType($mime);
 
         return $this;
     }
@@ -201,9 +212,9 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function getPayload()
+    public function getBody(): RequestBodyInterface
     {
-        return $this->payload;
+        return $this->body;
     }
 
     /**

@@ -12,8 +12,16 @@ class JsonContentTypeParser implements ContentTypeParserInterface
     /**
      * @inheritDoc
      */
-    public function parse(string $rawBody)
+    public function decode(string $rawBody)
     {
         return json_decode($rawBody, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function encode($rawBody): string
+    {
+        return json_encode($rawBody);
     }
 }

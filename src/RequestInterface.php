@@ -128,16 +128,16 @@ interface RequestInterface extends MessageInterface
     /**
      * Тело запроса
      *
-     * @param mixed $payload
+     * @param mixed $rawBody
      *
      * @return $this
      */
-    public function withBody($payload, ?string $mime = null);
+    public function withBody($rawBody, ?string $mime = null);
 
     /**
      * Возвращает payload
      *
      * @return mixed
      */
-    public function getPayload();
+    public function getBody(): RequestBodyInterface;
 }

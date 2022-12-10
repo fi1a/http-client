@@ -10,9 +10,16 @@ namespace Fi1a\HttpClient\ContentTypeParsers;
 interface ContentTypeParserInterface
 {
     /**
-     * Осуществляет парсинг контента
+     * Осуществляет декодирование контента
      *
      * @return mixed
      */
-    public function parse(string $rawBody);
+    public function decode(string $rawBody);
+
+    /**
+     * Осуществляет кодирование контента
+     *
+     * @param mixed $rawBody
+     */
+    public function encode($rawBody): string;
 }

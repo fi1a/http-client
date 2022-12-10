@@ -39,19 +39,7 @@ interface ResponseInterface extends MessageInterface
     public function withBody(string $rawBody, ?string $mime = null);
 
     /**
-     * Есть тело ответа или нет
-     */
-    public function hasBody(): bool;
-
-    /**
      * Возвращает тело ответа
-     *
-     * @return mixed
      */
-    public function getBody();
-
-    /**
-     * Возвращает тело ответа без примененного преобразования
-     */
-    public function getRawBody(): string;
+    public function getBody(): ResponseBodyInterface;
 }

@@ -22,15 +22,15 @@ class Response extends Message implements ResponseInterface
     private $reasonPhrase;
 
     /**
-     * @var mixed
-     * @psalm-suppress PropertyNotSetInConstructor
+     * @var ResponseBodyInterface
      */
     private $body;
 
-    /**
-     * @var string
-     */
-    private $rawBody = '';
+    public function __construct()
+    {
+        parent::__construct();
+        $this->body = new ResponseBody();
+    }
 
     /**
      * @inheritDoc
@@ -75,19 +75,7 @@ class Response extends Message implements ResponseInterface
      */
     public function withBody(string $rawBody, ?string $mime = null)
     {
-        if (!is_null($mime)) {
-            $this->withContentType($mime);
-        }
-
-        $this->rawBody = $rawBody;
-        $this->body = $rawBody;
-        $contentType = $this->getContentType();
-        if ($contentType) {
-            $parser = ParserRegistry::get($contentType);
-            if ($parser) {
-                $this->body = $parser->parse($rawBody);
-            }
-        }
+        $this->body->withBody($rawBody, $mime);
 
         return $this;
     }
@@ -95,24 +83,8 @@ class Response extends Message implements ResponseInterface
     /**
      * @inheritDoc
      */
-    public function hasBody(): bool
-    {
-        return $this->rawBody !== '';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getBody()
+    public function getBody(): ResponseBodyInterface
     {
         return $this->body;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getRawBody(): string
-    {
-        return $this->rawBody;
     }
 }

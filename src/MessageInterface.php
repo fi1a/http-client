@@ -62,16 +62,4 @@ interface MessageInterface
      * Удаляет заголовок с определенным именем
      */
     public function withoutHeader(string $name): bool;
-
-    /**
-     * Устанавливаем content type
-     *
-     * @return $this
-     */
-    public function withContentType(?string $mime = null);
-
-    /**
-     * Content type
-     */
-    public function getContentType(): ?string;
 }
