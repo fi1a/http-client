@@ -16,7 +16,8 @@ https.createServer(options, app).listen(port, () => {
 });
 
 app.get('/200-ok-text-plain', (req, res) => {
-    res.status(200).setHeader('Content-Type', 'text/plain').send('success');
+    res.status(200).setHeader('Content-Type', 'text/plain');
+    res.send('success');
 });
 
 app.get('/200-ok-json', (req, res) => {
