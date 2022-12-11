@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
-use Fi1a\HttpClient\Handlers\HandlerInterface;
 use Fi1a\HttpClient\RequestMiddleware\RequestMiddlewareInterface;
 use Fi1a\HttpClient\ResponseMiddleware\ResponseMiddlewareInterface;
 
@@ -13,7 +12,7 @@ use Fi1a\HttpClient\ResponseMiddleware\ResponseMiddlewareInterface;
  */
 interface HttpClientInterface
 {
-    public function __construct(HandlerInterface $handler);
+    public function __construct(ConfigInterface $config, string $handler);
 
     /**
      * Добавить промежуточное ПО для запроса

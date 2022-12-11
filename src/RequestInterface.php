@@ -41,31 +41,31 @@ interface RequestInterface extends MessageInterface
      * HTTP Метод Post
      *
      * @param string|UriInterface $uri
-     * @param mixed $payload
+     * @param mixed               $rawBody
      *
      * @return $this
      */
-    public function post($uri, $payload = null, ?string $mime = null);
+    public function post($uri, $rawBody = null, ?string $mime = null);
 
     /**
      * HTTP Метод Put
      *
      * @param string|UriInterface $uri
-     * @param mixed $payload
+     * @param mixed               $rawBody
      *
      * @return $this
      */
-    public function put($uri, $payload = null, ?string $mime = null);
+    public function put($uri, $rawBody = null, ?string $mime = null);
 
     /**
      * HTTP Метод Patch
      *
      * @param string|UriInterface $uri
-     * @param mixed $payload
+     * @param mixed               $rawBody
      *
      * @return $this
      */
-    public function patch($uri, $payload = null, ?string $mime = null);
+    public function patch($uri, $rawBody = null, ?string $mime = null);
 
     /**
      * HTTP Метод Delete
@@ -136,8 +136,6 @@ interface RequestInterface extends MessageInterface
 
     /**
      * Возвращает payload
-     *
-     * @return mixed
      */
     public function getBody(): RequestBodyInterface;
 }

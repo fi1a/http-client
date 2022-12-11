@@ -1,0 +1,107 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Fi1a\Unit\HttpClient\Handlers;
+
+use Fi1a\HttpClient\Config;
+use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
+use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
+use Fi1a\HttpClient\Handlers\Exceptions\TimeoutErrorException;
+use Fi1a\HttpClient\Handlers\HandlerInterface;
+use Fi1a\HttpClient\Handlers\StreamHandler;
+use Fi1a\HttpClient\MimeInterface;
+use Fi1a\HttpClient\Request;
+use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;
+
+/**
+ * Stream-обработчик запросов
+ */
+class StreamHandlerTest extends ServerTestCase
+{
+    /**
+     * Возвращает обработчик запросов
+     */
+    private function getHandler(): HandlerInterface
+    {
+        return new StreamHandler(new Config(['ssl_verify' => false]));
+    }
+
+    /**
+     * Исключение при соединении
+     */
+    public function testConnectErrorException(): void
+    {
+        $this->expectException(ConnectionErrorException::class);
+        $handler = $this->getHandler();
+        $request = Request::create()->get('https://127.0.0.1:10/');
+        $handler->send($request);
+    }
+
+    /**
+     * POST запрос
+     */
+    public function testPostSend(): void
+    {
+        $handler = $this->getHandler();
+        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
+        $response = $handler->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
+        $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * POST запрос
+     */
+    public function testGetSendNullContentLenght(): void
+    {
+        $handler = $this->getHandler();
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-null-content-length');
+        $response = $handler->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+        $this->assertIsString($response->getBody()->get());
+        $this->assertIsString($response->getBody()->getRaw());
+        $this->assertEquals(1000000, mb_strlen($response->getBody()->get()));
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Ошибка при чтении заголовков
+     */
+    public function testReadHeaderException(): void
+    {
+        $this->expectException(ErrorException::class);
+        $handler = $this->getMockBuilder(StreamHandler::class)
+            ->setConstructorArgs([new Config(['ssl_verify' => false])])
+            ->onlyMethods(['readContentLine'])
+            ->getMock();
+
+        $handler->method('readContentLine')->willReturn(false);
+        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
+        $handler->send($request);
+    }
+
+    /**
+     * Ошибка при чтении заголовков
+     */
+    public function testReadHeaderTimeoutException(): void
+    {
+        $this->expectException(TimeoutErrorException::class);
+        $handler = $this->getMockBuilder(StreamHandler::class)
+            ->setConstructorArgs([new Config(['ssl_verify' => false,])])
+            ->onlyMethods(['getMetaData'])
+            ->getMock();
+
+        $handler->method('getMetaData')->willReturn(['timed_out' => 20]);
+        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
+        $handler->send($request);
+    }
+}

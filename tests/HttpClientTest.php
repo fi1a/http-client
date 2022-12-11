@@ -1,0 +1,108 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Fi1a\Unit\HttpClient;
+
+use Fi1a\HttpClient\Config;
+use Fi1a\HttpClient\Handlers\StreamHandler;
+use Fi1a\HttpClient\HttpClient;
+use Fi1a\HttpClient\HttpClientInterface;
+use Fi1a\HttpClient\MimeInterface;
+use Fi1a\HttpClient\Request;
+use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;
+use InvalidArgumentException;
+
+/**
+ * HTTP-client
+ */
+class HttpClientTest extends ServerTestCase
+{
+    /**
+     * Возвращает HTTP-client
+     */
+    private function getStreamClient(): HttpClientInterface
+    {
+        return new HttpClient(new Config(['ssl_verify' => false]), StreamHandler::class);
+    }
+
+    /**
+     * Настроенные клиенты для тестов
+     *
+     * @return HttpClientInterface[][]
+     */
+    public function clientDataProvider(): array
+    {
+        return [
+            [
+                $this->getStreamClient(),
+            ],
+        ];
+    }
+
+    /**
+     * Отправка запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testSendEmptyHostException(HttpClientInterface $client): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $request = Request::create()->get('https');
+        $client->send($request);
+    }
+
+    /**
+     * Отправка GET запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testGetSendTextPlainResponse(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::PLAIN, $response->getBody()->getContentType());
+        $this->assertEquals('success', $response->getBody()->get());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Отправка GET запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testGetSendJsonResponse(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-json');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
+        $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Отправка POST запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testPostSend(HttpClientInterface $client): void
+    {
+        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
+        $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+}

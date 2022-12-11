@@ -34,7 +34,7 @@ class Request extends Message implements RequestInterface
     protected function __construct()
     {
         parent::__construct();
-        $this->body = new RequestBody();
+        $this->body = new RequestBody($this);
         $this->withMethod(HttpInterface::GET)
             ->withUri(new Uri());
     }
@@ -94,7 +94,7 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function post($uri, $payload = null, ?string $mime = null)
+    public function post($uri, $rawBody = null, ?string $mime = null)
     {
         if (!$mime) {
             $mime = 'form';
@@ -102,7 +102,7 @@ class Request extends Message implements RequestInterface
 
         $this->withMethod(HttpInterface::POST)
             ->withUri($this->createUri($uri))
-            ->withBody($payload, $mime);
+            ->withBody($rawBody, $mime);
 
         return $this;
     }
@@ -110,7 +110,7 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function put($uri, $payload = null, ?string $mime = null)
+    public function put($uri, $rawBody = null, ?string $mime = null)
     {
         if (!$mime) {
             $mime = 'form';
@@ -118,7 +118,7 @@ class Request extends Message implements RequestInterface
 
         $this->withMethod(HttpInterface::PUT)
             ->withUri($this->createUri($uri))
-            ->withBody($payload, $mime);
+            ->withBody($rawBody, $mime);
 
         return $this;
     }
@@ -126,11 +126,11 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function patch($uri, $payload = null, ?string $mime = null)
+    public function patch($uri, $rawBody = null, ?string $mime = null)
     {
         $this->withMethod(HttpInterface::PATCH)
             ->withUri($this->createUri($uri))
-            ->withBody($payload, $mime);
+            ->withBody($rawBody, $mime);
 
         return $this;
     }
@@ -186,6 +186,12 @@ class Request extends Message implements RequestInterface
     public function withExpectedType(?string $mime = null)
     {
         $this->expectedType = $mime ? Mime::getMime($mime) : null;
+
+        $this->withoutHeader('Accept');
+
+        if ($this->expectedType) {
+            $this->withHeader('Accept', $this->expectedType);
+        }
 
         return $this;
     }

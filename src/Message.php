@@ -19,6 +19,11 @@ class Message implements MessageInterface
      */
     private $headers;
 
+    /**
+     * @var string
+     */
+    private $encoding = 'utf-8';
+
     public function __construct()
     {
         $this->headers = new HeaderCollection();
@@ -38,6 +43,24 @@ class Message implements MessageInterface
     public function withProtocolVersion(string $version)
     {
         $this->protocol = $version;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getEncoding(): string
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function withEncoding(string $encoding)
+    {
+        $this->encoding = $encoding;
 
         return $this;
     }

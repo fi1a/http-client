@@ -128,4 +128,23 @@ class MessageTest extends TestCase
         $this->assertFalse($message->withoutHeader('CONTENT-TYPE'));
         $this->assertCount(0, $message->getHeader('Content-Type'));
     }
+
+    /**
+     * Возвращает кодировку по умолчанию
+     */
+    public function testDefaultEncoding(): void
+    {
+        $message = $this->getMessage();
+        $this->assertEquals('utf-8', $message->getEncoding());
+    }
+
+    /**
+     * Возвращает кодировку по умолчанию
+     */
+    public function testEncoding(): void
+    {
+        $message = $this->getMessage();
+        $message->withEncoding('windows-1251');
+        $this->assertEquals('windows-1251', $message->getEncoding());
+    }
 }

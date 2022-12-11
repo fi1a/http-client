@@ -21,6 +21,16 @@ class RequestBody extends AbstractBody implements RequestBodyInterface
     private $raw;
 
     /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    public function __construct(RequestInterface $request)
+    {
+        $this->request = $request;
+    }
+
+    /**
      * @inheritDoc
      */
     public function withBody($raw, ?string $mime = null): void
@@ -77,6 +87,22 @@ class RequestBody extends AbstractBody implements RequestBodyInterface
             if ($parser) {
                 $this->body = $parser->encode($this->raw);
             }
+        }
+
+        $this->request->withoutHeader('Content-Type');
+        $this->request->withoutHeader('Content-Length');
+        if (!$contentType) {
+            $contentType = MimeInterface::HTML;
+            if (
+                $this->request->getMethod() === HttpInterface::POST
+                || $this->request->getMethod() === HttpInterface::PUT
+            ) {
+                $contentType = MimeInterface::FORM;
+            }
+        }
+        $this->request->withHeader('Content-Type', $contentType);
+        if ($this->getSize()) {
+            $this->request->withHeader('Content-Length', (string) $this->getSize());
         }
     }
 }

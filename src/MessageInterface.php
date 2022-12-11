@@ -22,6 +22,18 @@ interface MessageInterface
     public function withProtocolVersion(string $version);
 
     /**
+     * Возвращает кодировку запроса
+     */
+    public function getEncoding(): string;
+
+    /**
+     * Устанавливает кодировку
+     *
+     * @return $this
+     */
+    public function withEncoding(string $encoding);
+
+    /**
      * Возвращает коллекцию заголовков
      */
     public function getHeaders(): HeaderCollectionInterface;
