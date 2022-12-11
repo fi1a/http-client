@@ -22,7 +22,7 @@
     "phpunit/phpunit": "^9.5",
     "slevomat/coding-standard": "^8.6",
     "squizlabs/php_codesniffer": "^3.7",
-    "vimeo/psalm": "^5.1",
+    "vimeo/psalm": "^4.3",
     "captainhook/captainhook": "^5.11",
     "phpmd/phpmd" : "^2.13",
     "ext-posix": "*"

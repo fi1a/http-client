@@ -271,7 +271,7 @@ class StreamHandler extends AbstractHandler
     /**
      * Создать контекст
      *
-     * @param string[] $options
+     * @param string[][] $options
      *
      * @return resource
      */
