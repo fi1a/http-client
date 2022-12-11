@@ -40,7 +40,8 @@ class Server implements ServerInterface
 
         $output = [];
         exec(
-            'node ' . __DIR__ . '/server.js ' . $port . ' >> ' . $logFilePath . ' 2>&1 & echo $!',
+            'node ' . str_replace(' ', '\ ', __DIR__)
+            . '/server.js ' . $port . ' >> ' . $logFilePath . ' 2>&1 & echo $!',
             $output
         );
         sleep(1);
