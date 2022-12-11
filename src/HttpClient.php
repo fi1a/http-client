@@ -59,7 +59,8 @@ class HttpClient implements HttpClientInterface
         if (!$request->getUri()->getHost()) {
             throw new InvalidArgumentException('Не передан хост для запроса');
         }
-        $this->addHeaders($request);
+        $this->addDefaultHeaders($request);
+        $this->addContentHeaders($request);
         $instance = $this->factoryHandler();
 
         return $instance->send($request);
@@ -124,13 +125,36 @@ class HttpClient implements HttpClientInterface
     /**
      * Добавить заголовки
      */
-    private function addHeaders(RequestInterface $request): void
+    private function addDefaultHeaders(RequestInterface $request): void
     {
         if (!$request->hasHeader('Host')) {
             $request->withHeader('Host', $request->getUri()->getHost());
         }
         if (!$request->hasHeader('Connection')) {
             $request->withHeader('Connection', 'close');
+        }
+    }
+
+    /**
+     * Добавить заголовки
+     */
+    private function addContentHeaders(RequestInterface $request): void
+    {
+        if (!$request->hasHeader('Accept') && $request->getExpectedType()) {
+            $request->withHeader('Accept', (string) $request->getExpectedType());
+        }
+        if (!$request->hasHeader('Content-Type')) {
+            $contentType = $request->getBody()->getContentType();
+            if (!$contentType) {
+                $contentType = MimeInterface::PLAIN;
+                if ($request->getMethod() === HttpInterface::POST || $request->getMethod() === HttpInterface::PUT) {
+                    $contentType = MimeInterface::FORM;
+                }
+            }
+            $request->withHeader('Content-Type', $contentType);
+        }
+        if (!$request->hasHeader('Content-Length') && $request->getBody()->getSize()) {
+            $request->withHeader('Content-Length', (string) $request->getBody()->getSize());
         }
     }
 

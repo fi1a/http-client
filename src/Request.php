@@ -34,7 +34,7 @@ class Request extends Message implements RequestInterface
     protected function __construct()
     {
         parent::__construct();
-        $this->body = new RequestBody($this);
+        $this->body = new RequestBody();
         $this->withMethod(HttpInterface::GET)
             ->withUri(new Uri());
     }

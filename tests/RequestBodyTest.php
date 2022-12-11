@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient;
 
-use Fi1a\HttpClient\HttpInterface;
-use Fi1a\HttpClient\Mime;
 use Fi1a\HttpClient\MimeInterface;
-use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\RequestBody;
 use Fi1a\HttpClient\RequestBodyInterface;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +19,7 @@ class RequestBodyTest extends TestCase
      */
     private function getRequestBody(): RequestBodyInterface
     {
-        return new RequestBody(Request::create());
+        return new RequestBody();
     }
 
     /**
@@ -125,57 +122,5 @@ class RequestBodyTest extends TestCase
         $body = $this->getRequestBody();
         $body->withBody($array, 'json');
         $this->assertEquals(mb_strlen($json), $body->getSize());
-    }
-
-    /**
-     * Устанавливаемын заголовки размер запроса
-     */
-    public function testHeaderContentLength(): void
-    {
-        $request = Request::create()->withMethod(HttpInterface::POST);
-        $body = new RequestBody($request);
-        $body->withBody(['foo' => 'bar'], Mime::JSON);
-        $this->assertTrue($request->hasHeader('Content-Length'));
-        $header = $request->getLastHeader('Content-Length');
-        $this->assertEquals((string) $body->getSize(), $header->getValue());
-    }
-
-    /**
-     * Устанавливаемын заголовки по умолчанию
-     */
-    public function testHeaderContentTypePlainText(): void
-    {
-        $request = Request::create();
-        $body = new RequestBody($request);
-        $body->withBody('foo');
-        $this->assertTrue($request->hasHeader('Content-Type'));
-        $header = $request->getLastHeader('Content-Type');
-        $this->assertEquals(MimeInterface::HTML, $header->getValue());
-    }
-
-    /**
-     * Устанавливаемын заголовки при POST запросе
-     */
-    public function testHeaderContentTypeFormPost(): void
-    {
-        $request = Request::create()->withMethod(HttpInterface::POST);
-        $body = new RequestBody($request);
-        $body->withBody(['foo' => 'bar']);
-        $this->assertTrue($request->hasHeader('Content-Type'));
-        $header = $request->getLastHeader('Content-Type');
-        $this->assertEquals(MimeInterface::FORM, $header->getValue());
-    }
-
-    /**
-     * Устанавливаемын заголовки при PUT запросе
-     */
-    public function testHeaderContentTypeFormPut(): void
-    {
-        $request = Request::create()->withMethod(HttpInterface::PUT);
-        $body = new RequestBody($request);
-        $body->withBody(['foo' => 'bar']);
-        $this->assertTrue($request->hasHeader('Content-Type'));
-        $header = $request->getLastHeader('Content-Type');
-        $this->assertEquals(MimeInterface::FORM, $header->getValue());
     }
 }
