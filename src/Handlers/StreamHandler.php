@@ -26,10 +26,8 @@ class StreamHandler extends AbstractHandler
     /**
      * @inheritDoc
      */
-    public function send(RequestInterface $request): ResponseInterface
+    public function send(RequestInterface $request, Response $response): ResponseInterface
     {
-        $response = new Response();
-
         $resource = $this->connect($request->getUri());
         $this->sendRequest($resource, $request);
         $this->getHeaders($resource, $response);

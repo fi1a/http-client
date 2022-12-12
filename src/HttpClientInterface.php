@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
-use Fi1a\HttpClient\RequestMiddleware\RequestMiddlewareInterface;
-use Fi1a\HttpClient\ResponseMiddleware\ResponseMiddlewareInterface;
+use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
 
 /**
  * HTTP-client
@@ -19,14 +18,14 @@ interface HttpClientInterface
      *
      * @return $this
      */
-    public function addRequestMiddleware(RequestMiddlewareInterface $middleware);
+    public function addRequestMiddleware(MiddlewareInterface $middleware, int $sort = 500);
 
     /**
      * Добавить промежуточное ПО для ответа
      *
      * @return $this
      */
-    public function addResponseMiddleware(ResponseMiddlewareInterface $middleware);
+    public function addResponseMiddleware(MiddlewareInterface $middleware, int $sort = 500);
 
     /**
      * Отправляет запрос

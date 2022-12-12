@@ -12,6 +12,7 @@ use Fi1a\HttpClient\Handlers\HandlerInterface;
 use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
+use Fi1a\HttpClient\Response;
 use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;
 
 /**
@@ -35,7 +36,7 @@ class StreamHandlerTest extends ServerTestCase
         $this->expectException(ConnectionErrorException::class);
         $handler = $this->getHandler();
         $request = Request::create()->get('https://127.0.0.1:10/');
-        $handler->send($request);
+        $handler->send($request, new Response());
     }
 
     /**
@@ -47,7 +48,7 @@ class StreamHandlerTest extends ServerTestCase
         $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
         $request->withHeader('Content-Type', $request->getBody()->getContentType());
         $request->withHeader('Content-Length', (string) $request->getBody()->getSize());
-        $response = $handler->send($request);
+        $response = $handler->send($request, new Response());
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
@@ -64,7 +65,7 @@ class StreamHandlerTest extends ServerTestCase
     {
         $handler = $this->getHandler();
         $request = Request::create()->get('https://' . self::HOST . '/200-ok-null-content-length');
-        $response = $handler->send($request);
+        $response = $handler->send($request, new Response());
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
@@ -88,7 +89,7 @@ class StreamHandlerTest extends ServerTestCase
 
         $handler->method('readContentLine')->willReturn(false);
         $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
-        $handler->send($request);
+        $handler->send($request, new Response());
     }
 
     /**
@@ -104,6 +105,6 @@ class StreamHandlerTest extends ServerTestCase
 
         $handler->method('getMetaData')->willReturn(['timed_out' => 20]);
         $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
-        $handler->send($request);
+        $handler->send($request, new Response());
     }
 }

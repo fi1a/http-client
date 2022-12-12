@@ -11,6 +11,8 @@ use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Uri;
+use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\Set500StatusMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\StopMiddleware;
 use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;
 use InvalidArgumentException;
 
@@ -241,7 +243,7 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
-     * Отправка GET запроса
+     * 404 статус ответа
      *
      * @dataProvider clientDataProvider
      */
@@ -255,5 +257,32 @@ class HttpClientTest extends ServerTestCase
         $this->assertTrue($response->getBody()->has());
         $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
         $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Промежуточное ПО для запроса (останаливает запрос)
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testStopMiddleware(HttpClientInterface $client): void
+    {
+        $client->addRequestMiddleware(new StopMiddleware());
+        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain');
+        $this->assertEquals(0, $response->getStatusCode());
+        $this->assertEquals('', $response->getReasonPhrase());
+        $this->assertFalse($response->getBody()->has());
+    }
+
+    /**
+     * Промежуточное ПО для запроса (сортировка)
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testSortMiddleware(HttpClientInterface $client): void
+    {
+        $client->addRequestMiddleware(new StopMiddleware(), 600);
+        $client->addRequestMiddleware(new Set500StatusMiddleware(), 100);
+        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain');
+        $this->assertEquals(500, $response->getStatusCode());
     }
 }

@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\HttpClient;
 
 use Fi1a\HttpClient\Handlers\HandlerInterface;
-use Fi1a\HttpClient\RequestMiddleware\RequestMiddlewareInterface;
-use Fi1a\HttpClient\ResponseMiddleware\ResponseMiddlewareInterface;
+use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
 use InvalidArgumentException;
 
 /**
@@ -24,6 +23,11 @@ class HttpClient implements HttpClientInterface
      */
     private $config;
 
+    /**
+     * @var MiddlewareInterface[][]|int[][]
+     */
+    private $requestMiddlewares = [];
+
     public function __construct(ConfigInterface $config, string $handler)
     {
         if (!is_subclass_of($handler, HandlerInterface::class)) {
@@ -39,15 +43,18 @@ class HttpClient implements HttpClientInterface
      * @inheritDoc
      * @psalm-suppress InvalidReturnType
      */
-    public function addRequestMiddleware(RequestMiddlewareInterface $middleware)
+    public function addRequestMiddleware(MiddlewareInterface $middleware, int $sort = 500)
     {
+        $this->requestMiddlewares[] = [$middleware, $sort,];
+
+        return $this;
     }
 
     /**
      * @inheritDoc
      * @psalm-suppress InvalidReturnType
      */
-    public function addResponseMiddleware(ResponseMiddlewareInterface $middleware)
+    public function addResponseMiddleware(MiddlewareInterface $middleware, int $sort = 500)
     {
     }
 
@@ -59,11 +66,21 @@ class HttpClient implements HttpClientInterface
         if (!$request->getUri()->getHost()) {
             throw new InvalidArgumentException('Не передан хост для запроса');
         }
+
+        $response = new Response();
+
         $this->addDefaultHeaders($request);
         $this->addContentHeaders($request);
+
+        if ($this->callRequestMiddlewares($request, $response) === false) {
+            return $response;
+        }
+
         $instance = $this->factoryHandler();
 
-        return $instance->send($request);
+        $response = $instance->send($request, $response);
+
+        return $response;
     }
 
     /**
@@ -170,5 +187,31 @@ class HttpClient implements HttpClientInterface
         $instance = new $this->handler($this->config);
 
         return $instance;
+    }
+
+    /**
+     * Вызывает промежуточное ПО запросов
+     */
+    private function callRequestMiddlewares(RequestInterface $request, Response $response): bool
+    {
+        $middlewares = $this->requestMiddlewares;
+        usort(
+            $middlewares, /**
+            @psalm-param $itemA array<array-key, Fi1a\HttpClient\Middlewares\MiddlewareInterface|int>
+            @psalm-param $itemB array<array-key, Fi1a\HttpClient\Middlewares\MiddlewareInterface|int>
+            */
+            function (array $itemA, array $itemB): int {
+                return (int) $itemA[1] - (int) $itemB[1];
+            }
+        );
+        foreach ($middlewares as $item) {
+            [$middleware,] = $item;
+            assert($middleware instanceof MiddlewareInterface);
+            if ($middleware->process($request, $response) === false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
