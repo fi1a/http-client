@@ -44,6 +44,11 @@ app.head('/200-ok-head', (req, res) => {
     res.status(200).send('success');
 });
 
+app.options('/200-ok-options', (req, res) => {
+    res.status(200).setHeader('Content-Type', 'text/plain');
+    res.send('success');
+});
+
 app.get('/200-ok-null-content-length', (req, res) => {
     res.status(200).send(new Array(1000001).join('r'));
 });

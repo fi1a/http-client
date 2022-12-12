@@ -222,4 +222,21 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertFalse($response->getBody()->has());
     }
+
+    /**
+     * Отправка OPTIONS запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testOptions(HttpClientInterface $client): void
+    {
+        $response = $client->options('https://' . self::HOST . '/200-ok-options');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::PLAIN, $response->getBody()->getContentType());
+        $this->assertEquals('success', $response->getBody()->get());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
 }
