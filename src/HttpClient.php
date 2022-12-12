@@ -84,10 +84,10 @@ class HttpClient implements HttpClientInterface
 
     /**
      * @inheritDoc
-     * @psalm-suppress InvalidReturnType
      */
     public function put($uri, $body = null, ?string $mime = null): ResponseInterface
     {
+        return $this->send(Request::create()->put($uri, $body, $mime));
     }
 
     /**
