@@ -167,4 +167,25 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
         $this->assertEquals('utf-8', $response->getEncoding());
     }
+
+    /**
+     * Отправка PATCH запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testPatch(HttpClientInterface $client): void
+    {
+        $response = $client->patch(
+            'https://' . self::HOST . '/200-ok-patch',
+            ['foo' => 'bar'],
+            'form'
+        );
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
+        $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
 }

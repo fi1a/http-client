@@ -32,6 +32,10 @@ app.put('/200-ok-put', urlencodedParser, (req, res) => {
     res.status(200).json({'foo' : req.body.foo});
 });
 
+app.patch('/200-ok-patch', urlencodedParser, (req, res) => {
+    res.status(200).json({'foo' : req.body.foo});
+});
+
 app.get('/200-ok-null-content-length', (req, res) => {
     res.status(200).send(new Array(1000001).join('r'));
 });

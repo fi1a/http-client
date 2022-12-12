@@ -92,10 +92,10 @@ class HttpClient implements HttpClientInterface
 
     /**
      * @inheritDoc
-     * @psalm-suppress InvalidReturnType
      */
     public function patch($uri, $body = null, ?string $mime = null): ResponseInterface
     {
+        return $this->send(Request::create()->patch($uri, $body, $mime));
     }
 
     /**
