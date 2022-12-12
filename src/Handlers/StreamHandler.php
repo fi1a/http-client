@@ -151,9 +151,9 @@ class StreamHandler extends AbstractHandler
             /**
              * @psalm-suppress PossiblyFalseArgument
              */
-            if (preg_match('#HTTP/(\S+) (\d+) (\w+)#', $headerLine, $httpVersionAndStatus)) {
+            if (preg_match('#^HTTP/(\S+) (\d+) (.+)\r\n$#', $headerLine, $httpVersionAndStatus)) {
                 $response->withStatus((int) $httpVersionAndStatus[2], $httpVersionAndStatus[3]);
-                $response->withProtocolVersion($httpVersionAndStatus[1]);
+                $response->withProtocolVersion(trim($httpVersionAndStatus[1]));
 
                 continue;
             }

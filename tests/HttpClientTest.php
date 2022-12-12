@@ -239,4 +239,21 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals('success', $response->getBody()->getRaw());
         $this->assertEquals('utf-8', $response->getEncoding());
     }
+
+    /**
+     * Отправка GET запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function test404Status(HttpClientInterface $client): void
+    {
+        $uri = new Uri('https://' . self::HOST . '/404-not-found');
+        $uri->withQueryParams(['foo' => 'bar']);
+        $response = $client->get($uri);
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('Not Found', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
 }
