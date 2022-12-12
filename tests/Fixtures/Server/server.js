@@ -37,8 +37,11 @@ app.patch('/200-ok-patch', urlencodedParser, (req, res) => {
 });
 
 app.delete('/200-ok-delete', (req, res) => {
-    console.log(req.query)
     res.status(200).json({'foo' : req.query.foo});
+});
+
+app.head('/200-ok-head', (req, res) => {
+    res.status(200).send('success');
 });
 
 app.get('/200-ok-null-content-length', (req, res) => {

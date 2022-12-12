@@ -192,7 +192,7 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
-     * Отправка PATCH запроса
+     * Отправка DELETE запроса
      *
      * @dataProvider clientDataProvider
      */
@@ -208,5 +208,18 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
         $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
         $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Отправка HEAD запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testHead(HttpClientInterface $client): void
+    {
+        $response = $client->head('https://' . self::HOST . '/200-ok-head');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertFalse($response->getBody()->has());
     }
 }

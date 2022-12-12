@@ -32,7 +32,7 @@ class StreamHandler extends AbstractHandler
 
         $resource = $this->connect($request->getUri());
         $this->sendRequest($resource, $request);
-        $this->responseHeaders($resource, $response);
+        $this->getHeaders($resource, $response);
         $rawBody = $this->getRawBody($resource, $response);
         $this->setRawBody($rawBody, $response);
         $this->disconnect($resource);
@@ -138,7 +138,7 @@ class StreamHandler extends AbstractHandler
      * @throws ErrorException
      * @throws TimeoutErrorException
      */
-    private function responseHeaders($resource, ResponseInterface $response): void
+    private function getHeaders($resource, ResponseInterface $response): void
     {
         while (!feof($resource)) {
             $headerLine = $this->readContentLine($resource, self::STREAM_READ_LENGTH);

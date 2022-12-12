@@ -108,10 +108,10 @@ class HttpClient implements HttpClientInterface
 
     /**
      * @inheritDoc
-     * @psalm-suppress InvalidReturnType
      */
     public function head($uri): ResponseInterface
     {
+        return $this->send(Request::create()->head($uri));
     }
 
     /**
