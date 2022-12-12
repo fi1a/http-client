@@ -76,9 +76,17 @@ class HttpClient implements HttpClientInterface
 
     /**
      * @inheritDoc
+     */
+    public function post($uri, $body = null, ?string $mime = null): ResponseInterface
+    {
+        return $this->send(Request::create()->post($uri, $body, $mime));
+    }
+
+    /**
+     * @inheritDoc
      * @psalm-suppress InvalidReturnType
      */
-    public function post($uri, $payload = null, ?string $mime = null): ResponseInterface
+    public function put($uri, $body = null, ?string $mime = null): ResponseInterface
     {
     }
 
@@ -86,15 +94,7 @@ class HttpClient implements HttpClientInterface
      * @inheritDoc
      * @psalm-suppress InvalidReturnType
      */
-    public function put($uri, $payload = null, ?string $mime = null): ResponseInterface
-    {
-    }
-
-    /**
-     * @inheritDoc
-     * @psalm-suppress InvalidReturnType
-     */
-    public function patch($uri, $payload = null, ?string $mime = null): ResponseInterface
+    public function patch($uri, $body = null, ?string $mime = null): ResponseInterface
     {
     }
 

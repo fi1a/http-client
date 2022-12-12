@@ -44,25 +44,25 @@ interface HttpClientInterface
      * HTTP Метод Post
      *
      * @param string|UriInterface $uri
-     * @param mixed $payload
+     * @param mixed               $body
      */
-    public function post($uri, $payload = null, ?string $mime = null): ResponseInterface;
+    public function post($uri, $body = null, ?string $mime = null): ResponseInterface;
 
     /**
      * HTTP Метод Put
      *
      * @param string|UriInterface $uri
-     * @param mixed $payload
+     * @param mixed               $body
      */
-    public function put($uri, $payload = null, ?string $mime = null): ResponseInterface;
+    public function put($uri, $body = null, ?string $mime = null): ResponseInterface;
 
     /**
      * HTTP Метод Patch
      *
      * @param string|UriInterface $uri
-     * @param mixed $payload
+     * @param mixed               $body
      */
-    public function patch($uri, $payload = null, ?string $mime = null): ResponseInterface;
+    public function patch($uri, $body = null, ?string $mime = null): ResponseInterface;
 
     /**
      * HTTP Метод Delete

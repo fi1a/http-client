@@ -94,7 +94,7 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function post($uri, $rawBody = null, ?string $mime = null)
+    public function post($uri, $body = null, ?string $mime = null)
     {
         if (!$mime) {
             $mime = 'form';
@@ -102,7 +102,7 @@ class Request extends Message implements RequestInterface
 
         $this->withMethod(HttpInterface::POST)
             ->withUri($this->createUri($uri))
-            ->withBody($rawBody, $mime);
+            ->withBody($body, $mime);
 
         return $this;
     }
@@ -110,7 +110,7 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function put($uri, $rawBody = null, ?string $mime = null)
+    public function put($uri, $body = null, ?string $mime = null)
     {
         if (!$mime) {
             $mime = 'form';
@@ -118,7 +118,7 @@ class Request extends Message implements RequestInterface
 
         $this->withMethod(HttpInterface::PUT)
             ->withUri($this->createUri($uri))
-            ->withBody($rawBody, $mime);
+            ->withBody($body, $mime);
 
         return $this;
     }
@@ -126,11 +126,11 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function patch($uri, $rawBody = null, ?string $mime = null)
+    public function patch($uri, $body = null, ?string $mime = null)
     {
         $this->withMethod(HttpInterface::PATCH)
             ->withUri($this->createUri($uri))
-            ->withBody($rawBody, $mime);
+            ->withBody($body, $mime);
 
         return $this;
     }
@@ -207,9 +207,9 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function withBody($rawBody, ?string $mime = null)
+    public function withBody($body, ?string $mime = null)
     {
-        $this->body->withBody($rawBody, $mime);
+        $this->body->withBody($body, $mime);
         $this->withExpectedType($mime);
 
         return $this;

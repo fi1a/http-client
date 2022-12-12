@@ -108,7 +108,7 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
-     * Отправка POST запроса
+     * Отправка GET запроса
      *
      * @dataProvider clientDataProvider
      */
@@ -117,6 +117,27 @@ class HttpClientTest extends ServerTestCase
         $uri = new Uri('https://' . self::HOST . '/200-ok-json');
         $uri->withQueryParams(['foo' => 'bar']);
         $response = $client->get($uri, 'json');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
+        $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Отправка POST запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testPost(HttpClientInterface $client): void
+    {
+        $response = $client->post(
+            'https://' . self::HOST . '/200-ok-post',
+            ['foo' => 'bar'],
+            'form'
+        );
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
