@@ -10,6 +10,7 @@ use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
+use Fi1a\HttpClient\Uri;
 use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;
 use InvalidArgumentException;
 
@@ -97,6 +98,25 @@ class HttpClientTest extends ServerTestCase
     {
         $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
         $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
+        $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Отправка POST запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testGet(HttpClientInterface $client): void
+    {
+        $uri = new Uri('https://' . self::HOST . '/200-ok-json');
+        $uri->withQueryParams(['foo' => 'bar']);
+        $response = $client->get($uri, 'json');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());

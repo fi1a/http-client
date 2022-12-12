@@ -68,10 +68,10 @@ class HttpClient implements HttpClientInterface
 
     /**
      * @inheritDoc
-     * @psalm-suppress InvalidReturnType
      */
     public function get($uri, ?string $mime = null): ResponseInterface
     {
+        return $this->send(Request::create()->get($uri, $mime));
     }
 
     /**
@@ -146,7 +146,7 @@ class HttpClient implements HttpClientInterface
         if (!$request->hasHeader('Content-Type')) {
             $contentType = $request->getBody()->getContentType();
             if (!$contentType) {
-                $contentType = MimeInterface::PLAIN;
+                $contentType = MimeInterface::HTML;
                 if ($request->getMethod() === HttpInterface::POST || $request->getMethod() === HttpInterface::PUT) {
                     $contentType = MimeInterface::FORM;
                 }
