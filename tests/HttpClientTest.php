@@ -278,10 +278,23 @@ class HttpClientTest extends ServerTestCase
      *
      * @dataProvider clientDataProvider
      */
-    public function testSortMiddleware(HttpClientInterface $client): void
+    public function testSortRequestMiddleware(HttpClientInterface $client): void
     {
         $client->addRequestMiddleware(new StopMiddleware(), 600);
         $client->addRequestMiddleware(new Set500StatusMiddleware(), 100);
+        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain');
+        $this->assertEquals(500, $response->getStatusCode());
+    }
+
+    /**
+     * Промежуточное ПО для ответа (сортировка)
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testSortResponseMiddleware(HttpClientInterface $client): void
+    {
+        $client->addResponseMiddleware(new StopMiddleware(), 600);
+        $client->addResponseMiddleware(new Set500StatusMiddleware(), 100);
         $response = $client->get('https://' . self::HOST . '/200-ok-text-plain');
         $this->assertEquals(500, $response->getStatusCode());
     }

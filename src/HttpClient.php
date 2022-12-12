@@ -28,6 +28,11 @@ class HttpClient implements HttpClientInterface
      */
     private $requestMiddlewares = [];
 
+    /**
+     * @var MiddlewareInterface[][]|int[][]
+     */
+    private $responseMiddlewares = [];
+
     public function __construct(ConfigInterface $config, string $handler)
     {
         if (!is_subclass_of($handler, HandlerInterface::class)) {
@@ -56,6 +61,9 @@ class HttpClient implements HttpClientInterface
      */
     public function addResponseMiddleware(MiddlewareInterface $middleware, int $sort = 500)
     {
+        $this->responseMiddlewares[] = [$middleware, $sort,];
+
+        return $this;
     }
 
     /**
@@ -79,6 +87,10 @@ class HttpClient implements HttpClientInterface
         $instance = $this->factoryHandler();
 
         $response = $instance->send($request, $response);
+
+        if ($this->callResponseMiddlewares($request, $response) === false) {
+            return $response;
+        }
 
         return $response;
     }
@@ -192,9 +204,26 @@ class HttpClient implements HttpClientInterface
     /**
      * Вызывает промежуточное ПО запросов
      */
-    private function callRequestMiddlewares(RequestInterface $request, Response $response): bool
+    private function callRequestMiddlewares(RequestInterface $request, ResponseInterface $response): bool
     {
-        $middlewares = $this->requestMiddlewares;
+        return $this->callMiddlewares($this->requestMiddlewares, $request, $response);
+    }
+
+    /**
+     * Вызывает промежуточное ПО ответа
+     */
+    private function callResponseMiddlewares(RequestInterface $request, ResponseInterface $response): bool
+    {
+        return $this->callMiddlewares($this->responseMiddlewares, $request, $response);
+    }
+
+    /**
+     * Вызывает промежуточное ПО
+     *
+     * @param MiddlewareInterface[][]|int[][] $middlewares
+     */
+    private function callMiddlewares(array $middlewares, RequestInterface $request, ResponseInterface $response): bool
+    {
         usort(
             $middlewares, /**
             @psalm-param $itemA array<array-key, Fi1a\HttpClient\Middlewares\MiddlewareInterface|int>
