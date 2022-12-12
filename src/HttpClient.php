@@ -176,9 +176,6 @@ class HttpClient implements HttpClientInterface
             $contentType = $request->getBody()->getContentType();
             if (!$contentType) {
                 $contentType = MimeInterface::HTML;
-                if ($request->getMethod() === HttpInterface::POST || $request->getMethod() === HttpInterface::PUT) {
-                    $contentType = MimeInterface::FORM;
-                }
             }
             $request->withHeader('Content-Type', $contentType);
         }

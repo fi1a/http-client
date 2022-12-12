@@ -187,12 +187,6 @@ class Request extends Message implements RequestInterface
     {
         $this->expectedType = $mime ? Mime::getMime($mime) : null;
 
-        $this->withoutHeader('Accept');
-
-        if ($this->expectedType) {
-            $this->withHeader('Accept', $this->expectedType);
-        }
-
         return $this;
     }
 

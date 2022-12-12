@@ -298,4 +298,58 @@ class HttpClientTest extends ServerTestCase
         $response = $client->get('https://' . self::HOST . '/200-ok-text-plain');
         $this->assertEquals(500, $response->getStatusCode());
     }
+
+    /**
+     * Конструктор
+     */
+    public function testConstructor(): void
+    {
+        $client = new HttpClient(new Config(['ssl_verify' => false]), StreamHandler::class);
+        $this->assertInstanceOf(HttpClientInterface::class, $client);
+    }
+
+    /**
+     * Конструктор
+     */
+    public function testConstructorHandlerException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new HttpClient(new Config(['ssl_verify' => false]), static::class);
+    }
+
+    /**
+     * Выставляемые заголовки
+     */
+    public function testContentHeadersAccept(): void
+    {
+        $client = $this->getStreamClient();
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain', 'json');
+        $response = $client->send($request);
+        $this->assertEquals(MimeInterface::JSON, $request->getLastHeader('Accept')->getValue());
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::PLAIN, $response->getBody()->getContentType());
+        $this->assertEquals('success', $response->getBody()->get());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Выставляемые заголовки
+     */
+    public function testContentHeadersContentTypeForm(): void
+    {
+        $client = $this->getStreamClient();
+        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
+        $response = $client->send($request);
+        $this->assertEquals(MimeInterface::FORM, $request->getLastHeader('Content-Type')->getValue());
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
+        $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
 }
