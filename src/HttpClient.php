@@ -100,10 +100,10 @@ class HttpClient implements HttpClientInterface
 
     /**
      * @inheritDoc
-     * @psalm-suppress InvalidReturnType
      */
     public function delete($uri, ?string $mime = null): ResponseInterface
     {
+        return $this->send(Request::create()->delete($uri, $mime));
     }
 
     /**

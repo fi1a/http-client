@@ -21,7 +21,7 @@ app.get('/200-ok-text-plain', (req, res) => {
 });
 
 app.get('/200-ok-json', (req, res) => {
-    res.status(200).json({'foo' : 'bar'});
+    res.status(200).json({'foo' : req.query.foo});
 });
 
 app.post('/200-ok-post', urlencodedParser, (req, res) => {
@@ -34,6 +34,11 @@ app.put('/200-ok-put', urlencodedParser, (req, res) => {
 
 app.patch('/200-ok-patch', urlencodedParser, (req, res) => {
     res.status(200).json({'foo' : req.body.foo});
+});
+
+app.delete('/200-ok-delete', (req, res) => {
+    console.log(req.query)
+    res.status(200).json({'foo' : req.query.foo});
 });
 
 app.get('/200-ok-null-content-length', (req, res) => {

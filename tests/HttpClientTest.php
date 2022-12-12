@@ -78,7 +78,9 @@ class HttpClientTest extends ServerTestCase
      */
     public function testGetSendJsonResponse(HttpClientInterface $client): void
     {
-        $request = Request::create()->get('https://' . self::HOST . '/200-ok-json');
+        $uri = new Uri('https://' . self::HOST . '/200-ok-json');
+        $uri->withQueryParams(['foo' => 'bar']);
+        $request = Request::create()->get($uri);
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -180,6 +182,25 @@ class HttpClientTest extends ServerTestCase
             ['foo' => 'bar'],
             'form'
         );
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
+        $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Отправка PATCH запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testDelete(HttpClientInterface $client): void
+    {
+        $uri = new Uri('https://' . self::HOST . '/200-ok-delete');
+        $uri->withQueryParams(['foo' => 'bar']);
+        $response = $client->delete($uri);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
