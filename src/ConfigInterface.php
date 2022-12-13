@@ -34,4 +34,16 @@ interface ConfigInterface extends ValueObjectInterface
      * @return $this
      */
     public function setTimeout(int $timeout);
+
+    /**
+     * Вернуть сжатие ответа
+     */
+    public function getCompress(): ?string;
+
+    /**
+     * Установить сжатие ответа
+     *
+     * @return $this
+     */
+    public function setCompress(?string $compress = null);
 }

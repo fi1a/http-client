@@ -78,6 +78,7 @@ class HttpClient implements HttpClientInterface
         $response = new Response();
 
         $this->addDefaultHeaders($request);
+        $this->addAcceptHeaders($request);
         $this->addContentHeaders($request);
 
         if ($this->callRequestMiddlewares($request, $response) === false) {
@@ -167,15 +168,26 @@ class HttpClient implements HttpClientInterface
     /**
      * Добавить заголовки
      */
-    private function addContentHeaders(RequestInterface $request): void
+    private function addAcceptHeaders(RequestInterface $request): void
     {
         if (!$request->hasHeader('Accept') && $request->getExpectedType()) {
             $request->withHeader('Accept', (string) $request->getExpectedType());
         }
-        if (!$request->hasHeader('Content-Type')) {
+        $compress = $this->config->getCompress();
+        if ($compress && !$request->hasHeader('Accept-Encoding')) {
+            $request->withHeader('Accept-Encoding', $compress);
+        }
+    }
+
+    /**
+     * Добавить заголовки
+     */
+    private function addContentHeaders(RequestInterface $request): void
+    {
+        if (!$request->hasHeader('Content-Type') && $request->getBody()->has()) {
             $contentType = $request->getBody()->getContentType();
             if (!$contentType) {
-                $contentType = MimeInterface::HTML;
+                $contentType = MimeInterface::PLAIN;
             }
             $request->withHeader('Content-Type', $contentType);
         }

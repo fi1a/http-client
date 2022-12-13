@@ -60,7 +60,7 @@ class Message implements MessageInterface
      */
     public function withEncoding(string $encoding)
     {
-        $this->encoding = $encoding;
+        $this->encoding = mb_strtolower($encoding);
 
         return $this;
     }

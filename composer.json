@@ -17,6 +17,7 @@
     "fi1a/collection": "^2.0"
   },
   "suggest": {
+    "ext-zlib": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",

@@ -32,6 +32,7 @@ class StreamHandler extends AbstractHandler
         $this->sendRequest($resource, $request);
         $this->getHeaders($resource, $response);
         $rawBody = $this->getRawBody($resource, $response);
+        $rawBody = $this->decompress($rawBody, $response);
         $this->setRawBody($rawBody, $response);
         $this->disconnect($resource);
 
@@ -39,18 +40,63 @@ class StreamHandler extends AbstractHandler
     }
 
     /**
-     * Тело ответа
+     * Распаковывает тело сообщения
+     */
+    private function decompress(string $rawBody, ResponseInterface $response): string
+    {
+        $contEncodingHeader = $response->getLastHeader('Content-Encoding');
+        if (!$contEncodingHeader || !$rawBody) {
+            return $rawBody;
+        }
+        $encoding = mb_strtolower((string) $contEncodingHeader->getValue());
+        if ($encoding === 'gzip') {
+            $compressed = substr($rawBody, 10, -8);
+
+            return gzinflate($compressed);
+        }
+
+        return $rawBody;
+    }
+
+    /**
+     * Transfer-Encoding: chunked
      *
      * @param resource $resource
      */
-    private function getRawBody($resource, ResponseInterface $response): string
+    private function getRawBodyChunked($resource): string
     {
-        $contentLength = null;
-        $contentLengthHeader = $response->getLastHeader('Content-Length');
-        if ($contentLengthHeader) {
-            $contentLength = (int) $contentLengthHeader->getValue();
-        }
         $rawBody = '';
+
+        while (!feof($resource)) {
+            $line = $this->readContentLine($resource, self::STREAM_READ_LENGTH);
+            $this->checkReadErrors($resource, $line);
+            if ($line === "\r\n") {
+                continue;
+            }
+            /**
+             * @psalm-suppress PossiblyFalseArgument
+             */
+            $bufLength = hexdec($line);
+            $buf = $this->readContents($resource, $bufLength);
+            $this->checkReadErrors($resource, $buf);
+            /**
+             * @psalm-suppress PossiblyFalseOperand
+             */
+            $rawBody .= $buf;
+        }
+
+        return $rawBody;
+    }
+
+    /**
+     * Не кодированный ответ
+     *
+     * @param resource $resource
+     */
+    private function getRawBodyNoEncoding($resource, ?int $contentLength): string
+    {
+        $rawBody = '';
+
         while (!feof($resource) && (is_null($contentLength) || $contentLength > 0)) {
             $bufLength = is_null($contentLength) || $contentLength > self::STREAM_READ_LENGTH
                 ? self::STREAM_READ_LENGTH
@@ -73,11 +119,32 @@ class StreamHandler extends AbstractHandler
     }
 
     /**
+     * Тело ответа
+     *
+     * @param resource $resource
+     */
+    private function getRawBody($resource, ResponseInterface $response): string
+    {
+        $transferEncoding = $response->getLastHeader('Transfer-Encoding');
+        if ($transferEncoding && $transferEncoding->getValue() === 'chunked') {
+            return $this->getRawBodyChunked($resource);
+        }
+
+        $contentLength = null;
+        $contentLengthHeader = $response->getLastHeader('Content-Length');
+        if ($contentLengthHeader) {
+            $contentLength = (int) $contentLengthHeader->getValue();
+        }
+
+        return $this->getRawBodyNoEncoding($resource, $contentLength);
+    }
+
+    /**
      * Устанавливает полученное тело ответа в объет ответа
      */
     private function setRawBody(string $rawBody, ResponseInterface $response): void
     {
-        $mime = MimeInterface::PLAIN;
+        $mime = MimeInterface::HTML;
         $contentTypeHeader = $response->getLastHeader('Content-Type');
         if ($contentTypeHeader) {
             $contentType = $contentTypeHeader->getValue();

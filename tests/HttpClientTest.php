@@ -13,6 +13,7 @@ use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Uri;
 use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\Set500StatusMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\StopMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\UnknownContentEncodingMiddleware;
 use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;
 use InvalidArgumentException;
 
@@ -318,7 +319,7 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
-     * Выставляемые заголовки
+     * Выставляем заголовок Accept
      */
     public function testContentHeadersAccept(): void
     {
@@ -336,7 +337,7 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
-     * Выставляемые заголовки
+     * Выставляем заголовок Content-Type
      */
     public function testContentHeadersContentTypeForm(): void
     {
@@ -351,5 +352,61 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
         $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
         $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Сжатие ответа
+     */
+    public function testGetGzipContentEncoding(): void
+    {
+        $client = new HttpClient(
+            new Config(['ssl_verify' => false, 'compress' => 'gzip']),
+            StreamHandler::class
+        );
+        $request = Request::create()->get('https://' . self::HOST . '/index.html', 'html');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+        $this->assertEquals('utf-8', $response->getEncoding());
+        $this->assertEquals('gzip', $response->getLastHeader('Content-Encoding')->getValue());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('success', $response->getBody()->get());
+    }
+
+    /**
+     * Неизвестное сжатие ответа
+     */
+    public function testUnknownContentEncoding(): void
+    {
+        $client = new HttpClient(
+            new Config(['ssl_verify' => false,]),
+            StreamHandler::class
+        );
+        $client->addRequestMiddleware(new UnknownContentEncodingMiddleware());
+        $request = Request::create()->get('https://' . self::HOST . '/index.html', 'html');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+        $this->assertEquals('utf-8', $response->getEncoding());
+        $this->assertEquals('unknown', $response->getLastHeader('Content-Encoding')->getValue());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('success', $response->getBody()->get());
+    }
+
+    /**
+     * Тип контента по умолчанию
+     */
+    public function testDefaultContentType(): void
+    {
+        $client = $this->getStreamClient();
+        $request = Request::create()->head('https://' . self::HOST . '/200-ok-head')->withBody('plain-text');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertFalse($response->getBody()->has());
     }
 }

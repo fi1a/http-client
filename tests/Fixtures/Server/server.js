@@ -1,22 +1,23 @@
 const express = require('express'),
+    compress = require('compression'),
     fs = require('fs'),
     https = require('https'),
     app = express(),
     port = process.argv.length > 2 ? Number(process.argv[2]) : 3000,
-    urlencodedParser = express.urlencoded({extended: false});
+    urlencodedParser = express.urlencoded({extended: false}),
+    oneYear = 1 * 365 * 24 * 60 * 60 * 1000;
 
 const options = {
     key: fs.readFileSync(__dirname + '/ssl/key.key').toString(),
     cert: fs.readFileSync(__dirname + '/ssl/cert.pem').toString(),
 };
 
-
-https.createServer(options, app).listen(port, () => {
-    console.log(`App listening on port ${port}`)
-});
+app.use(compress({threshold: 0}));
+app.use(express.static(__dirname + '/public', { maxAge: oneYear }));
 
 app.get('/200-ok-text-plain', (req, res) => {
-    res.status(200).setHeader('Content-Type', 'text/plain');
+    res.status(200);
+    res.setHeader('Content-Type', 'text/plain');
     res.send('success');
 });
 
@@ -51,4 +52,8 @@ app.options('/200-ok-options', (req, res) => {
 
 app.get('/200-ok-null-content-length', (req, res) => {
     res.status(200).send(new Array(1000001).join('r'));
+});
+
+https.createServer(options, app).listen(port, () => {
+    console.log(`App listening on port ${port}`)
 });
