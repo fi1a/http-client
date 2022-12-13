@@ -76,4 +76,9 @@ interface HttpClientInterface
      * @param string|UriInterface $uri
      */
     public function options($uri): ResponseInterface;
+
+    /**
+     * Возвращает конфигурацию
+     */
+    public function getConfig(): ConfigInterface;
 }

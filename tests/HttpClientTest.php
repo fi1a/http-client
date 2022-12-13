@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\HttpClient\Config;
+use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\HttpClientInterface;
@@ -33,6 +34,14 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
+     * Возвращает HTTP-client
+     */
+    private function getCurlClient(): HttpClientInterface
+    {
+        return new HttpClient(new Config(['ssl_verify' => false]), CurlHandler::class);
+    }
+
+    /**
      * Настроенные клиенты для тестов
      *
      * @return HttpClientInterface[][]
@@ -42,6 +51,9 @@ class HttpClientTest extends ServerTestCase
         return [
             [
                 $this->getStreamClient(),
+            ],
+            [
+                $this->getCurlClient(),
             ],
         ];
     }
@@ -322,10 +334,11 @@ class HttpClientTest extends ServerTestCase
 
     /**
      * Выставляем заголовок Accept
+     *
+     * @dataProvider clientDataProvider
      */
-    public function testContentHeadersAccept(): void
+    public function testContentHeadersAccept(HttpClientInterface $client): void
     {
-        $client = $this->getStreamClient();
         $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain', 'json');
         $response = $client->send($request);
         $this->assertEquals(MimeInterface::JSON, $request->getLastHeader('Accept')->getValue());
@@ -340,10 +353,11 @@ class HttpClientTest extends ServerTestCase
 
     /**
      * Выставляем заголовок Content-Type
+     *
+     * @dataProvider clientDataProvider
      */
-    public function testContentHeadersContentTypeForm(): void
+    public function testContentHeadersContentTypeForm(HttpClientInterface $client): void
     {
-        $client = $this->getStreamClient();
         $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
         $response = $client->send($request);
         $this->assertEquals(MimeInterface::FORM, $request->getLastHeader('Content-Type')->getValue());
@@ -358,13 +372,12 @@ class HttpClientTest extends ServerTestCase
 
     /**
      * Сжатие ответа
+     *
+     * @dataProvider clientDataProvider
      */
-    public function testGetGzipContentEncoding(): void
+    public function testGetGzipContentEncoding(HttpClientInterface $client): void
     {
-        $client = new HttpClient(
-            new Config(['ssl_verify' => false, 'compress' => 'gzip']),
-            StreamHandler::class
-        );
+        $client->getConfig()->setCompress('gzip');
         $request = Request::create()->get('https://' . self::HOST . '/index.html', 'html');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
@@ -379,13 +392,11 @@ class HttpClientTest extends ServerTestCase
 
     /**
      * Неизвестное сжатие ответа
+     *
+     * @dataProvider clientDataProvider
      */
-    public function testUnknownContentEncoding(): void
+    public function testUnknownContentEncoding(HttpClientInterface $client): void
     {
-        $client = new HttpClient(
-            new Config(['ssl_verify' => false,]),
-            StreamHandler::class
-        );
         $client->addMiddleware(new UnknownContentEncodingMiddleware());
         $request = Request::create()->get('https://' . self::HOST . '/index.html', 'html');
         $response = $client->send($request);
@@ -401,14 +412,88 @@ class HttpClientTest extends ServerTestCase
 
     /**
      * Тип контента по умолчанию
+     *
+     * @dataProvider clientDataProvider
      */
-    public function testDefaultContentType(): void
+    public function testDefaultContentType(HttpClientInterface $client): void
     {
-        $client = $this->getStreamClient();
         $request = Request::create()->head('https://' . self::HOST . '/200-ok-head')->withBody('plain-text');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertFalse($response->getBody()->has());
+    }
+
+    /**
+     * Версия HTTP 1.0
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testProtocolVersion10(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain')->withProtocolVersion('1.0');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::PLAIN, $response->getBody()->getContentType());
+        $this->assertEquals('success', $response->getBody()->get());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Версия HTTP 1.1
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testProtocolVersion11(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain')->withProtocolVersion('1.1');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::PLAIN, $response->getBody()->getContentType());
+        $this->assertEquals('success', $response->getBody()->get());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Версия HTTP 2.0
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testProtocolVersion20(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain')->withProtocolVersion('2.0');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::PLAIN, $response->getBody()->getContentType());
+        $this->assertEquals('success', $response->getBody()->get());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Версия HTTP UNKNOWN
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testProtocolVersionUnknown(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain')
+            ->withProtocolVersion('UNKNOWN');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::PLAIN, $response->getBody()->getContentType());
+        $this->assertEquals('success', $response->getBody()->get());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
     }
 }

@@ -247,4 +247,12 @@ class HttpClient implements HttpClientInterface
 
         return $middlewares;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getConfig(): ConfigInterface
+    {
+        return $this->config;
+    }
 }

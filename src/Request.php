@@ -52,7 +52,7 @@ class Request extends Message implements RequestInterface
      */
     public function withMethod(string $method)
     {
-        $this->method = $method;
+        $this->method = mb_strtoupper($method);
 
         return $this;
     }

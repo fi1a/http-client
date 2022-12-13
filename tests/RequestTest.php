@@ -51,7 +51,7 @@ class RequestTest extends TestCase
     {
         $request = Request::create();
         $request->withMethod('custom');
-        $this->assertEquals('custom', $request->getMethod());
+        $this->assertEquals('CUSTOM', $request->getMethod());
     }
 
     /**

@@ -8,7 +8,6 @@ use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
 use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 use Fi1a\HttpClient\Handlers\Exceptions\TimeoutErrorException;
 use Fi1a\HttpClient\HeaderInterface;
-use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\Response;
 use Fi1a\HttpClient\ResponseInterface;
@@ -31,31 +30,12 @@ class StreamHandler extends AbstractHandler
         $resource = $this->connect($request->getUri());
         $this->sendRequest($resource, $request);
         $this->getHeaders($resource, $response);
-        $rawBody = $this->getRawBody($resource, $response);
-        $rawBody = $this->decompress($rawBody, $response);
-        $this->setRawBody($rawBody, $response);
+        $body = $this->getBody($resource, $response);
+        $body = $this->decompress($body, $response);
+        $this->setBody($body, $response);
         $this->disconnect($resource);
 
         return $response;
-    }
-
-    /**
-     * Распаковывает тело сообщения
-     */
-    private function decompress(string $rawBody, ResponseInterface $response): string
-    {
-        $contEncodingHeader = $response->getLastHeader('Content-Encoding');
-        if (!$contEncodingHeader || !$rawBody) {
-            return $rawBody;
-        }
-        $encoding = mb_strtolower((string) $contEncodingHeader->getValue());
-        if ($encoding === 'gzip') {
-            $compressed = substr($rawBody, 10, -8);
-
-            return gzinflate($compressed);
-        }
-
-        return $rawBody;
     }
 
     /**
@@ -123,7 +103,7 @@ class StreamHandler extends AbstractHandler
      *
      * @param resource $resource
      */
-    private function getRawBody($resource, ResponseInterface $response): string
+    private function getBody($resource, ResponseInterface $response): string
     {
         $transferEncoding = $response->getLastHeader('Transfer-Encoding');
         if ($transferEncoding && $transferEncoding->getValue() === 'chunked') {
@@ -137,26 +117,6 @@ class StreamHandler extends AbstractHandler
         }
 
         return $this->getRawBodyNoEncoding($resource, $contentLength);
-    }
-
-    /**
-     * Устанавливает полученное тело ответа в объет ответа
-     */
-    private function setRawBody(string $rawBody, ResponseInterface $response): void
-    {
-        $mime = MimeInterface::HTML;
-        $contentTypeHeader = $response->getLastHeader('Content-Type');
-        if ($contentTypeHeader) {
-            $contentType = $contentTypeHeader->getValue();
-            if ($contentType) {
-                $mime = $contentType;
-                if (preg_match('#(.+); charset=(.+)#mui', $contentType, $matches) > 0) {
-                    $mime = $matches[1];
-                    $response->withEncoding($matches[2]);
-                }
-            }
-        }
-        $response->withBody($rawBody, $mime);
     }
 
     /**
@@ -268,7 +228,7 @@ class StreamHandler extends AbstractHandler
     {
         $payload = $request->getMethod() . ' ' . $request->getUri()->getPath()
             . ($request->getUri()->getQuery() ? '?' . $request->getUri()->getQuery() : '')
-            . ' HTTP/' . $request->getProtocolVersion() . "\r\n";
+            . ' HTTP/' . $this->getProtocolVersion($request->getProtocolVersion()) . "\r\n";
 
         /**
          * @var HeaderInterface $header
@@ -350,5 +310,17 @@ class StreamHandler extends AbstractHandler
         }
 
         return stream_context_create($options);
+    }
+
+    /**
+     * Возвращает версию протокола
+     */
+    private function getProtocolVersion(string $protocolVersion): string
+    {
+        if (in_array($protocolVersion, ['1.0', '1.1', '2.0'])) {
+            return $protocolVersion;
+        }
+
+        return '1.0';
     }
 }
