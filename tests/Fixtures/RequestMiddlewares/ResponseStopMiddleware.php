@@ -10,9 +10,9 @@ use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
 
 /**
- * Промежуточное ПО для запроса (неизвестное сжатие)
+ * Промежуточное ПО для запроса (останаливает запрос)
  */
-class UnknownContentEncodingMiddleware implements MiddlewareInterface
+class ResponseStopMiddleware implements MiddlewareInterface
 {
     /**
      * @inheritDoc
@@ -22,8 +22,6 @@ class UnknownContentEncodingMiddleware implements MiddlewareInterface
         ResponseInterface $response,
         HttpClientInterface $httpClient
     ): bool {
-        $response->withHeader('Content-Encoding', 'unknown');
-
         return true;
     }
 
@@ -35,6 +33,6 @@ class UnknownContentEncodingMiddleware implements MiddlewareInterface
         ResponseInterface $response,
         HttpClientInterface $httpClient
     ): bool {
-        return true;
+        return false;
     }
 }

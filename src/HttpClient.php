@@ -26,12 +26,7 @@ class HttpClient implements HttpClientInterface
     /**
      * @var MiddlewareInterface[][]|int[][]
      */
-    private $requestMiddlewares = [];
-
-    /**
-     * @var MiddlewareInterface[][]|int[][]
-     */
-    private $responseMiddlewares = [];
+    private $middlewares = [];
 
     public function __construct(ConfigInterface $config, string $handler)
     {
@@ -48,20 +43,9 @@ class HttpClient implements HttpClientInterface
      * @inheritDoc
      * @psalm-suppress InvalidReturnType
      */
-    public function addRequestMiddleware(MiddlewareInterface $middleware, int $sort = 500)
+    public function addMiddleware(MiddlewareInterface $middleware, int $sort = 500)
     {
-        $this->requestMiddlewares[] = [$middleware, $sort,];
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     * @psalm-suppress InvalidReturnType
-     */
-    public function addResponseMiddleware(MiddlewareInterface $middleware, int $sort = 500)
-    {
-        $this->responseMiddlewares[] = [$middleware, $sort,];
+        $this->middlewares[] = [$middleware, $sort,];
 
         return $this;
     }
@@ -215,7 +199,15 @@ class HttpClient implements HttpClientInterface
      */
     private function callRequestMiddlewares(RequestInterface $request, ResponseInterface $response): bool
     {
-        return $this->callMiddlewares($this->requestMiddlewares, $request, $response);
+        foreach ($this->sortMiddlewares($this->middlewares) as $item) {
+            [$middleware,] = $item;
+            assert($middleware instanceof MiddlewareInterface);
+            if ($middleware->handleRequest($request, $response, $this) === false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -223,15 +215,25 @@ class HttpClient implements HttpClientInterface
      */
     private function callResponseMiddlewares(RequestInterface $request, ResponseInterface $response): bool
     {
-        return $this->callMiddlewares($this->responseMiddlewares, $request, $response);
+        foreach ($this->sortMiddlewares($this->middlewares) as $item) {
+            [$middleware,] = $item;
+            assert($middleware instanceof MiddlewareInterface);
+            if ($middleware->handleResponse($request, $response, $this) === false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
-     * Вызывает промежуточное ПО
+     * Сортирует промежуточное ПО
      *
      * @param MiddlewareInterface[][]|int[][] $middlewares
+     *
+     * @return MiddlewareInterface[][]|int[][]
      */
-    private function callMiddlewares(array $middlewares, RequestInterface $request, ResponseInterface $response): bool
+    private function sortMiddlewares(array $middlewares): array
     {
         usort(
             $middlewares, /**
@@ -242,14 +244,7 @@ class HttpClient implements HttpClientInterface
                 return (int) $itemA[1] - (int) $itemB[1];
             }
         );
-        foreach ($middlewares as $item) {
-            [$middleware,] = $item;
-            assert($middleware instanceof MiddlewareInterface);
-            if ($middleware->process($request, $response) === false) {
-                return false;
-            }
-        }
 
-        return true;
+        return $middlewares;
     }
 }

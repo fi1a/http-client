@@ -14,18 +14,11 @@ interface HttpClientInterface
     public function __construct(ConfigInterface $config, string $handler);
 
     /**
-     * Добавить промежуточное ПО для запроса
+     * Добавить промежуточное ПО
      *
      * @return $this
      */
-    public function addRequestMiddleware(MiddlewareInterface $middleware, int $sort = 500);
-
-    /**
-     * Добавить промежуточное ПО для ответа
-     *
-     * @return $this
-     */
-    public function addResponseMiddleware(MiddlewareInterface $middleware, int $sort = 500);
+    public function addMiddleware(MiddlewareInterface $middleware, int $sort = 500);
 
     /**
      * Отправляет запрос

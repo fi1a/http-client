@@ -4,16 +4,30 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient\Middlewares;
 
+use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
 
 /**
- * Промежуточное ПО для запроса
+ * Промежуточное ПО
  */
 interface MiddlewareInterface
 {
     /**
-     * Промежуточное ПО для запроса
+     * Обработчик для запроса
      */
-    public function process(RequestInterface $request, ResponseInterface $response): bool;
+    public function handleRequest(
+        RequestInterface $request,
+        ResponseInterface $response,
+        HttpClientInterface $httpClient
+    ): bool;
+
+    /**
+     * Обработчик для ответа
+     */
+    public function handleResponse(
+        RequestInterface $request,
+        ResponseInterface $response,
+        HttpClientInterface $httpClient
+    ): bool;
 }
