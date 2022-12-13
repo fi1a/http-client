@@ -74,4 +74,9 @@ interface MessageInterface
      * Удаляет заголовок с определенным именем
      */
     public function withoutHeader(string $name): bool;
+
+    /**
+     * Удаляет все заголовки
+     */
+    public function clearHeaders(): bool;
 }

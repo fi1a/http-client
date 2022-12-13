@@ -147,4 +147,15 @@ class MessageTest extends TestCase
         $message->withEncoding('windows-1251');
         $this->assertEquals('windows-1251', $message->getEncoding());
     }
+
+    /**
+     * Удаляет все заголовки
+     */
+    public function testClearHeaders(): void
+    {
+        $message = $this->getMessage();
+        $this->assertCount(3, $message->getHeaders());
+        $this->assertTrue($message->clearHeaders());
+        $this->assertCount(0, $message->getHeaders());
+    }
 }

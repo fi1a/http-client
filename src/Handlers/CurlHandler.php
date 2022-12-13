@@ -13,11 +13,13 @@ use UnexpectedValueException;
 
 use const CURLOPT_CUSTOMREQUEST;
 use const CURLOPT_FAILONERROR;
+use const CURLOPT_FOLLOWLOCATION;
 use const CURLOPT_HEADER;
 use const CURLOPT_HEADERFUNCTION;
 use const CURLOPT_HTTPGET;
 use const CURLOPT_HTTPHEADER;
 use const CURLOPT_HTTP_VERSION;
+use const CURLOPT_MAXREDIRS;
 use const CURLOPT_NOBODY;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
@@ -179,6 +181,9 @@ class CurlHandler extends AbstractHandler
         if ($this->config->getTimeout() > 0) {
             $options[CURLOPT_TIMEOUT] = $this->config->getTimeout();
         }
+
+        $options[CURLOPT_FOLLOWLOCATION] = $this->config->getAllowRedirects() ? 1 : 0;
+        $options[CURLOPT_MAXREDIRS] = $this->config->getAllowRedirects() ? $this->config->getMaxRedirects() : 0;
 
         curl_setopt_array($resource, $options);
     }

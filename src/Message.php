@@ -133,4 +133,14 @@ class Message implements MessageInterface
     {
         return $this->headers->withoutHeader($name);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function clearHeaders(): bool
+    {
+        $this->headers->exchangeArray([]);
+
+        return true;
+    }
 }

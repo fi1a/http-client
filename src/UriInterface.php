@@ -125,4 +125,16 @@ interface UriInterface
      * Компонент полномочий URI
      */
     public function getAuthority(): string;
+
+    /**
+     * Возвращает URI с маской на данных авторизации
+     */
+    public function getMaskedUri(): string;
+
+    /**
+     * Заменить адрес переданным значением
+     *
+     * @return $this
+     */
+    public function replace(string $uri = '');
 }

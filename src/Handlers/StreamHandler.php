@@ -23,19 +23,66 @@ class StreamHandler extends AbstractHandler
     private const STREAM_READ_LENGTH = 32768;
 
     /**
+     * @var int
+     */
+    private $redirects = 0;
+
+    /**
+     * @var string|null
+     */
+    private $fromUrl;
+
+    /**
      * @inheritDoc
      */
     public function send(RequestInterface $request, Response $response): ResponseInterface
     {
-        $resource = $this->connect($request->getUri());
-        $this->sendRequest($resource, $request);
-        $this->getHeaders($resource, $response);
+        do {
+            $resource = $this->connect($request->getUri());
+            $this->sendRequest($resource, $request);
+            $this->getHeaders($resource, $response);
+        } while ($this->redirect($request, $response));
+
         $body = $this->getBody($resource, $response);
         $body = $this->decompress($body, $response);
         $this->setBody($body, $response);
+
         $this->disconnect($resource);
 
         return $response;
+    }
+
+    private function redirect(RequestInterface $request, ResponseInterface $response): bool
+    {
+        if (!$this->config->getAllowRedirects()) {
+            return false;
+        }
+
+        $headerLocation = $response->getLastHeader('Location');
+        if (!$headerLocation || !$headerLocation->getValue()) {
+            return false;
+        }
+
+        if (!$this->fromUrl) {
+            $this->fromUrl = $request->getUri()->getMaskedUri();
+        }
+
+        if ($this->config->getMaxRedirects() !== 0 && $this->redirects >= $this->config->getMaxRedirects()) {
+            throw new ErrorException(
+                sprintf(
+                    'Максимальное число редиректор %d было достигнуто при запросе %s',
+                    $this->config->getMaxRedirects(),
+                    $this->fromUrl
+                )
+            );
+        }
+
+        $request->getUri()->replace((string) $headerLocation->getValue());
+        $response->clearHeaders();
+
+        $this->redirects++;
+
+        return true;
     }
 
     /**
@@ -43,7 +90,7 @@ class StreamHandler extends AbstractHandler
      *
      * @param resource $resource
      */
-    private function getRawBodyChunked($resource): string
+    private function getBodyChunked($resource): string
     {
         $rawBody = '';
 
@@ -73,7 +120,7 @@ class StreamHandler extends AbstractHandler
      *
      * @param resource $resource
      */
-    private function getRawBodyNoEncoding($resource, ?int $contentLength): string
+    private function getBodyNoEncoding($resource, ?int $contentLength): string
     {
         $rawBody = '';
 
@@ -107,7 +154,7 @@ class StreamHandler extends AbstractHandler
     {
         $transferEncoding = $response->getLastHeader('Transfer-Encoding');
         if ($transferEncoding && $transferEncoding->getValue() === 'chunked') {
-            return $this->getRawBodyChunked($resource);
+            return $this->getBodyChunked($resource);
         }
 
         $contentLength = null;
@@ -116,7 +163,7 @@ class StreamHandler extends AbstractHandler
             $contentLength = (int) $contentLengthHeader->getValue();
         }
 
-        return $this->getRawBodyNoEncoding($resource, $contentLength);
+        return $this->getBodyNoEncoding($resource, $contentLength);
     }
 
     /**

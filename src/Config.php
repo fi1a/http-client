@@ -21,6 +21,8 @@ class Config extends ValueObject implements ConfigInterface
             'ssl_verify' => true,
             'timeout'  => 10,
             'compress' => null,
+            'allow_redirects' => true,
+            'max_redirects' => 10,
         ];
     }
 
@@ -86,6 +88,47 @@ class Config extends ValueObject implements ConfigInterface
         }
 
         $this->modelSet('compress', $compress);
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllowRedirects(): bool
+    {
+        return (bool) $this->modelGet('allow_redirects');
+    }
+
+    /**
+     * @inheritDoc
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
+    public function setAllowRedirects(bool $allowRedirects = true)
+    {
+        $this->modelSet('allow_redirects', $allowRedirects);
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMaxRedirects(): int
+    {
+        return (int) $this->modelGet('max_redirects');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setMaxRedirects(int $maxRedirects = 10)
+    {
+        if ($maxRedirects < 0) {
+            throw new InvalidArgumentException('Значение не может быть меньше 0');
+        }
+
+        $this->modelSet('max_redirects', $maxRedirects);
 
         return $this;
     }

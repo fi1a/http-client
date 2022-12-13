@@ -274,4 +274,47 @@ class Uri implements UriInterface
 
         return $url . ($query ? '?' . $query : '') . ($fragment ? '#' . $fragment : '');
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMaskedUri(): string
+    {
+        if (!$this->getHost()) {
+            return '';
+        }
+        $userInfo = $this->getUserInfo();
+        $port = $this->getPort();
+        $query = $this->getQuery();
+        $fragment = $this->getFragment();
+
+        return $this->getScheme() . '://' . ($userInfo ? '######:######@' : '')
+            . $this->getHost() . ($port ? ':' . $port : '') . $this->getPath()
+            . ($query ? '?' . $query : '') . ($fragment ? '#' . $fragment : '');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function replace(string $uri = '')
+    {
+        $parsed = parse_url($uri);
+        if (isset($parsed['scheme'])) {
+            $this->withScheme($parsed['scheme']);
+        }
+        if (isset($parsed['user']) && isset($parsed['pass'])) {
+            $this->withUserInfo($parsed['user'], $parsed['pass']);
+        }
+        if (isset($parsed['host'])) {
+            $this->withHost($parsed['host']);
+        }
+        if (isset($parsed['port'])) {
+            $this->withPort($parsed['port']);
+        }
+        $this->withPath($parsed['path'] ?? '')
+            ->withQuery($parsed['query'] ?? '')
+            ->withFragment($parsed['fragment'] ?? '');
+
+        return $this;
+    }
 }

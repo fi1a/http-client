@@ -22,6 +22,8 @@ class ConfigTest extends TestCase
         $this->assertTrue($config->getSslVerify());
         $this->assertEquals(10, $config->getTimeout());
         $this->assertNull($config->getCompress());
+        $this->assertTrue($config->getAllowRedirects());
+        $this->assertEquals(10, $config->getMaxRedirects());
     }
 
     /**
@@ -65,5 +67,37 @@ class ConfigTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $config = new Config();
         $config->setCompress('unknown');
+    }
+
+    /**
+     * Разрешены редиректы или нет
+     */
+    public function testAllowRedirects(): void
+    {
+        $config = new Config();
+        $this->assertTrue($config->getAllowRedirects());
+        $config->setAllowRedirects(false);
+        $this->assertFalse($config->getAllowRedirects());
+    }
+
+    /**
+     * Максимальное число редиректов
+     */
+    public function testMaxRedirects(): void
+    {
+        $config = new Config();
+        $this->assertEquals(10, $config->getMaxRedirects());
+        $config->setMaxRedirects(0);
+        $this->assertEquals(0, $config->getMaxRedirects());
+    }
+
+    /**
+     * Максимальное число редиректов (исключение при отрицательном значении)
+     */
+    public function testMaxRedirectsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $config = new Config();
+        $config->setMaxRedirects(-1);
     }
 }

@@ -46,4 +46,30 @@ interface ConfigInterface extends ValueObjectInterface
      * @return $this
      */
     public function setCompress(?string $compress = null);
+
+    /**
+     * Разрешены редиректы или нет
+     */
+    public function getAllowRedirects(): bool;
+
+    /**
+     * Разрешить редиректы
+     *
+     * @return $this
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
+    public function setAllowRedirects(bool $allowRedirects = true);
+
+    /**
+     * Максимальное число редиректов
+     */
+    public function getMaxRedirects(): int;
+
+    /**
+     * Установить максимальное число редиректов
+     *
+     * @return $this
+     */
+    public function setMaxRedirects(int $maxRedirects = 10);
 }

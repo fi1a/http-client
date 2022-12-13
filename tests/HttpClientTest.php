@@ -6,6 +6,7 @@ namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\HttpClient\Config;
 use Fi1a\HttpClient\Handlers\CurlHandler;
+use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\HttpClientInterface;
@@ -495,5 +496,47 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals('success', $response->getBody()->get());
         $this->assertEquals('success', $response->getBody()->getRaw());
         $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Редиректы
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testRedirects(HttpClientInterface $client): void
+    {
+        $response = $client->get('https://' . self::HOST . '/redirect');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::PLAIN, $response->getBody()->getContentType());
+        $this->assertEquals('success', $response->getBody()->get());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Редиректы не разрешены
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testNotAllowRedirects(HttpClientInterface $client): void
+    {
+        $client->getConfig()->setAllowRedirects(false);
+        $response = $client->get('https://' . self::HOST . '/redirect');
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertEquals('Found', $response->getReasonPhrase());
+    }
+
+    /**
+     * Редиректы не разрешены
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testMaxRedirectsException(HttpClientInterface $client): void
+    {
+        $client->getConfig()->setMaxRedirects(2);
+        $this->expectException(ErrorException::class);
+        $client->get('https://' . self::HOST . '/redirect-loop');
     }
 }

@@ -54,6 +54,14 @@ app.get('/200-ok-null-content-length', (req, res) => {
     res.status(200).send(new Array(1000001).join('r'));
 });
 
+app.get('/redirect', (req, res) => {
+    res.redirect('/200-ok-text-plain');
+});
+
+app.get('/redirect-loop', (req, res) => {
+    res.redirect('/redirect-loop');
+});
+
 https.createServer(options, app).listen(port, () => {
     console.log(`App listening on port ${port}`)
 });

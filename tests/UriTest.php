@@ -370,4 +370,80 @@ class UriTest extends TestCase
         $uri = new Uri('https');
         $this->assertEquals('', $uri->getAuthority());
     }
+
+    /**
+     * Возвращает URI с маской на данных авторизации
+     */
+    public function testGetMaskedUri(): void
+    {
+        $uri = new Uri('https://username:password@host.ru:8080/some/path/?foo=bar#fragment');
+        $this->assertEquals(
+            'https://######:######@host.ru:8080/some/path/?foo=bar#fragment',
+            $uri->getMaskedUri()
+        );
+    }
+
+    /**
+     * Возвращает URI с маской на данных авторизации
+     */
+    public function testGetMaskedUriEmpty(): void
+    {
+        $uri = new Uri('https');
+        $this->assertEquals(
+            '',
+            $uri->getMaskedUri()
+        );
+    }
+
+    /**
+     * Заменить адрес
+     */
+    public function testReplace(): void
+    {
+        $uri = new Uri('https://username:password@host.ru:8080/some/path/?foo=bar#fragment');
+        $uri->replace('/new/path');
+        $this->assertEquals(
+            'https://username:password@host.ru:8080/new/path',
+            $uri->getUri()
+        );
+    }
+
+    /**
+     * Заменить адрес
+     */
+    public function testReplaceWithQuery(): void
+    {
+        $uri = new Uri('https://username:password@host.ru:8080/some/path/?foo=bar#fragment');
+        $uri->replace('/new/path?baz=qux');
+        $this->assertEquals(
+            'https://username:password@host.ru:8080/new/path?baz=qux',
+            $uri->getUri()
+        );
+    }
+
+    /**
+     * Заменить адрес
+     */
+    public function testReplaceWithFragment(): void
+    {
+        $uri = new Uri('https://username:password@host.ru:8080/some/path/?foo=bar#fragment');
+        $uri->replace('/new/path?baz=qux#new-fragment');
+        $this->assertEquals(
+            'https://username:password@host.ru:8080/new/path?baz=qux#new-fragment',
+            $uri->getUri()
+        );
+    }
+
+    /**
+     * Заменить адрес
+     */
+    public function testReplaceFull(): void
+    {
+        $uri = new Uri('https://username:password@host.ru:8080/some/path/?foo=bar#fragment');
+        $uri->replace('https://new-username:new-password@new-host.ru:8181/new/path/?baz=qux#new-fragment');
+        $this->assertEquals(
+            'https://new-username:new-password@new-host.ru:8181/new/path/?baz=qux#new-fragment',
+            $uri->getUri()
+        );
+    }
 }
