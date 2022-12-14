@@ -52,6 +52,9 @@ class StreamHandler extends AbstractHandler
         return $response;
     }
 
+    /**
+     * Редиректы
+     */
     private function redirect(RequestInterface $request, ResponseInterface $response): bool
     {
         if (!$this->config->getAllowRedirects()) {
@@ -219,7 +222,6 @@ class StreamHandler extends AbstractHandler
             }
 
             $this->checkReadErrors($resource, $headerLine);
-
             /**
              * @psalm-suppress PossiblyFalseArgument
              */

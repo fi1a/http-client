@@ -32,6 +32,11 @@ interface ResponseInterface extends MessageInterface
     public function hasErrors(): bool;
 
     /**
+     * Запрос выполнен успешно или нет
+     */
+    public function isSuccess(): bool;
+
+    /**
      * Установить тело ответа
      *
      * @return $this

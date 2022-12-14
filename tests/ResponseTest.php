@@ -75,6 +75,26 @@ class ResponseTest extends TestCase
     }
 
     /**
+     * Успешно выполнен
+     */
+    public function testIsSuccess(): void
+    {
+        $response = $this->getResponse();
+        $response->withStatus(200, 'OK');
+        $this->assertTrue($response->isSuccess());
+    }
+
+    /**
+     * Успешно выполнен
+     */
+    public function testIsNotSuccess(): void
+    {
+        $response = $this->getResponse();
+        $response->withStatus(400, 'Bad Request');
+        $this->assertFalse($response->isSuccess());
+    }
+
+    /**
      * Значение тела ответа по умолчанию
      */
     public function testDefaultBody(): void

@@ -73,6 +73,14 @@ class Response extends Message implements ResponseInterface
     /**
      * @inheritDoc
      */
+    public function isSuccess(): bool
+    {
+        return !$this->hasErrors();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function withBody(string $rawBody, ?string $mime = null)
     {
         $this->body->withBody($rawBody, $mime);

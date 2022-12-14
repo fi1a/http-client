@@ -6,7 +6,6 @@ namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\HttpClient\Config;
 use Fi1a\HttpClient\Cookie\CookieInterface;
-use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
@@ -27,39 +26,6 @@ use InvalidArgumentException;
  */
 class HttpClientTest extends ServerTestCase
 {
-    /**
-     * Возвращает HTTP-client
-     */
-    private function getStreamClient(): HttpClientInterface
-    {
-        return new HttpClient(new Config(['ssl_verify' => false]), StreamHandler::class);
-    }
-
-    /**
-     * Возвращает HTTP-client
-     */
-    private function getCurlClient(): HttpClientInterface
-    {
-        return new HttpClient(new Config(['ssl_verify' => false]), CurlHandler::class);
-    }
-
-    /**
-     * Настроенные клиенты для тестов
-     *
-     * @return HttpClientInterface[][]
-     */
-    public function clientDataProvider(): array
-    {
-        return [
-            [
-                $this->getStreamClient(),
-            ],
-            [
-                $this->getCurlClient(),
-            ],
-        ];
-    }
-
     /**
      * Отправка запроса
      *
