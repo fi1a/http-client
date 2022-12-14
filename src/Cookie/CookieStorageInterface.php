@@ -17,5 +17,14 @@ interface CookieStorageInterface
     /**
      * Возвращает коллекцию кук для домена и пути
      */
-    public function getCookies(string $domain, string $path, ?string $scheme = null): CookieCollectionInterface;
+    public function getCookiesWithCondidition(
+        string $domain,
+        string $path,
+        ?string $scheme = null
+    ): CookieCollectionInterface;
+
+    /**
+     * Возвращает коллекцию кук
+     */
+    public function getCookies(): CookieCollectionInterface;
 }

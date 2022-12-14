@@ -304,7 +304,7 @@ class HttpClient implements HttpClientInterface
         }
 
         $response->withCookies(
-            $this->cookieStorage->getCookies(
+            $this->cookieStorage->getCookiesWithCondidition(
                 $request->getUri()->getHost(),
                 $request->getUri()->getPath()
             )
@@ -321,7 +321,7 @@ class HttpClient implements HttpClientInterface
         }
 
         $request->withCookies(
-            $this->cookieStorage->getCookies(
+            $this->cookieStorage->getCookiesWithCondidition(
                 $request->getUri()->getHost(),
                 $request->getUri()->getPath(),
                 $request->getUri()->getScheme()

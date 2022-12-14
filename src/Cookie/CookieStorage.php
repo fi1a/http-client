@@ -14,7 +14,7 @@ class CookieStorage implements CookieStorageInterface
     /**
      * @var CookieCollectionInterface
      */
-    private $cookies;
+    protected $cookies;
 
     public function __construct()
     {
@@ -64,8 +64,11 @@ class CookieStorage implements CookieStorageInterface
     /**
      * @inheritDoc
      */
-    public function getCookies(string $domain, string $path, ?string $scheme = null): CookieCollectionInterface
-    {
+    public function getCookiesWithCondidition(
+        string $domain,
+        string $path,
+        ?string $scheme = null
+    ): CookieCollectionInterface {
         /**
          * @var CookieCollectionInterface $collection
          */
@@ -77,5 +80,13 @@ class CookieStorage implements CookieStorageInterface
         });
 
         return $collection;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCookies(): CookieCollectionInterface
+    {
+        return $this->cookies;
     }
 }

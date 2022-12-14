@@ -169,8 +169,8 @@ class CookieStorageTest extends TestCase
             'Path' => '/',
         ]);
         $this->assertTrue($storage->addCookie($cookie4));
-        $this->assertCount(2, $storage->getCookies('domain.ru', '/'));
-        $this->assertCount(3, $storage->getCookies('domain.ru', '/some/path'));
-        $this->assertCount(1, $storage->getCookies('otherdomain.ru', '/'));
+        $this->assertCount(2, $storage->getCookiesWithCondidition('domain.ru', '/'));
+        $this->assertCount(3, $storage->getCookiesWithCondidition('domain.ru', '/some/path'));
+        $this->assertCount(1, $storage->getCookiesWithCondidition('otherdomain.ru', '/'));
     }
 }
