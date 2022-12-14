@@ -72,4 +72,16 @@ interface ConfigInterface extends ValueObjectInterface
      * @return $this
      */
     public function setMaxRedirects(int $maxRedirects = 10);
+
+    /**
+     * Установить флаг использования кук
+     *
+     * @return $this
+     */
+    public function setCookie(bool $cookie);
+
+    /**
+     * Использовать куки или нет
+     */
+    public function getCookie(): bool;
 }

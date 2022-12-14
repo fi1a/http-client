@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares;
+namespace Fi1a\Unit\HttpClient\Fixtures\Middlewares;
 
 use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
@@ -10,9 +10,9 @@ use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
 
 /**
- * Промежуточное ПО для запроса (останаливает запрос)
+ * Промежуточное ПО для запроса (неизвестное сжатие)
  */
-class StopMiddleware implements MiddlewareInterface
+class UnknownContentEncodingMiddleware implements MiddlewareInterface
 {
     /**
      * @inheritDoc
@@ -22,7 +22,9 @@ class StopMiddleware implements MiddlewareInterface
         ResponseInterface $response,
         HttpClientInterface $httpClient
     ): bool {
-        return false;
+        $response->withHeader('Content-Encoding', 'unknown');
+
+        return true;
     }
 
     /**

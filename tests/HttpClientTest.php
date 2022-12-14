@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\HttpClient\Config;
+use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 use Fi1a\HttpClient\Handlers\StreamHandler;
@@ -13,11 +14,11 @@ use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Uri;
-use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\ResponseSet500StatusMiddleware;
-use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\ResponseStopMiddleware;
-use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\Set500StatusMiddleware;
-use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\StopMiddleware;
-use Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares\UnknownContentEncodingMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ResponseSet500StatusMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ResponseStopMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\Set500StatusMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\StopMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\UnknownContentEncodingMiddleware;
 use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;
 use InvalidArgumentException;
 
@@ -78,7 +79,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testGetSendTextPlainResponse(HttpClientInterface $client): void
     {
-        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain');
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -96,7 +97,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testGetSendJsonResponse(HttpClientInterface $client): void
     {
-        $uri = new Uri('https://' . self::HOST . '/200-ok-json');
+        $uri = new Uri('https://' . self::HOST . '/200-ok-json/');
         $uri->withQueryParams(['foo' => 'bar']);
         $request = Request::create()->get($uri);
         $response = $client->send($request);
@@ -116,7 +117,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testPostSend(HttpClientInterface $client): void
     {
-        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
+        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post/', ['foo' => 'bar']);
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -134,7 +135,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testGet(HttpClientInterface $client): void
     {
-        $uri = new Uri('https://' . self::HOST . '/200-ok-json');
+        $uri = new Uri('https://' . self::HOST . '/200-ok-json/');
         $uri->withQueryParams(['foo' => 'bar']);
         $response = $client->get($uri, 'json');
         $this->assertEquals(200, $response->getStatusCode());
@@ -154,7 +155,7 @@ class HttpClientTest extends ServerTestCase
     public function testPost(HttpClientInterface $client): void
     {
         $response = $client->post(
-            'https://' . self::HOST . '/200-ok-post',
+            'https://' . self::HOST . '/200-ok-post/',
             ['foo' => 'bar'],
             'form'
         );
@@ -175,7 +176,7 @@ class HttpClientTest extends ServerTestCase
     public function testPut(HttpClientInterface $client): void
     {
         $response = $client->put(
-            'https://' . self::HOST . '/200-ok-put',
+            'https://' . self::HOST . '/200-ok-put/',
             ['foo' => 'bar'],
             'form'
         );
@@ -196,7 +197,7 @@ class HttpClientTest extends ServerTestCase
     public function testPatch(HttpClientInterface $client): void
     {
         $response = $client->patch(
-            'https://' . self::HOST . '/200-ok-patch',
+            'https://' . self::HOST . '/200-ok-patch/',
             ['foo' => 'bar'],
             'form'
         );
@@ -216,7 +217,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testDelete(HttpClientInterface $client): void
     {
-        $uri = new Uri('https://' . self::HOST . '/200-ok-delete');
+        $uri = new Uri('https://' . self::HOST . '/200-ok-delete/');
         $uri->withQueryParams(['foo' => 'bar']);
         $response = $client->delete($uri);
         $this->assertEquals(200, $response->getStatusCode());
@@ -235,7 +236,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testHead(HttpClientInterface $client): void
     {
-        $response = $client->head('https://' . self::HOST . '/200-ok-head');
+        $response = $client->head('https://' . self::HOST . '/200-ok-head/');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertFalse($response->getBody()->has());
@@ -248,7 +249,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testOptions(HttpClientInterface $client): void
     {
-        $response = $client->options('https://' . self::HOST . '/200-ok-options');
+        $response = $client->options('https://' . self::HOST . '/200-ok-options/');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
@@ -265,7 +266,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function test404Status(HttpClientInterface $client): void
     {
-        $uri = new Uri('https://' . self::HOST . '/404-not-found');
+        $uri = new Uri('https://' . self::HOST . '/404-not-found/');
         $uri->withQueryParams(['foo' => 'bar']);
         $response = $client->get($uri);
         $this->assertEquals(404, $response->getStatusCode());
@@ -283,7 +284,7 @@ class HttpClientTest extends ServerTestCase
     public function testStopMiddleware(HttpClientInterface $client): void
     {
         $client->addMiddleware(new StopMiddleware());
-        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain');
+        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(0, $response->getStatusCode());
         $this->assertEquals('', $response->getReasonPhrase());
         $this->assertFalse($response->getBody()->has());
@@ -298,7 +299,7 @@ class HttpClientTest extends ServerTestCase
     {
         $client->addMiddleware(new StopMiddleware(), 600);
         $client->addMiddleware(new Set500StatusMiddleware(), 100);
-        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain');
+        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(500, $response->getStatusCode());
     }
 
@@ -311,7 +312,7 @@ class HttpClientTest extends ServerTestCase
     {
         $client->addMiddleware(new ResponseStopMiddleware(), 600);
         $client->addMiddleware(new ResponseSet500StatusMiddleware(), 100);
-        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain');
+        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(500, $response->getStatusCode());
     }
 
@@ -340,7 +341,9 @@ class HttpClientTest extends ServerTestCase
      */
     public function testContentHeadersAccept(HttpClientInterface $client): void
     {
-        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain', 'json');
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/', 'json')
+            ->withExpectedType('json');
+
         $response = $client->send($request);
         $this->assertEquals(MimeInterface::JSON, $request->getLastHeader('Accept')->getValue());
         $this->assertEquals(200, $response->getStatusCode());
@@ -359,7 +362,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testContentHeadersContentTypeForm(HttpClientInterface $client): void
     {
-        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
+        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post/', ['foo' => 'bar']);
         $response = $client->send($request);
         $this->assertEquals(MimeInterface::FORM, $request->getLastHeader('Content-Type')->getValue());
         $this->assertEquals(200, $response->getStatusCode());
@@ -418,7 +421,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testDefaultContentType(HttpClientInterface $client): void
     {
-        $request = Request::create()->head('https://' . self::HOST . '/200-ok-head')->withBody('plain-text');
+        $request = Request::create()->head('https://' . self::HOST . '/200-ok-head/')->withBody('plain-text');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -432,7 +435,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testProtocolVersion10(HttpClientInterface $client): void
     {
-        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain')->withProtocolVersion('1.0');
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/')->withProtocolVersion('1.0');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -450,7 +453,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testProtocolVersion11(HttpClientInterface $client): void
     {
-        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain')->withProtocolVersion('1.1');
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/')->withProtocolVersion('1.1');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -468,7 +471,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testProtocolVersion20(HttpClientInterface $client): void
     {
-        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain')->withProtocolVersion('2.0');
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/')->withProtocolVersion('2.0');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -486,7 +489,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testProtocolVersionUnknown(HttpClientInterface $client): void
     {
-        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain')
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/')
             ->withProtocolVersion('UNKNOWN');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
@@ -505,7 +508,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testRedirects(HttpClientInterface $client): void
     {
-        $response = $client->get('https://' . self::HOST . '/redirect');
+        $response = $client->get('https://' . self::HOST . '/redirect/');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
@@ -523,7 +526,7 @@ class HttpClientTest extends ServerTestCase
     public function testNotAllowRedirects(HttpClientInterface $client): void
     {
         $client->getConfig()->setAllowRedirects(false);
-        $response = $client->get('https://' . self::HOST . '/redirect');
+        $response = $client->get('https://' . self::HOST . '/redirect/');
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertEquals('Found', $response->getReasonPhrase());
     }
@@ -537,6 +540,80 @@ class HttpClientTest extends ServerTestCase
     {
         $client->getConfig()->setMaxRedirects(2);
         $this->expectException(ErrorException::class);
-        $client->get('https://' . self::HOST . '/redirect-loop');
+        $client->get('https://' . self::HOST . '/redirect-loop/');
+    }
+
+    /**
+     * Куки
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testCookie(HttpClientInterface $client): void
+    {
+        $client->getConfig()->setCookie(true);
+        $response = $client->get('https://' . self::HOST . '/cookie/');
+        $this->assertCount(2, $response->getCookies());
+        $this->assertInstanceOf(
+            CookieInterface::class,
+            $response->getCookies()->getByName('cookieName1')
+        );
+        $this->assertEquals(1, (int) $response->getCookies()->getByName('cookieName1')->getValue());
+        $this->assertEquals('value2=value2', $response->getCookies()->getByName('cookieName2')->getValue());
+
+        $request = Request::create()->get('https://' . self::HOST . '/send-cookie/');
+        $response = $client->send($request);
+        $this->assertCount(2, $request->getCookies());
+        $this->assertInstanceOf(
+            CookieInterface::class,
+            $request->getCookies()->getByName('cookieName1')
+        );
+        $this->assertEquals(1, (int) $request->getCookies()->getByName('cookieName1')->getValue());
+        $this->assertEquals('value2=value2', $request->getCookies()->getByName('cookieName2')->getValue());
+        $this->assertCount(3, $response->getCookies());
+        $this->assertInstanceOf(
+            CookieInterface::class,
+            $response->getCookies()->getByName('cookieName1')
+        );
+        $this->assertEquals(1, (int) $response->getCookies()->getByName('cookieName1')->getValue());
+        $this->assertEquals('value2=value2', $response->getCookies()->getByName('cookieName2')->getValue());
+        $this->assertEquals(1, (int) $response->getCookies()->getByName('cookieName3')->getValue());
+    }
+
+    /**
+     * Куки (пропускает пустой заголовок)
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testCookieEmptyHeader(HttpClientInterface $client): void
+    {
+        $client->getConfig()->setCookie(true);
+        $response = $client->get('https://' . self::HOST . '/cookie-empty/');
+        $this->assertCount(0, $response->getCookies());
+    }
+
+    /**
+     * Куки (устанавливает путь)
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testCookieSetPath(HttpClientInterface $client): void
+    {
+        $client->getConfig()->setCookie(true);
+        $response = $client->get('https://' . self::HOST . '/cookie-path/');
+        $this->assertCount(1, $response->getCookies());
+        $this->assertEquals('/cookie-path', $response->getCookies()->getByName('cookieName3')->getPath());
+    }
+
+    /**
+     * Куки (устанавливает путь)
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testCookieSetPathSlash(HttpClientInterface $client): void
+    {
+        $client->getConfig()->setCookie(true);
+        $response = $client->get('https://' . self::HOST . '/cookie-path');
+        $this->assertCount(1, $response->getCookies());
+        $this->assertEquals('/', $response->getCookies()->getByName('cookieName3')->getPath());
     }
 }

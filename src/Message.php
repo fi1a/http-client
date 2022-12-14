@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\HttpClient\Cookie\CookieCollection;
+use Fi1a\HttpClient\Cookie\CookieCollectionInterface;
+
 /**
  * Сообщение
  */
@@ -24,9 +27,15 @@ class Message implements MessageInterface
      */
     private $encoding = 'utf-8';
 
+    /**
+     * @var CookieCollectionInterface
+     */
+    private $cookies;
+
     public function __construct()
     {
         $this->headers = new HeaderCollection();
+        $this->cookies = new CookieCollection();
     }
 
     /**
@@ -142,5 +151,23 @@ class Message implements MessageInterface
         $this->headers->exchangeArray([]);
 
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCookies(): CookieCollectionInterface
+    {
+        return $this->cookies;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function withCookies(CookieCollectionInterface $collection)
+    {
+        $this->cookies = $collection;
+
+        return $this;
     }
 }

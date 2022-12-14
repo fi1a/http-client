@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares;
+namespace Fi1a\Unit\HttpClient\Fixtures\Middlewares;
 
 use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
@@ -12,7 +12,7 @@ use Fi1a\HttpClient\ResponseInterface;
 /**
  * Промежуточное ПО для запроса (останаливает запрос)
  */
-class ResponseSet500StatusMiddleware implements MiddlewareInterface
+class Set500StatusMiddleware implements MiddlewareInterface
 {
     /**
      * @inheritDoc
@@ -22,6 +22,8 @@ class ResponseSet500StatusMiddleware implements MiddlewareInterface
         ResponseInterface $response,
         HttpClientInterface $httpClient
     ): bool {
+        $response->withStatus(500);
+
         return true;
     }
 
@@ -30,8 +32,6 @@ class ResponseSet500StatusMiddleware implements MiddlewareInterface
         ResponseInterface $response,
         HttpClientInterface $httpClient
     ): bool {
-        $response->withStatus(500);
-
         return true;
     }
 }

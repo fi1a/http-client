@@ -71,8 +71,9 @@ class Request extends Message implements RequestInterface
     public function get($uri, ?string $mime = null)
     {
         $this->withMethod(HttpInterface::GET)
-            ->withUri($this->createUri($uri))
-            ->withMime($mime);
+            ->withUri($this->createUri($uri));
+
+        $this->body->withContentType($mime);
 
         return $this;
     }
@@ -141,8 +142,9 @@ class Request extends Message implements RequestInterface
     public function delete($uri, ?string $mime = null)
     {
         $this->withMethod(HttpInterface::DELETE)
-            ->withUri($this->createUri($uri))
-            ->withMime($mime);
+            ->withUri($this->createUri($uri));
+
+        $this->body->withContentType($mime);
 
         return $this;
     }
@@ -204,7 +206,6 @@ class Request extends Message implements RequestInterface
     public function withBody($body, ?string $mime = null)
     {
         $this->body->withBody($body, $mime);
-        $this->withExpectedType($mime);
 
         return $this;
     }

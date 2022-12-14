@@ -12,6 +12,8 @@ use InvalidArgumentException;
  */
 class Config extends ValueObject implements ConfigInterface
 {
+    protected $modelKeys = ['ssl_verify', 'timeout', 'compress', 'allow_redirects', 'max_redirects', 'cookie'];
+
     /**
      * @inheritDoc
      */
@@ -23,6 +25,7 @@ class Config extends ValueObject implements ConfigInterface
             'compress' => null,
             'allow_redirects' => true,
             'max_redirects' => 10,
+            'cookie' => false,
         ];
     }
 
@@ -131,5 +134,23 @@ class Config extends ValueObject implements ConfigInterface
         $this->modelSet('max_redirects', $maxRedirects);
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setCookie(bool $cookie)
+    {
+        $this->modelSet('cookie', $cookie);
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCookie(): bool
+    {
+        return (bool) $this->modelGet('cookie');
     }
 }

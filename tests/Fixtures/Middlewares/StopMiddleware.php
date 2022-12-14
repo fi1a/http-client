@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Fi1a\Unit\HttpClient\Fixtures\RequestMiddlewares;
+namespace Fi1a\Unit\HttpClient\Fixtures\Middlewares;
 
 use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
@@ -12,7 +12,7 @@ use Fi1a\HttpClient\ResponseInterface;
 /**
  * Промежуточное ПО для запроса (останаливает запрос)
  */
-class ResponseStopMiddleware implements MiddlewareInterface
+class StopMiddleware implements MiddlewareInterface
 {
     /**
      * @inheritDoc
@@ -22,7 +22,7 @@ class ResponseStopMiddleware implements MiddlewareInterface
         ResponseInterface $response,
         HttpClientInterface $httpClient
     ): bool {
-        return true;
+        return false;
     }
 
     /**
@@ -33,6 +33,6 @@ class ResponseStopMiddleware implements MiddlewareInterface
         ResponseInterface $response,
         HttpClientInterface $httpClient
     ): bool {
-        return false;
+        return true;
     }
 }

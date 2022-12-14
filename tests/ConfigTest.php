@@ -24,6 +24,7 @@ class ConfigTest extends TestCase
         $this->assertNull($config->getCompress());
         $this->assertTrue($config->getAllowRedirects());
         $this->assertEquals(10, $config->getMaxRedirects());
+        $this->assertFalse($config->getCookie());
     }
 
     /**
@@ -99,5 +100,16 @@ class ConfigTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $config = new Config();
         $config->setMaxRedirects(-1);
+    }
+
+    /**
+     * Использовать куки или нет
+     */
+    public function testCookie(): void
+    {
+        $config = new Config();
+        $this->assertFalse($config->getCookie());
+        $config->setCookie(true);
+        $this->assertTrue($config->getCookie());
     }
 }

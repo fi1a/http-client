@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\HttpClient\Cookie\CookieCollectionInterface;
+
 /**
  * Сообщение
  */
@@ -79,4 +81,16 @@ interface MessageInterface
      * Удаляет все заголовки
      */
     public function clearHeaders(): bool;
+
+    /**
+     * Возвращает коллекцию кук
+     */
+    public function getCookies(): CookieCollectionInterface;
+
+    /**
+     * Устанавливает коллекцию кук
+     *
+     * @return $this
+     */
+    public function withCookies(CookieCollectionInterface $collection);
 }

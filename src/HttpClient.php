@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\HttpClient\Cookie\Cookie;
+use Fi1a\HttpClient\Cookie\CookieInterface;
+use Fi1a\HttpClient\Cookie\CookieStorage;
+use Fi1a\HttpClient\Cookie\CookieStorageInterface;
 use Fi1a\HttpClient\Handlers\HandlerInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
 use InvalidArgumentException;
@@ -28,8 +32,16 @@ class HttpClient implements HttpClientInterface
      */
     private $middlewares = [];
 
-    public function __construct(ConfigInterface $config, string $handler)
-    {
+    /**
+     * @var CookieStorageInterface
+     */
+    private $cookieStorage;
+
+    public function __construct(
+        ConfigInterface $config,
+        string $handler,
+        ?CookieStorageInterface $cookieStorage = null
+    ) {
         if (!is_subclass_of($handler, HandlerInterface::class)) {
             throw new InvalidArgumentException(
                 'Обработчик запросов должен реализовывать интерфейс ' . HandlerInterface::class
@@ -37,6 +49,10 @@ class HttpClient implements HttpClientInterface
         }
         $this->config = $config;
         $this->handler = $handler;
+        if (!$cookieStorage) {
+            $cookieStorage = new CookieStorage();
+        }
+        $this->cookieStorage = $cookieStorage;
     }
 
     /**
@@ -64,6 +80,7 @@ class HttpClient implements HttpClientInterface
         $this->addDefaultHeaders($request);
         $this->addAcceptHeaders($request);
         $this->addContentHeaders($request);
+        $this->setCookieToRequest($request);
 
         if ($this->callRequestMiddlewares($request, $response) === false) {
             return $response;
@@ -72,6 +89,8 @@ class HttpClient implements HttpClientInterface
         $instance = $this->factoryHandler();
 
         $response = $instance->send($request, $response);
+
+        $this->setCookieToResponse($request, $response);
 
         if ($this->callResponseMiddlewares($request, $response) === false) {
             return $response;
@@ -134,6 +153,14 @@ class HttpClient implements HttpClientInterface
     public function options($uri): ResponseInterface
     {
         return $this->send(Request::create()->options($uri));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getConfig(): ConfigInterface
+    {
+        return $this->config;
     }
 
     /**
@@ -249,10 +276,86 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
-     * @inheritDoc
+     * Устанавливает куки для ответа
      */
-    public function getConfig(): ConfigInterface
+    private function setCookieToResponse(RequestInterface $request, ResponseInterface $response): void
     {
-        return $this->config;
+        if (!$this->config->getCookie()) {
+            return;
+        }
+
+        if ($response->hasHeader('Set-Cookie')) {
+            foreach ($response->getHeader('Set-Cookie') as $header) {
+                assert($header instanceof HeaderInterface);
+                $value = $header->getValue();
+                if (!$value) {
+                    continue;
+                }
+                $cookie = Cookie::fromString($value);
+                if (!$cookie->getDomain()) {
+                    $cookie->setDomain($request->getUri()->getHost());
+                }
+                if (mb_strpos($cookie->getPath(), '/') !== 0) {
+                    $cookie->setPath($this->getCookiePath($request->getUri()->getPath()));
+                }
+
+                $this->cookieStorage->addCookie($cookie);
+            }
+        }
+
+        $response->withCookies(
+            $this->cookieStorage->getCookies(
+                $request->getUri()->getHost(),
+                $request->getUri()->getPath()
+            )
+        );
+    }
+
+    /**
+     * Устанавливает куки для запроса
+     */
+    private function setCookieToRequest(RequestInterface $request): void
+    {
+        if (!$this->config->getCookie()) {
+            return;
+        }
+
+        $request->withCookies(
+            $this->cookieStorage->getCookies(
+                $request->getUri()->getHost(),
+                $request->getUri()->getPath(),
+                $request->getUri()->getScheme()
+            )
+        );
+
+        $cookies = [];
+        foreach ($request->getCookies()->getValid() as $cookie) {
+            assert($cookie instanceof CookieInterface);
+            /**
+             * @var string $name
+             */
+            $name = $cookie->getName();
+            /**
+             * @var string $value
+             */
+            $value = $cookie->getValue();
+            $cookies[] = $name . '=' . rawurlencode($value);
+        }
+        if (count($cookies)) {
+            $request->withHeader('Cookie', implode('; ', $cookies));
+        }
+    }
+
+    /**
+     * Возвращает путь куки
+     */
+    private function getCookiePath(string $url): string
+    {
+        $lastSlashes = mb_strrpos($url, '/');
+        if ($url === '' || mb_strpos($url, '/') !== 0 || $url === '/' || !$lastSlashes) {
+            return '/';
+        }
+
+        return mb_substr($url, 0, $lastSlashes);
     }
 }

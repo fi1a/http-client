@@ -1,5 +1,6 @@
 const express = require('express'),
     compress = require('compression'),
+    cookieParser = require('cookie-parser'),
     fs = require('fs'),
     https = require('https'),
     app = express(),
@@ -12,6 +13,7 @@ const options = {
     cert: fs.readFileSync(__dirname + '/ssl/cert.pem').toString(),
 };
 
+app.use(cookieParser());
 app.use(compress({threshold: 0}));
 app.use(express.static(__dirname + '/public', { maxAge: oneYear }));
 
@@ -60,6 +62,37 @@ app.get('/redirect', (req, res) => {
 
 app.get('/redirect-loop', (req, res) => {
     res.redirect('/redirect-loop');
+});
+
+app.get('/cookie', (req, res, next) => {
+    let cookie = req.cookies.cookieName1,
+        value = 1;
+
+    if (cookie) {
+    }
+
+    res.cookie('cookieName1', value, {maxAge: 900000, httpOnly: true});
+    res.cookie('cookieName2', 'value2=value2', {maxAge: 100000, httpOnly: false, secure: true, domain: '127.0.0.1'});
+    res.status(200);
+    next();
+});
+
+app.get('/cookie-empty', (req, res, next) => {
+    res.status(200).setHeader('Set-Cookie', ' ');
+    next();
+});
+
+app.get('/cookie-path', (req, res, next) => {
+    res.status(200).setHeader('Set-Cookie', 'cookieName3=value3; Path=path');
+    next();
+});
+
+app.get('/send-cookie', (req, res, next) => {
+    let cookie = req.cookies.cookieName1;
+
+    res.cookie('cookieName3', cookie);
+    res.status(200);
+    next();
 });
 
 https.createServer(options, app).listen(port, () => {
