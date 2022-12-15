@@ -9,7 +9,10 @@ namespace Fi1a\HttpClient;
  */
 interface UriInterface
 {
-    public function __construct(string $uri = '');
+    /**
+     * @param mixed[] $variables
+     */
+    public function __construct(string $uri = '', array $variables = []);
 
     /**
      * Схема
@@ -134,7 +137,9 @@ interface UriInterface
     /**
      * Заменить адрес переданным значением
      *
+     * @param mixed[]  $variables
+     *
      * @return $this
      */
-    public function replace(string $uri = '');
+    public function replace(string $uri = '', array $variables = []);
 }

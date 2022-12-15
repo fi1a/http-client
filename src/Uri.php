@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\Format\Formatter;
 use InvalidArgumentException;
 
 /**
@@ -64,9 +65,12 @@ class Uri implements UriInterface
      */
     private $fragment;
 
-    public function __construct(string $uri = '')
+    /**
+     * @inheritDoc
+     */
+    public function __construct(string $uri = '', array $variables = [])
     {
-        $parsed = parse_url($uri);
+        $parsed = parse_url(Formatter::format($uri, $variables));
         $this->withScheme($parsed['scheme'] ?? 'https')
             ->withUserInfo($parsed['user'] ?? '', $parsed['pass'] ?? null)
             ->withHost($parsed['host'] ?? '')
@@ -296,9 +300,9 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function replace(string $uri = '')
+    public function replace(string $uri = '', array $variables = [])
     {
-        $parsed = parse_url($uri);
+        $parsed = parse_url(Formatter::format($uri, $variables));
         if (isset($parsed['scheme'])) {
             $this->withScheme($parsed['scheme']);
         }
