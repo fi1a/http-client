@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Fi1a\Unit\HttpClient\Middlewares;
 
 use Fi1a\HttpClient\HttpClientInterface;
-use Fi1a\HttpClient\Middlewares\BasicAuthMiddleware;
+use Fi1a\HttpClient\Middlewares\BearerAuthMiddleware;
 use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;
+use InvalidArgumentException;
 
-/**
- * Basic Auth
- */
-class BasicAuthMiddlewareTest extends ServerTestCase
+class BearerAuthMiddlewareTest extends ServerTestCase
 {
     /**
      * Успешная авторизация
@@ -20,8 +18,8 @@ class BasicAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthSuccess(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new BasicAuthMiddleware('test', 'test'));
-        $response = $client->get('https://' . self::HOST . '/basic-auth/');
+        $client->addMiddleware(new BearerAuthMiddleware('123'));
+        $response = $client->get('https://' . self::HOST . '/bearer-auth/');
         $this->assertTrue($response->isSuccess());
         $this->assertEquals(200, $response->getStatusCode());
     }
@@ -33,9 +31,18 @@ class BasicAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthNotSuccess(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new BasicAuthMiddleware('test', ''));
-        $response = $client->get('https://' . self::HOST . '/basic-auth/');
+        $client->addMiddleware(new BearerAuthMiddleware('unknown'));
+        $response = $client->get('https://' . self::HOST . '/bearer-auth/');
         $this->assertFalse($response->isSuccess());
         $this->assertEquals(401, $response->getStatusCode());
+    }
+
+    /**
+     * Исключение при пустом токене
+     */
+    public function testEmptyTokenException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new BearerAuthMiddleware('');
     }
 }

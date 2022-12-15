@@ -2,6 +2,8 @@ const express = require('express'),
     compress = require('compression'),
     cookieParser = require('cookie-parser'),
     basicAuth = require('basic-auth'),
+    passport = require('passport'),
+    BearerStrategy = require('passport-http-bearer').Strategy,
     fs = require('fs'),
     https = require('https'),
     app = express(),
@@ -19,6 +21,19 @@ const auth = {name: 'test', pass: 'test'}
 app.use(cookieParser());
 app.use(compress({threshold: 0}));
 app.use(express.static(__dirname + '/public', { maxAge: oneYear }));
+passport.use(new BearerStrategy(
+    function(token, done){
+        if (token === '123') {
+            const user = {
+                success: true
+            }
+
+            return done(null, user);
+        }
+
+        return done(null, false);
+    }
+));
 
 app.get('/200-ok-text-plain/', (req, res) => {
     res.status(200);
@@ -109,6 +124,13 @@ app.get('/basic-auth/', (req, res, next) => {
     }
 
     res.status(200).send('Access granted');
+    next();
+});
+
+app.get('/bearer-auth/', passport.authenticate('bearer', { session: false }), (req, res, next) => {
+    if (req.user.success) {
+        res.status(200).send('Access granted');
+    }
     next();
 });
 
