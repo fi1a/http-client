@@ -6,6 +6,7 @@ namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\HttpClient\Config;
 use Fi1a\HttpClient\Cookie\CookieInterface;
+use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
 use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
@@ -600,5 +601,16 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
+    }
+
+    /**
+     * Ошибка соединения при протоколе http
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testConnectionError(HttpClientInterface $client): void
+    {
+        $this->expectException(ConnectionErrorException::class);
+        $client->get('http://' . self::HOST . '/200-ok-text-plain/');
     }
 }
