@@ -32,6 +32,16 @@ interface UriInterface
     public function getUserInfo(): string;
 
     /**
+     * Возвращает имя пользователя
+     */
+    public function getUser(): string;
+
+    /**
+     * Возвращает пароль
+     */
+    public function getPassword(): ?string;
+
+    /**
      * Задать информацию о пользователе
      *
      * @return $this

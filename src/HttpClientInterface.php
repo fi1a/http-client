@@ -86,4 +86,11 @@ interface HttpClientInterface
      * Возвращает конфигурацию
      */
     public function getConfig(): ConfigInterface;
+
+    /**
+     * Добавляет префикс к используемым адресам
+     *
+     * @return $this
+     */
+    public function withUrlPrefix(?string $urlPrefix);
 }
