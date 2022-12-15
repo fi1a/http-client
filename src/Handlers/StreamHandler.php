@@ -98,10 +98,10 @@ class StreamHandler extends AbstractHandler
 
         while (!feof($resource)) {
             $line = $this->readContentLine($resource, self::STREAM_READ_LENGTH);
-            $this->checkReadErrors($resource, $line);
             if ($line === "\r\n" || $line === false) {
                 continue;
             }
+            $this->checkReadErrors($resource, $line);
             /**
              * @psalm-suppress PossiblyFalseArgument
              */
