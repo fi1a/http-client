@@ -100,7 +100,7 @@ class StreamHandler extends AbstractHandler
         while (!feof($resource)) {
             $line = $this->readContentLine($resource, self::STREAM_READ_LENGTH);
             $this->checkReadErrors($resource, $line);
-            if ($line === "\r\n") {
+            if ($line === "\r\n" || $line === false) {
                 continue;
             }
             /**
@@ -253,7 +253,7 @@ class StreamHandler extends AbstractHandler
      */
     private function checkReadErrors($resource, $line)
     {
-        if ($line === false) {
+        if ($line === false && !feof($resource)) {
             $this->disconnect($resource);
 
             throw new ErrorException('Ошибка при чтении потока');
