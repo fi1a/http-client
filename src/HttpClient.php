@@ -37,6 +37,11 @@ class HttpClient implements HttpClientInterface
      */
     private $cookieStorage;
 
+    /**
+     * @var string|null
+     */
+    private $urlPrefix;
+
     public function __construct(
         ConfigInterface $config,
         string $handler,
@@ -71,6 +76,8 @@ class HttpClient implements HttpClientInterface
      */
     public function send(RequestInterface $request): ResponseInterface
     {
+        $this->setUrlPrefix($request);
+
         if (!$request->getUri()->getHost()) {
             throw new InvalidArgumentException('Не передан хост для запроса');
         }
@@ -168,6 +175,16 @@ class HttpClient implements HttpClientInterface
     public function getConfig(): ConfigInterface
     {
         return $this->config;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function withUrlPrefix(?string $urlPrefix)
+    {
+        $this->urlPrefix = $urlPrefix;
+
+        return $this;
     }
 
     /**
@@ -377,5 +394,33 @@ class HttpClient implements HttpClientInterface
         }
 
         return mb_substr($url, 0, $lastSlashes);
+    }
+
+    /**
+     * Устанавливает префикс для адреса
+     */
+    private function setUrlPrefix(RequestInterface $request): void
+    {
+        if (!$this->urlPrefix) {
+            return;
+        }
+
+        $prefixUri = new Uri($this->urlPrefix);
+        $uri = $request->getUri();
+        if ($prefixUri->getScheme()) {
+            $uri->withScheme($prefixUri->getScheme());
+        }
+        if ($prefixUri->getUserInfo()) {
+            $uri->withUserInfo($prefixUri->getUser(), $prefixUri->getPassword());
+        }
+        if ($prefixUri->getHost()) {
+            $uri->withHost($prefixUri->getHost());
+        }
+        if ($prefixUri->getPort()) {
+            $uri->withPort($prefixUri->getPort());
+        }
+        if ($prefixUri->getPath()) {
+            $uri->withPath($prefixUri->getPath() . $uri->getPath());
+        }
     }
 }

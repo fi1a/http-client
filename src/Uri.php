@@ -108,12 +108,29 @@ class Uri implements UriInterface
      */
     public function getUserInfo(): string
     {
-        $userInfo = $this->user;
-        if (!is_null($this->password)) {
-            $userInfo .= ':' . $this->password;
+        $userInfo = $this->getUser();
+        $password = $this->getPassword();
+        if (!is_null($password)) {
+            $userInfo .= ':' . $password;
         }
 
         return $userInfo;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUser(): string
+    {
+        return $this->user;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
     }
 
     /**

@@ -89,6 +89,24 @@ class UriTest extends TestCase
     /**
      * Компонент информации о пользователе URI
      */
+    public function testGetUser(): void
+    {
+        $uri = new Uri('https://username:password@host.ru/');
+        $this->assertEquals('username', $uri->getUser());
+    }
+
+    /**
+     * Компонент информации о пользователе URI
+     */
+    public function testGetPassword(): void
+    {
+        $uri = new Uri('https://username:password@host.ru/');
+        $this->assertEquals('password', $uri->getPassword());
+    }
+
+    /**
+     * Компонент информации о пользователе URI
+     */
     public function testGetUserInfoWithoutPassword(): void
     {
         $uri = new Uri('https://username@host.ru/');

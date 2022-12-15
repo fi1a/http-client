@@ -252,10 +252,10 @@ class StreamHandler extends AbstractHandler
      */
     private function checkReadErrors($resource, $line)
     {
-        if ($line === false && !feof($resource)) {
+        if ($line === false) {
             $this->disconnect($resource);
 
-            throw new ErrorException('Ошибка при чтении потока');
+            throw new ConnectionErrorException('Ошибка при чтении потока');
         }
         if ($this->config->getTimeout() > 0) {
             $info = $this->getMetaData($resource);

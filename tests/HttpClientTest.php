@@ -582,4 +582,23 @@ class HttpClientTest extends ServerTestCase
         $this->assertCount(1, $response->getCookies());
         $this->assertEquals('/', $response->getCookies()->getByName('cookieName3')->getPath());
     }
+
+    /**
+     * Префикс к адресам
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testWithUrlPrefix(HttpClientInterface $client): void
+    {
+        $client->withUrlPrefix('https://user:pass@' . self::HOST . '/200-ok-text-plain/');
+        $response = $client->get('');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $client->withUrlPrefix(null);
+        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+    }
 }
