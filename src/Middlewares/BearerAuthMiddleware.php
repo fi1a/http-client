@@ -33,7 +33,7 @@ class BearerAuthMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         $request->withHeader(
             'Authorization',
             sprintf('Bearer %s', $this->token)
@@ -49,7 +49,7 @@ class BearerAuthMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         return true;
     }
 }

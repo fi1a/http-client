@@ -36,7 +36,7 @@ class BasicAuthMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         $request->withHeader(
             'Authorization',
             sprintf('Basic %s', base64_encode($this->username . ':' . $this->password))
@@ -52,7 +52,7 @@ class BasicAuthMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         return true;
     }
 }

@@ -7,7 +7,6 @@ namespace Fi1a\HttpClient\Handlers;
 use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
 use Fi1a\HttpClient\HttpInterface;
 use Fi1a\HttpClient\RequestInterface;
-use Fi1a\HttpClient\Response;
 use Fi1a\HttpClient\ResponseInterface;
 use UnexpectedValueException;
 
@@ -39,7 +38,7 @@ class CurlHandler extends AbstractHandler
     /**
      * @inheritDoc
      */
-    public function send(RequestInterface $request, Response $response): ResponseInterface
+    public function send(RequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $resource = $this->createHandler();
         $this->configure($resource);

@@ -15,19 +15,23 @@ interface MiddlewareInterface
 {
     /**
      * Обработчик для запроса
+     *
+     * @return ResponseInterface|bool
      */
     public function handleRequest(
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool;
+    );
 
     /**
      * Обработчик для ответа
+     *
+     * @return ResponseInterface|bool
      */
     public function handleResponse(
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool;
+    );
 }

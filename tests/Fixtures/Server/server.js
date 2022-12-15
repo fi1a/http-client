@@ -11,6 +11,8 @@ const express = require('express'),
     urlencodedParser = express.urlencoded({extended: false}),
     oneYear = 1 * 365 * 24 * 60 * 60 * 1000;
 
+let retry = 0;
+
 const options = {
     key: fs.readFileSync(__dirname + '/ssl/key.key').toString(),
     cert: fs.readFileSync(__dirname + '/ssl/cert.pem').toString(),
@@ -151,8 +153,24 @@ app.get('/api-key-auth/', (req, res, next) => {
     next();
 });
 
+app.get('/retry-success/', (req, res, next) => {
+    if (retry % 2 === 0) {
+        res.status(401).send('Access denied');
+        retry++;
 
+        next();
+        return;
+    }
 
+    retry++;
+    res.status(200).send('Access granted');
+    next();
+});
+
+app.get('/retry-not-success/', (req, res, next) => {
+    res.status(401).send('Access denied');
+    next();
+});
 
 https.createServer(options, app).listen(port, () => {
     console.log(`App listening on port ${port}`)

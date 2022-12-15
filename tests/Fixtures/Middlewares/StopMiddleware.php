@@ -21,7 +21,7 @@ class StopMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         return false;
     }
 
@@ -32,7 +32,7 @@ class StopMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         return true;
     }
 }

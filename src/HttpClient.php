@@ -82,21 +82,28 @@ class HttpClient implements HttpClientInterface
         $this->addContentHeaders($request);
         $this->setCookieToRequest($request);
 
-        if ($this->callRequestMiddlewares($request, $response) === false) {
+        /**
+         * @var false|ResponseInterface $resultMiddleware
+         */
+        $resultMiddleware = $this->callRequestMiddlewares($request, $response);
+        if (!$resultMiddleware) {
             return $response;
         }
+        $response = $resultMiddleware;
 
         $instance = $this->factoryHandler();
-
         $response = $instance->send($request, $response);
-
         $this->setCookieToResponse($request, $response);
 
-        if ($this->callResponseMiddlewares($request, $response) === false) {
+        /**
+         * @var false|ResponseInterface $resultMiddleware
+         */
+        $resultMiddleware = $this->callResponseMiddlewares($request, $response);
+        if (!$resultMiddleware) {
             return $response;
         }
 
-        return $response;
+        return $resultMiddleware;
     }
 
     /**
@@ -223,34 +230,47 @@ class HttpClient implements HttpClientInterface
 
     /**
      * Вызывает промежуточное ПО запросов
+     *
+     * @return ResponseInterface|bool
      */
-    private function callRequestMiddlewares(RequestInterface $request, ResponseInterface $response): bool
+    private function callRequestMiddlewares(RequestInterface $request, ResponseInterface $response)
     {
-        foreach ($this->sortMiddlewares($this->middlewares) as $item) {
-            [$middleware,] = $item;
-            assert($middleware instanceof MiddlewareInterface);
-            if ($middleware->handleRequest($request, $response, $this) === false) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->callMiddlewares($request, $response, 'handleRequest');
     }
 
     /**
      * Вызывает промежуточное ПО ответа
+     *
+     * @return ResponseInterface|bool
      */
-    private function callResponseMiddlewares(RequestInterface $request, ResponseInterface $response): bool
+    private function callResponseMiddlewares(RequestInterface $request, ResponseInterface $response)
+    {
+        return $this->callMiddlewares($request, $response, 'handleResponse');
+    }
+
+    /**
+     * Вызывает промежуточное ПО
+     *
+     * @return ResponseInterface|bool
+     */
+    private function callMiddlewares(RequestInterface $request, ResponseInterface $response, string $function)
     {
         foreach ($this->sortMiddlewares($this->middlewares) as $item) {
             [$middleware,] = $item;
             assert($middleware instanceof MiddlewareInterface);
-            if ($middleware->handleResponse($request, $response, $this) === false) {
+            /**
+             * @var bool|ResponseInterface $result
+             */
+            $result = call_user_func_array([$middleware, $function], [$request, $response, $this]);
+            if (!$result) {
                 return false;
+            }
+            if ($result instanceof ResponseInterface) {
+                $response = $result;
             }
         }
 
-        return true;
+        return $response;
     }
 
     /**

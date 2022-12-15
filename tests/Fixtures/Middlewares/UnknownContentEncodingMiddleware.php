@@ -21,7 +21,7 @@ class UnknownContentEncodingMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         $response->withHeader('Content-Encoding', 'unknown');
 
         return true;
@@ -34,7 +34,7 @@ class UnknownContentEncodingMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         return true;
     }
 }
