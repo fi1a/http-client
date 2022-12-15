@@ -134,6 +134,25 @@ app.get('/bearer-auth/', passport.authenticate('bearer', { session: false }), (r
     next();
 });
 
+app.get('/api-key-auth/', (req, res, next) => {
+    let token = req.header('token');
+    if (req.query.token) {
+        token = req.query.token;
+    }
+
+    if (token === '123') {
+        res.status(200).send('Access granted');
+        next();
+
+        return;
+    }
+
+    res.status(401).send('Access denied');
+    next();
+});
+
+
+
 
 https.createServer(options, app).listen(port, () => {
     console.log(`App listening on port ${port}`)
