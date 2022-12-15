@@ -9,7 +9,6 @@ use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 use Fi1a\HttpClient\Handlers\Exceptions\TimeoutErrorException;
 use Fi1a\HttpClient\HeaderInterface;
 use Fi1a\HttpClient\RequestInterface;
-use Fi1a\HttpClient\Response;
 use Fi1a\HttpClient\ResponseInterface;
 use Fi1a\HttpClient\UriInterface;
 
@@ -35,7 +34,7 @@ class StreamHandler extends AbstractHandler
     /**
      * @inheritDoc
      */
-    public function send(RequestInterface $request, Response $response): ResponseInterface
+    public function send(RequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         do {
             $resource = $this->connect($request->getUri());

@@ -54,7 +54,7 @@ class ApiKeyAuthMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         if ($this->place === self::IN_HEADER) {
             $request->withHeader($this->key, $this->value);
 
@@ -75,7 +75,7 @@ class ApiKeyAuthMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         return true;
     }
 }

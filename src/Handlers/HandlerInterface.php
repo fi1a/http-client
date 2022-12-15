@@ -6,7 +6,6 @@ namespace Fi1a\HttpClient\Handlers;
 
 use Fi1a\HttpClient\ConfigInterface;
 use Fi1a\HttpClient\RequestInterface;
-use Fi1a\HttpClient\Response;
 use Fi1a\HttpClient\ResponseInterface;
 
 /**
@@ -19,5 +18,5 @@ interface HandlerInterface
     /**
      * Отправляет запрос
      */
-    public function send(RequestInterface $request, Response $response): ResponseInterface;
+    public function send(RequestInterface $request, ResponseInterface $response): ResponseInterface;
 }

@@ -21,17 +21,20 @@ class Set500StatusMiddleware implements MiddlewareInterface
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         $response->withStatus(500);
 
         return true;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function handleResponse(
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient
-    ): bool {
+    ) {
         return true;
     }
 }
