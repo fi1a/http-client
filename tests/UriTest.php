@@ -446,4 +446,32 @@ class UriTest extends TestCase
             $uri->getUri()
         );
     }
+
+    /**
+     * Форматирование в Uri
+     */
+    public function testFormatInUri(): void
+    {
+        $uri = new Uri('https://host.ru/some/path/{{id}}#fragment', ['id' => 100,]);
+        $this->assertEquals(
+            'https://host.ru/some/path/100#fragment',
+            $uri->getUri()
+        );
+    }
+
+    /**
+     * Форматирование в Uri
+     */
+    public function testFormatInReplaceUri(): void
+    {
+        $uri = new Uri('https://username:password@host.ru:8080/some/path/?foo=bar#fragment');
+        $uri->replace(
+            'https://new-username:new-password@new-host.ru:8181/new/path/?baz={{baz}}#new-fragment',
+            ['baz' => 'qux']
+        );
+        $this->assertEquals(
+            'https://new-username:new-password@new-host.ru:8181/new/path/?baz=qux#new-fragment',
+            $uri->getUri()
+        );
+    }
 }
