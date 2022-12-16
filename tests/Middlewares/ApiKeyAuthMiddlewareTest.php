@@ -21,7 +21,7 @@ class ApiKeyAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthSuccessKeyInHeader(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new ApiKeyAuthMiddleware('token', '123'));
+        $client->withMiddleware(new ApiKeyAuthMiddleware('token', '123'));
         $response = $client->get('https://' . self::HOST . '/api-key-auth/');
         $this->assertTrue($response->isSuccess());
         $this->assertEquals(200, $response->getStatusCode());
@@ -34,7 +34,7 @@ class ApiKeyAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthNotSuccessKeyInHeader(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new ApiKeyAuthMiddleware('token', 'unknown'));
+        $client->withMiddleware(new ApiKeyAuthMiddleware('token', 'unknown'));
         $response = $client->get('https://' . self::HOST . '/api-key-auth/');
         $this->assertFalse($response->isSuccess());
         $this->assertEquals(401, $response->getStatusCode());
@@ -47,7 +47,7 @@ class ApiKeyAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthSuccessKeyInQuery(HttpClientInterface $client): void
     {
-        $client->addMiddleware(
+        $client->withMiddleware(
             new ApiKeyAuthMiddleware('token', '123', ApiKeyAuthMiddleware::IN_QUERY)
         );
         $response = $client->get('https://' . self::HOST . '/api-key-auth/');
@@ -62,7 +62,7 @@ class ApiKeyAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthNotSuccessKeyInQuery(HttpClientInterface $client): void
     {
-        $client->addMiddleware(
+        $client->withMiddleware(
             new ApiKeyAuthMiddleware('token', 'unknown', ApiKeyAuthMiddleware::IN_QUERY)
         );
         $response = $client->get('https://' . self::HOST . '/api-key-auth/');

@@ -9,6 +9,8 @@ use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Cookie\CookieStorage;
 use Fi1a\HttpClient\Cookie\CookieStorageInterface;
 use Fi1a\HttpClient\Handlers\HandlerInterface;
+use Fi1a\HttpClient\Middlewares\MiddlewareCollection;
+use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
 use InvalidArgumentException;
 
@@ -28,9 +30,9 @@ class HttpClient implements HttpClientInterface
     private $config;
 
     /**
-     * @var MiddlewareInterface[][]|int[][]
+     * @var MiddlewareCollectionInterface
      */
-    private $middlewares = [];
+    private $middlewares;
 
     /**
      * @var CookieStorageInterface
@@ -58,15 +60,19 @@ class HttpClient implements HttpClientInterface
             $cookieStorage = new CookieStorage();
         }
         $this->cookieStorage = $cookieStorage;
+        $this->middlewares = new MiddlewareCollection();
     }
 
     /**
      * @inheritDoc
      * @psalm-suppress InvalidReturnType
      */
-    public function addMiddleware(MiddlewareInterface $middleware, int $sort = 500)
+    public function withMiddleware(MiddlewareInterface $middleware, ?int $sort = null)
     {
-        $this->middlewares[] = [$middleware, $sort,];
+        if (!is_null($sort)) {
+            $middleware->setSort($sort);
+        }
+        $this->middlewares[] = $middleware;
 
         return $this;
     }
@@ -272,8 +278,9 @@ class HttpClient implements HttpClientInterface
      */
     private function callMiddlewares(RequestInterface $request, ResponseInterface $response, string $function)
     {
-        foreach ($this->sortMiddlewares($this->middlewares) as $item) {
-            [$middleware,] = $item;
+        $middlewares = $this->middlewares->merge($request->getMiddlewares());
+
+        foreach ($middlewares->sortByField() as $middleware) {
             assert($middleware instanceof MiddlewareInterface);
             /**
              * @var bool|ResponseInterface $result
@@ -288,28 +295,6 @@ class HttpClient implements HttpClientInterface
         }
 
         return $response;
-    }
-
-    /**
-     * Сортирует промежуточное ПО
-     *
-     * @param MiddlewareInterface[][]|int[][] $middlewares
-     *
-     * @return MiddlewareInterface[][]|int[][]
-     */
-    private function sortMiddlewares(array $middlewares): array
-    {
-        usort(
-            $middlewares, /**
-            @psalm-param $itemA array<array-key, Fi1a\HttpClient\Middlewares\MiddlewareInterface|int>
-            @psalm-param $itemB array<array-key, Fi1a\HttpClient\Middlewares\MiddlewareInterface|int>
-            */
-            function (array $itemA, array $itemB): int {
-                return (int) $itemA[1] - (int) $itemB[1];
-            }
-        );
-
-        return $middlewares;
     }
 
     /**

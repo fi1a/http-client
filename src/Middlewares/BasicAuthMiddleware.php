@@ -11,7 +11,7 @@ use Fi1a\HttpClient\ResponseInterface;
 /**
  * Basic Auth
  */
-class BasicAuthMiddleware implements MiddlewareInterface
+class BasicAuthMiddleware extends AbstractMiddleware
 {
     /**
      * @var string

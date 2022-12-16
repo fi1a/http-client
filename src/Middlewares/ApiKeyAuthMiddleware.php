@@ -12,7 +12,7 @@ use InvalidArgumentException;
 /**
  * Авторизация по ключу
  */
-class ApiKeyAuthMiddleware implements MiddlewareInterface
+class ApiKeyAuthMiddleware extends AbstractMiddleware
 {
     public const IN_HEADER = 'header';
 
