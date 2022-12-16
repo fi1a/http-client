@@ -20,7 +20,7 @@ class BasicAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthSuccess(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new BasicAuthMiddleware('test', 'test'));
+        $client->withMiddleware(new BasicAuthMiddleware('test', 'test'));
         $response = $client->get('https://' . self::HOST . '/basic-auth/');
         $this->assertTrue($response->isSuccess());
         $this->assertEquals(200, $response->getStatusCode());
@@ -33,7 +33,7 @@ class BasicAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthNotSuccess(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new BasicAuthMiddleware('test', ''));
+        $client->withMiddleware(new BasicAuthMiddleware('test', ''));
         $response = $client->get('https://' . self::HOST . '/basic-auth/');
         $this->assertFalse($response->isSuccess());
         $this->assertEquals(401, $response->getStatusCode());

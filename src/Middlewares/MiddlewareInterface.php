@@ -14,6 +14,18 @@ use Fi1a\HttpClient\ResponseInterface;
 interface MiddlewareInterface
 {
     /**
+     * Возвращает сортировку
+     */
+    public function getSort(): int;
+
+    /**
+     * Устанавливает сортировку
+     *
+     * @return $this
+     */
+    public function setSort(int $sort);
+
+    /**
      * Обработчик для запроса
      *
      * @return ResponseInterface|bool

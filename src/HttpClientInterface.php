@@ -23,7 +23,7 @@ interface HttpClientInterface
      *
      * @return $this
      */
-    public function addMiddleware(MiddlewareInterface $middleware, int $sort = 500);
+    public function withMiddleware(MiddlewareInterface $middleware, ?int $sort = null);
 
     /**
      * Отправляет запрос

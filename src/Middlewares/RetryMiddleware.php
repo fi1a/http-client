@@ -12,7 +12,7 @@ use InvalidArgumentException;
 /**
  * Повторная отправка запросов при ошибке
  */
-class RetryMiddleware implements MiddlewareInterface
+class RetryMiddleware extends AbstractMiddleware
 {
     /**
      * @var int

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\HttpClient\Middlewares\MiddlewareCollection;
+use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
+use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
+
 /**
  * Объект запроса
  */
@@ -31,9 +35,15 @@ class Request extends Message implements RequestInterface
      */
     private $body;
 
+    /**
+     * @var MiddlewareCollectionInterface
+     */
+    private $middlewares;
+
     protected function __construct()
     {
         parent::__construct();
+        $this->middlewares = new MiddlewareCollection();
         $this->body = new RequestBody();
         $this->withMethod(HttpInterface::GET)
             ->withUri(new Uri());
@@ -234,5 +244,26 @@ class Request extends Message implements RequestInterface
         $this->uri = $uri;
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function withMiddleware(MiddlewareInterface $middleware, ?int $sort = null)
+    {
+        if (!is_null($sort)) {
+            $middleware->setSort($sort);
+        }
+        $this->middlewares[] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMiddlewares(): MiddlewareCollectionInterface
+    {
+        return $this->middlewares;
     }
 }

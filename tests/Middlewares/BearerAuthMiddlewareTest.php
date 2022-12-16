@@ -18,7 +18,7 @@ class BearerAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthSuccess(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new BearerAuthMiddleware('123'));
+        $client->withMiddleware(new BearerAuthMiddleware('123'));
         $response = $client->get('https://' . self::HOST . '/bearer-auth/');
         $this->assertTrue($response->isSuccess());
         $this->assertEquals(200, $response->getStatusCode());
@@ -31,7 +31,7 @@ class BearerAuthMiddlewareTest extends ServerTestCase
      */
     public function testAuthNotSuccess(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new BearerAuthMiddleware('unknown'));
+        $client->withMiddleware(new BearerAuthMiddleware('unknown'));
         $response = $client->get('https://' . self::HOST . '/bearer-auth/');
         $this->assertFalse($response->isSuccess());
         $this->assertEquals(401, $response->getStatusCode());

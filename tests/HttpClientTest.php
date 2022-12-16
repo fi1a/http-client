@@ -250,7 +250,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testStopMiddleware(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new StopMiddleware());
+        $client->withMiddleware(new StopMiddleware());
         $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(0, $response->getStatusCode());
         $this->assertEquals('', $response->getReasonPhrase());
@@ -264,10 +264,28 @@ class HttpClientTest extends ServerTestCase
      */
     public function testSortRequestMiddleware(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new StopMiddleware(), 600);
-        $client->addMiddleware(new Set500StatusMiddleware(), 100);
+        $client->withMiddleware(new StopMiddleware(), 600);
+        $client->withMiddleware(new Set500StatusMiddleware(), 100);
         $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(500, $response->getStatusCode());
+    }
+
+    /**
+     * Промежуточное ПО задается в запросе
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testSetMiddlewareInRequest(HttpClientInterface $client): void
+    {
+        $client->withMiddleware(new StopMiddleware(), 600);
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/')
+            ->withMiddleware(new Set500StatusMiddleware(), 100);
+        $response = $client->send($request);
+        $this->assertEquals(500, $response->getStatusCode());
+
+        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/');
+        $response = $client->send($request);
+        $this->assertEquals(0, $response->getStatusCode());
     }
 
     /**
@@ -277,8 +295,8 @@ class HttpClientTest extends ServerTestCase
      */
     public function testSortResponseMiddleware(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new ResponseStopMiddleware(), 600);
-        $client->addMiddleware(new ResponseSet500StatusMiddleware(), 100);
+        $client->withMiddleware(new ResponseStopMiddleware(), 600);
+        $client->withMiddleware(new ResponseSet500StatusMiddleware(), 100);
         $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(500, $response->getStatusCode());
     }
@@ -368,7 +386,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testUnknownContentEncoding(HttpClientInterface $client): void
     {
-        $client->addMiddleware(new UnknownContentEncodingMiddleware());
+        $client->withMiddleware(new UnknownContentEncodingMiddleware());
         $request = Request::create()->get('https://' . self::HOST . '/index.html', 'html');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());

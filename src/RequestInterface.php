@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
+use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
+
 /**
  * Объект запроса
  */
@@ -138,4 +141,16 @@ interface RequestInterface extends MessageInterface
      * Возвращает payload
      */
     public function getBody(): RequestBodyInterface;
+
+    /**
+     * Добавить промежуточное ПО
+     *
+     * @return $this
+     */
+    public function withMiddleware(MiddlewareInterface $middleware, ?int $sort = null);
+
+    /**
+     *  Возвращает промежуточное ПО
+     */
+    public function getMiddlewares(): MiddlewareCollectionInterface;
 }

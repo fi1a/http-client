@@ -36,7 +36,11 @@ class StreamHandler extends AbstractHandler
      */
     public function send(RequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        $resource = null;
         do {
+            if ($resource) {
+                $this->disconnect($resource);
+            }
             $resource = $this->connect($request->getUri());
             $this->sendRequest($resource, $request);
             $this->getHeaders($resource, $response);
@@ -45,6 +49,10 @@ class StreamHandler extends AbstractHandler
         $body = $this->getBody($resource, $response);
         $body = $this->decompress($body, $response);
         $this->setBody($body, $response);
+
+        if ($response->getHeaders()->count() === 0 && !$response->getBody()->has()) {
+            throw new ConnectionErrorException('Пустой ответ сервера');
+        }
 
         $this->disconnect($resource);
 
