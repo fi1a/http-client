@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\HttpClient\HttpInterface;
+use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\Uri;
 use Fi1a\HttpClient\UriInterface;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\Set500StatusMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\StopMiddleware;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -397,5 +400,19 @@ class RequestTest extends TestCase
         $request->withExpectedType();
         $this->assertNull($request->getExpectedType());
         $this->assertNull($request->getBody()->getContentType());
+    }
+
+    /**
+     * Промежуточное ПО у запроса
+     */
+    public function testWithMiddleware(): void
+    {
+        $request = Request::create();
+        $this->assertInstanceOf(MiddlewareCollectionInterface::class, $request->getMiddlewares());
+        $this->assertCount(0, $request->getMiddlewares());
+        $request->withMiddleware(new Set500StatusMiddleware(), 100);
+        $request->withMiddleware(new StopMiddleware(), 600);
+        $this->assertInstanceOf(MiddlewareCollectionInterface::class, $request->getMiddlewares());
+        $this->assertCount(2, $request->getMiddlewares());
     }
 }

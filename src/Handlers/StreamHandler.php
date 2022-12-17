@@ -50,13 +50,21 @@ class StreamHandler extends AbstractHandler
         $body = $this->decompress($body, $response);
         $this->setBody($body, $response);
 
-        if ($response->getHeaders()->count() === 0 && !$response->getBody()->has()) {
+        if ($this->isConnectionError($response)) {
             throw new ConnectionErrorException('Пустой ответ сервера');
         }
 
         $this->disconnect($resource);
 
         return $response;
+    }
+
+    /**
+     * Проверяем возвращенные данные и если ничего не вернули выбрасываем исключение
+     */
+    protected function isConnectionError(ResponseInterface $response): bool
+    {
+        return $response->getHeaders()->count() === 0 && !$response->getBody()->has();
     }
 
     /**

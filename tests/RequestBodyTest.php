@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient;
 
+use Fi1a\Filesystem\Adapters\LocalAdapter;
+use Fi1a\Filesystem\Filesystem;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\RequestBody;
 use Fi1a\HttpClient\RequestBodyInterface;
-use PHPUnit\Framework\TestCase;
+use Fi1a\HttpClient\UploadFileCollectionInterface;
+use Fi1a\HttpClient\UploadFileInterface;
+use Fi1a\Unit\HttpClient\TestCase\UploadFileTestCase;
 
 /**
  * Тело запроса
  */
-class RequestBodyTest extends TestCase
+class RequestBodyTest extends UploadFileTestCase
 {
     /**
      * Возвращает тело запроса
@@ -122,5 +126,72 @@ class RequestBodyTest extends TestCase
         $body = $this->getRequestBody();
         $body->withBody($array, 'json');
         $this->assertEquals(mb_strlen($json), $body->getSize());
+    }
+
+    /**
+     * Прикрепить файлы к телу запроса
+     */
+    public function testWithFiles(): void
+    {
+        $body = $this->getRequestBody();
+        $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
+        $this->assertCount(0, $body->getUploadFiles());
+        $body->withUploadFiles($this->getUploadFiles());
+        $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
+        $this->assertCount(3, $body->getUploadFiles());
+    }
+
+    /**
+     * Сброс загружаемых файлов
+     */
+    public function testWithFilesEmpty(): void
+    {
+        $body = $this->getRequestBody();
+        $body->withUploadFiles($this->getUploadFiles());
+        $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
+        $this->assertCount(3, $body->getUploadFiles());
+        $body->withUploadFiles(null);
+        $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
+        $this->assertCount(0, $body->getUploadFiles());
+    }
+
+    /**
+     * Добавить загружаемый файл
+     */
+    public function testAddUploadFile(): void
+    {
+        $filesystem = new Filesystem(new LocalAdapter(__DIR__ . '/Resources'));
+        $body = $this->getRequestBody();
+        $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
+        $this->assertCount(0, $body->getUploadFiles());
+        $body->addUploadFile('file1', $filesystem->factoryFile('./file1.txt'));
+        $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
+        $this->assertCount(1, $body->getUploadFiles());
+        /**
+         * @var UploadFileInterface $uploadFile
+         */
+        $uploadFile = $body->getUploadFiles()[0];
+        $this->assertEquals('file1', $uploadFile->getName());
+    }
+
+    /**
+     * Content type для заголовков
+     */
+    public function testGetContentTypeHeader(): void
+    {
+        $body = $this->getRequestBody();
+        $this->assertNull($body->getContentTypeHeader());
+        $body->withContentType(MimeInterface::FORM);
+        $this->assertEquals(MimeInterface::FORM, $body->getContentTypeHeader());
+    }
+
+    /**
+     * Выставляется multipart/form-data при наличии файлов
+     */
+    public function testMimeUploadContentTypeSet(): void
+    {
+        $body = $this->getRequestBody();
+        $body->withBody(['foo' => 'bar'], MimeInterface::FORM, $this->getUploadFiles());
+        $this->assertEquals(MimeInterface::UPLOAD, $body->getContentType());
     }
 }

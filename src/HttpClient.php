@@ -130,25 +130,37 @@ class HttpClient implements HttpClientInterface
     /**
      * @inheritDoc
      */
-    public function post($uri, $body = null, ?string $mime = null): ResponseInterface
-    {
-        return $this->send(Request::create()->post($uri, $body, $mime));
+    public function post(
+        $uri,
+        $body = null,
+        ?string $mime = null,
+        ?UploadFileCollectionInterface $files = null
+    ): ResponseInterface {
+        return $this->send(Request::create()->post($uri, $body, $mime, $files));
     }
 
     /**
      * @inheritDoc
      */
-    public function put($uri, $body = null, ?string $mime = null): ResponseInterface
-    {
-        return $this->send(Request::create()->put($uri, $body, $mime));
+    public function put(
+        $uri,
+        $body = null,
+        ?string $mime = null,
+        ?UploadFileCollectionInterface $files = null
+    ): ResponseInterface {
+        return $this->send(Request::create()->put($uri, $body, $mime, $files));
     }
 
     /**
      * @inheritDoc
      */
-    public function patch($uri, $body = null, ?string $mime = null): ResponseInterface
-    {
-        return $this->send(Request::create()->patch($uri, $body, $mime));
+    public function patch(
+        $uri,
+        $body = null,
+        ?string $mime = null,
+        ?UploadFileCollectionInterface $files = null
+    ): ResponseInterface {
+        return $this->send(Request::create()->patch($uri, $body, $mime, $files));
     }
 
     /**
@@ -226,11 +238,11 @@ class HttpClient implements HttpClientInterface
     private function addContentHeaders(RequestInterface $request): void
     {
         if (!$request->hasHeader('Content-Type') && $request->getBody()->has()) {
-            $contentType = $request->getBody()->getContentType();
-            if (!$contentType) {
-                $contentType = MimeInterface::PLAIN;
+            $contentTypeHeader = $request->getBody()->getContentTypeHeader();
+            if (!$contentTypeHeader) {
+                $contentTypeHeader = MimeInterface::PLAIN;
             }
-            $request->withHeader('Content-Type', $contentType);
+            $request->withHeader('Content-Type', $contentTypeHeader);
         }
         if (!$request->hasHeader('Content-Length') && $request->getBody()->getSize()) {
             $request->withHeader('Content-Length', (string) $request->getBody()->getSize());

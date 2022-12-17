@@ -4,6 +4,7 @@ const express = require('express'),
     basicAuth = require('basic-auth'),
     passport = require('passport'),
     BearerStrategy = require('passport-http-bearer').Strategy,
+    fileUpload = require('express-fileupload'),
     fs = require('fs'),
     https = require('https'),
     app = express(),
@@ -36,6 +37,7 @@ passport.use(new BearerStrategy(
         return done(null, false);
     }
 ));
+app.use(fileUpload());
 
 app.get('/200-ok-text-plain/', (req, res) => {
     res.status(200);
@@ -169,6 +171,18 @@ app.get('/retry-success/', (req, res, next) => {
 
 app.get('/retry-not-success/', (req, res, next) => {
     res.status(401).send('Access denied');
+    next();
+});
+
+app.post('/file-upload/', urlencodedParser, (req, res, next) => {
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).send('No files were uploaded.');
+    }
+
+    let file1 = req.files.file1,
+        file2 = req.files.file2;
+
+    res.status(200).send(req.body.foo + '_' + file1.data.toString('utf8') + '_' + file2.data.toString('utf8'));
     next();
 });
 

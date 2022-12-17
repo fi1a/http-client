@@ -20,6 +20,7 @@ use const CURLOPT_HTTPHEADER;
 use const CURLOPT_HTTP_VERSION;
 use const CURLOPT_MAXREDIRS;
 use const CURLOPT_NOBODY;
+use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_SSL_VERIFYHOST;
@@ -219,6 +220,7 @@ class CurlHandler extends AbstractHandler
             case HttpInterface::DELETE:
             case HttpInterface::PATCH:
             case HttpInterface::OPTIONS:
+                $options[CURLOPT_POST] = true;
                 $options[CURLOPT_POSTFIELDS] = $request->getBody()->get();
 
                 break;

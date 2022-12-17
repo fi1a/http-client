@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient;
 
+use Fi1a\Filesystem\Adapters\LocalAdapter;
+use Fi1a\Filesystem\Filesystem;
 use Fi1a\HttpClient\Config;
 use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
@@ -13,6 +15,7 @@ use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
+use Fi1a\HttpClient\UploadFileCollection;
 use Fi1a\HttpClient\Uri;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ResponseSet500StatusMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ResponseStopMiddleware;
@@ -132,6 +135,27 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
         $this->assertEquals(['foo' => 'bar'], $response->getBody()->get());
         $this->assertEquals('{"foo":"bar"}', $response->getBody()->getRaw());
+        $this->assertEquals('utf-8', $response->getEncoding());
+    }
+
+    /**
+     * Отправка пустого POST запроса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testPostEmpty(HttpClientInterface $client): void
+    {
+        $response = $client->post(
+            'https://' . self::HOST . '/200-ok-post/',
+            [],
+            'form'
+        );
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
+        $this->assertEquals([], $response->getBody()->get());
+        $this->assertEquals('{}', $response->getBody()->getRaw());
         $this->assertEquals('utf-8', $response->getEncoding());
     }
 
@@ -630,5 +654,37 @@ class HttpClientTest extends ServerTestCase
     {
         $this->expectException(ConnectionErrorException::class);
         $client->get('http://' . self::HOST . '/200-ok-text-plain/');
+    }
+
+    /**
+     * Загрузка файлов
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testUploadFiles(HttpClientInterface $client): void
+    {
+        $filesystem = new Filesystem(new LocalAdapter(__DIR__ . '/Resources'));
+        $files = new UploadFileCollection();
+        $files[] = [
+            'name' => 'file1',
+            'file' => $filesystem->factoryFile('./file1.txt'),
+        ];
+        $files[] = [
+            'name' => 'file2',
+            'file' => $filesystem->factoryFile('./file2.txt'),
+        ];
+
+        $response = $client->post(
+            'https://' . self::HOST . '/file-upload/',
+            [
+                'foo' => 'bar',
+            ],
+            MimeInterface::FORM,
+            $files
+        );
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals('bar_file1_file2', $response->getBody()->get());
     }
 }

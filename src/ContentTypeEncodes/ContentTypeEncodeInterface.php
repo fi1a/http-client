@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient\ContentTypeEncodes;
 
+use Fi1a\HttpClient\UploadFileCollectionInterface;
+
 /**
  * Парсер типа контента
  */
@@ -21,5 +23,10 @@ interface ContentTypeEncodeInterface
      *
      * @param mixed $rawBody
      */
-    public function encode($rawBody): string;
+    public function encode($rawBody, UploadFileCollectionInterface $uploadFiles): string;
+
+    /**
+     * Возвращает заголовок
+     */
+    public function getContentTypeHeader(): string;
 }
