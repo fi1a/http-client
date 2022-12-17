@@ -9,6 +9,9 @@ use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\HttpClientInterface;
+use Fi1a\HttpClient\Proxy\HttpProxy;
+use Fi1a\HttpClient\Proxy\ProxyInterface;
+use Fi1a\HttpClient\Proxy\Socks5Proxy;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,6 +35,32 @@ class ServerTestCase extends TestCase
     protected function getCurlClient(): HttpClientInterface
     {
         return new HttpClient(new Config(['ssl_verify' => false]), CurlHandler::class);
+    }
+
+    /**
+     * Http proxy
+     */
+    protected function getHttpProxy(): ProxyInterface
+    {
+        return new HttpProxy(
+            (string) HTTP_PROXY_HOST,
+            (int) HTTP_PROXY_PORT,
+            HTTP_PROXY_USERNAME,
+            HTTP_PROXY_PASSWORD
+        );
+    }
+
+    /**
+     * Socks5 proxy
+     */
+    protected function getSocks5Proxy(): ProxyInterface
+    {
+        return new Socks5Proxy(
+            (string) SOCKS5_PROXY_HOST,
+            (int) SOCKS5_PROXY_PORT,
+            SOCKS5_PROXY_USERNAME,
+            SOCKS5_PROXY_PASSWORD
+        );
     }
 
     /**
