@@ -12,7 +12,7 @@ abstract class AbstractBody implements BodyInterface
     /**
      * @var string|null
      */
-    private $contentType;
+    protected $contentType;
 
     /**
      * Осуществляет парсинг

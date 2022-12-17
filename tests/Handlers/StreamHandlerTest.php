@@ -107,4 +107,20 @@ class StreamHandlerTest extends ServerTestCase
         $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
         $handler->send($request, new Response());
     }
+
+    /**
+     * Проверяем возвращенные данные и если ничего не вернули выбрасываем исключение
+     */
+    public function testIsConnectionErrorException(): void
+    {
+        $this->expectException(ConnectionErrorException::class);
+        $handler = $this->getMockBuilder(StreamHandler::class)
+            ->setConstructorArgs([new Config(['ssl_verify' => false,])])
+            ->onlyMethods(['isConnectionError'])
+            ->getMock();
+
+        $handler->method('isConnectionError')->willReturn(true);
+        $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
+        $handler->send($request, new Response());
+    }
 }

@@ -43,7 +43,12 @@ interface HttpClientInterface
      * @param string|UriInterface $uri
      * @param mixed               $body
      */
-    public function post($uri, $body = null, ?string $mime = null): ResponseInterface;
+    public function post(
+        $uri,
+        $body = null,
+        ?string $mime = null,
+        ?UploadFileCollectionInterface $files = null
+    ): ResponseInterface;
 
     /**
      * HTTP Метод Put
@@ -51,7 +56,12 @@ interface HttpClientInterface
      * @param string|UriInterface $uri
      * @param mixed               $body
      */
-    public function put($uri, $body = null, ?string $mime = null): ResponseInterface;
+    public function put(
+        $uri,
+        $body = null,
+        ?string $mime = null,
+        ?UploadFileCollectionInterface $files = null
+    ): ResponseInterface;
 
     /**
      * HTTP Метод Patch
@@ -59,7 +69,12 @@ interface HttpClientInterface
      * @param string|UriInterface $uri
      * @param mixed               $body
      */
-    public function patch($uri, $body = null, ?string $mime = null): ResponseInterface;
+    public function patch(
+        $uri,
+        $body = null,
+        ?string $mime = null,
+        ?UploadFileCollectionInterface $files = null
+    ): ResponseInterface;
 
     /**
      * HTTP Метод Delete

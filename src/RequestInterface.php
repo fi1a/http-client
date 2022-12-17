@@ -48,7 +48,7 @@ interface RequestInterface extends MessageInterface
      *
      * @return $this
      */
-    public function post($uri, $body = null, ?string $mime = null);
+    public function post($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null);
 
     /**
      * HTTP Метод Put
@@ -58,7 +58,7 @@ interface RequestInterface extends MessageInterface
      *
      * @return $this
      */
-    public function put($uri, $body = null, ?string $mime = null);
+    public function put($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null);
 
     /**
      * HTTP Метод Patch
@@ -68,7 +68,7 @@ interface RequestInterface extends MessageInterface
      *
      * @return $this
      */
-    public function patch($uri, $body = null, ?string $mime = null);
+    public function patch($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null);
 
     /**
      * HTTP Метод Delete
@@ -135,7 +135,7 @@ interface RequestInterface extends MessageInterface
      *
      * @return $this
      */
-    public function withBody($body, ?string $mime = null);
+    public function withBody($body, ?string $mime = null, ?UploadFileCollectionInterface $files = null);
 
     /**
      * Возвращает payload
