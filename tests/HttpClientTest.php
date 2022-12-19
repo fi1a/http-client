@@ -10,11 +10,17 @@ use Fi1a\HttpClient\Config;
 use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
 use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
+use Fi1a\HttpClient\Handlers\HandlerInterface;
+use Fi1a\HttpClient\Handlers\HttpStreamProxyConnector;
 use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\MimeInterface;
+use Fi1a\HttpClient\Proxy\HttpProxy;
+use Fi1a\HttpClient\Proxy\ProxyInterface;
+use Fi1a\HttpClient\Proxy\Socks5Proxy;
 use Fi1a\HttpClient\Request;
+use Fi1a\HttpClient\Response;
 use Fi1a\HttpClient\UploadFileCollection;
 use Fi1a\HttpClient\Uri;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ResponseSet500StatusMiddleware;
@@ -22,8 +28,11 @@ use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ResponseStopMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\Set500StatusMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\StopMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\UnknownContentEncodingMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\Proxy\FixtureProxy;
 use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;
 use InvalidArgumentException;
+use LogicException;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * HTTP-client
@@ -686,5 +695,202 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
         $this->assertEquals('bar_file1_file2', $response->getBody()->get());
+    }
+
+    /**
+     * Провайдер данных для тестирования прокси с различными хэндлерами
+     *
+     * @return mixed[][]
+     */
+    public function clientAndProxyDataProvider(): array
+    {
+        return [
+            [
+                $this->getStreamClient(),
+                $this->getHttpProxy(),
+            ],
+            [
+                $this->getCurlClient(),
+                $this->getHttpProxy(),
+            ],
+            [
+                $this->getStreamClient(),
+                $this->getSocks5Proxy(),
+            ],
+            [
+                $this->getCurlClient(),
+                $this->getSocks5Proxy(),
+            ],
+        ];
+    }
+
+    /**
+     * Отправка GET запроса с Https портом по умолчанию
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testGetDefaultHttpsPort(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://ya.ru');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+    }
+
+    /**
+     * Отправка GET запроса с Http портом по умолчанию
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testGetDefaultHttpPort(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('http://ya.ru');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+    }
+
+    /**
+     * Использовать прокси с различными хэндлерами по HTTPS протоколу
+     *
+     * @dataProvider clientAndProxyDataProvider
+     */
+    public function testProxyHttps(HttpClientInterface $client, ProxyInterface $proxy): void
+    {
+        $client->withProxy($proxy);
+        $request = Request::create()->get('https://ya.ru');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+    }
+
+    /**
+     * Использовать прокси с различными хэндлерами по HTTP протоколу
+     *
+     * @dataProvider clientAndProxyDataProvider
+     */
+    public function testProxyHttp(HttpClientInterface $client, ProxyInterface $proxy): void
+    {
+        $client->withProxy($proxy);
+        $request = Request::create()->get('http://ya.ru');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+    }
+
+    /**
+     * Использовать прокси для доступа к хосту с IP
+     *
+     * @dataProvider clientAndProxyDataProvider
+     */
+    public function testProxyRequestIp(HttpClientInterface $client, ProxyInterface $proxy): void
+    {
+        $client->withProxy($proxy);
+        $request = Request::create()->get('http://' . self::HTTP_HOST . '/200-ok-text-plain/');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertTrue($response->getBody()->has());
+    }
+
+    /**
+     * Исключение при неизвестном классе proxy
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testProxyFactoryException(HttpClientInterface $client): void
+    {
+        $this->expectException(LogicException::class);
+        $client->withProxy(new FixtureProxy('127.0.0.1', 80));
+        $request = Request::create()->get('http://ya.ru');
+        $client->send($request);
+    }
+
+    /**
+     * Исключение при ошибке соединения с proxy socks5
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testSocks5ProxyConnectionFail(HttpClientInterface $client): void
+    {
+        $this->expectException(ConnectionErrorException::class);
+        $client->withProxy(new Socks5Proxy('127.0.0.1', 10000));
+        $request = Request::create()->get('http://ya.ru');
+        $client->send($request);
+    }
+
+    /**
+     * Исключение при ошибке соединения с proxy http
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testHttpProxyConnectionFail(HttpClientInterface $client): void
+    {
+        $this->expectException(ConnectionErrorException::class);
+        $client->withProxy(new HttpProxy('127.0.0.1', 10000));
+        $request = Request::create()->get('http://ya.ru');
+        $client->send($request);
+    }
+
+    /**
+     * Исключение при ошибке соединения с proxy socks5
+     *
+     * @dataProvider clientAndProxyDataProvider
+     */
+    public function testProxyAuthError(HttpClientInterface $client, ProxyInterface $proxy): void
+    {
+        $this->expectException(ConnectionErrorException::class);
+        $proxy->setUserName('unknown');
+        $client->withProxy($proxy);
+        $request = Request::create()->get('http://ya.ru');
+        $client->send($request);
+    }
+
+    /**
+     * Исключение при ошибке чтения потока
+     */
+    public function testHttpStreamProxyConnectorReadHeaderLineException(): void
+    {
+        $this->expectException(ConnectionErrorException::class);
+        $proxy = $this->getHttpProxy();
+        $config = new Config(['ssl_verify' => false]);
+        $request = Request::create()->get('http://' . self::HTTP_HOST . '/200-ok-text-plain/');
+
+        $options = [];
+        $options['ssl']['peer_name'] = $request->getUri()->getHost();
+        $options['ssl']['verify_peer_name'] = false;
+        $options['ssl']['verify_peer'] = false;
+        $options['ssl']['allow_self_signed'] = true;
+        $context = stream_context_create($options);
+
+        $connector = $this->getMockBuilder(HttpStreamProxyConnector::class)
+            ->onlyMethods(['readContentLine'])
+            ->setConstructorArgs([$context, $config, $request, new Response(), $proxy])
+            ->getMock();
+
+        $connector->method('readContentLine')->willReturn(false);
+
+        /**
+         * @var HandlerInterface|MockObject $handler
+         */
+        $handler = $this->getMockBuilder(StreamHandler::class)
+            ->onlyMethods(['factoryProxy'])
+            ->setConstructorArgs([$config])
+            ->getMock();
+
+        $handler->method('factoryProxy')->willReturn($connector);
+
+        $client = $this->getMockBuilder(HttpClient::class)
+            ->onlyMethods(['factoryHandler'])
+            ->setConstructorArgs([$config, StreamHandler::class])
+            ->getMock();
+
+        $client->method('factoryHandler')->willReturn($handler);
+
+        $client->withProxy($proxy);
+        $client->send($request);
     }
 }

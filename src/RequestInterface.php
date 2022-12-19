@@ -6,6 +6,7 @@ namespace Fi1a\HttpClient;
 
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
+use Fi1a\HttpClient\Proxy\ProxyInterface;
 
 /**
  * Объект запроса
@@ -153,4 +154,16 @@ interface RequestInterface extends MessageInterface
      *  Возвращает промежуточное ПО
      */
     public function getMiddlewares(): MiddlewareCollectionInterface;
+
+    /**
+     * Использовать прокси для соединения
+     *
+     * @return $this
+     */
+    public function withProxy(?ProxyInterface $proxy);
+
+    /**
+     * Возвращает прокси
+     */
+    public function getProxy(): ?ProxyInterface;
 }

@@ -7,6 +7,7 @@ namespace Fi1a\HttpClient;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollection;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
+use Fi1a\HttpClient\Proxy\ProxyInterface;
 
 /**
  * Объект запроса
@@ -39,6 +40,11 @@ class Request extends Message implements RequestInterface
      * @var MiddlewareCollectionInterface
      */
     private $middlewares;
+
+    /**
+     * @var ProxyInterface|null
+     */
+    private $proxy;
 
     protected function __construct()
     {
@@ -265,5 +271,23 @@ class Request extends Message implements RequestInterface
     public function getMiddlewares(): MiddlewareCollectionInterface
     {
         return $this->middlewares;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function withProxy(?ProxyInterface $proxy)
+    {
+        $this->proxy = $proxy;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getProxy(): ?ProxyInterface
+    {
+        return $this->proxy;
     }
 }

@@ -8,10 +8,14 @@ use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
 use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 use Fi1a\HttpClient\Handlers\Exceptions\TimeoutErrorException;
 use Fi1a\HttpClient\HeaderInterface;
+use Fi1a\HttpClient\Proxy\ProxyInterface;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
 use Fi1a\HttpClient\UriInterface;
 
+use const FILTER_FLAG_IPV4;
+use const FILTER_FLAG_IPV6;
+use const FILTER_VALIDATE_IP;
 use const STREAM_CLIENT_CONNECT;
 
 /**
@@ -41,7 +45,8 @@ class StreamHandler extends AbstractHandler
             if ($resource) {
                 $this->disconnect($resource);
             }
-            $resource = $this->connect($request->getUri());
+            $resource = $this->connect($request, $response);
+            @stream_set_timeout($resource, $this->config->getTimeout());
             $this->sendRequest($resource, $request);
             $this->getHeaders($resource, $response);
         } while ($this->redirect($request, $response));
@@ -141,7 +146,6 @@ class StreamHandler extends AbstractHandler
     private function getBodyNoEncoding($resource, ?int $contentLength): string
     {
         $rawBody = '';
-
         while (!feof($resource) && (is_null($contentLength) || $contentLength > 0)) {
             $bufLength = is_null($contentLength) || $contentLength > self::STREAM_READ_LENGTH
                 ? self::STREAM_READ_LENGTH
@@ -290,7 +294,11 @@ class StreamHandler extends AbstractHandler
      */
     private function sendRequest($resource, RequestInterface $request): void
     {
-        $payload = $request->getMethod() . ' ' . $request->getUri()->getPath()
+        $path = $request->getUri()->getPath();
+        if (!$path) {
+            $path = '/';
+        }
+        $payload = $request->getMethod() . ' ' . $path
             . ($request->getUri()->getQuery() ? '?' . $request->getUri()->getQuery() : '')
             . ' HTTP/' . $this->getProtocolVersion($request->getProtocolVersion()) . "\r\n";
 
@@ -300,6 +308,7 @@ class StreamHandler extends AbstractHandler
         foreach ($request->getHeaders() as $header) {
             $payload .= $header->getLine() . "\r\n";
         }
+
         $payload .= "\r\n";
 
         fwrite($resource, $payload);
@@ -321,26 +330,76 @@ class StreamHandler extends AbstractHandler
     }
 
     /**
+     * Соединение через прокси
+     *
+     * @param resource $context
+     *
+     * @return resource
+     */
+    protected function proxyConnect($context, RequestInterface $request, ResponseInterface $response)
+    {
+        return $this->factoryProxy($context, $request, $response)->connect();
+    }
+
+    /**
+     * Вызывет фабричный метод для создания объекта proxy коннектора
+     *
+     * @param resource $context
+     */
+    protected function factoryProxy(
+        $context,
+        RequestInterface $request,
+        ResponseInterface $response
+    ): StreamProxyConnectorInterface {
+        $proxy = $request->getProxy();
+        assert($proxy instanceof ProxyInterface);
+
+        return (new StreamProxyConnectorFactory())->factory(
+            $context,
+            $this->config,
+            $request,
+            $response,
+            $proxy
+        );
+    }
+
+    /**
      * Соединение
      *
      * @return resource
-     *
-     * @SuppressWarnings(PHPMD.ErrorControlOperator)
      */
-    private function connect(UriInterface $uri)
+    private function connect(RequestInterface $request, ResponseInterface $response)
     {
+        $uri = $request->getUri();
+
         $options = [];
-        $context = $this->createContext($options);
+
+        $context = $this->createContext($options, $uri);
+
+        if ($request->getProxy()) {
+            return $this->proxyConnect($context, $request, $response);
+        }
+
+        $ip = filter_var(
+            $uri->getHost(),
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6
+        ) ? $uri->getHost() : gethostbyname($uri->getHost());
+        $port = $uri->getPort();
 
         $address = 'tcp://';
         if ($uri->getScheme() === 'https') {
             $address = 'ssl://';
+            if (!$port) {
+                $port = 443;
+            }
         }
-        $address .= $uri->getHost();
-        $port = $uri->getPort();
-        if (!is_null($port)) {
-            $address .= ':' . $port;
+        if (!$port) {
+            $port = 80;
         }
+
+        $address .= $ip;
+        $address .= ':' . $port;
 
         $resource = @stream_socket_client(
             $address,
@@ -365,9 +424,10 @@ class StreamHandler extends AbstractHandler
      *
      * @return resource
      */
-    private function createContext(array $options)
+    private function createContext(array $options, UriInterface $uri)
     {
         if ($this->config->getSslVerify() === false) {
+            $options['ssl']['peer_name'] = $uri->getHost();
             $options['ssl']['verify_peer_name'] = false;
             $options['ssl']['verify_peer'] = false;
             $options['ssl']['allow_self_signed'] = true;

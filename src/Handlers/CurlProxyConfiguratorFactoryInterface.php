@@ -9,10 +9,10 @@ use Fi1a\HttpClient\Proxy\ProxyInterface;
 /**
  * Фабрика для обработчиков proxy
  */
-interface CurlProxyFactoryInterface
+interface CurlProxyConfiguratorFactoryInterface
 {
     /**
      * Фабричеый метод
      */
-    public function factory(ProxyInterface $proxy): CurlProxyInterface;
+    public function factory(ProxyInterface $proxy): CurlProxyConfiguratorInterface;
 }

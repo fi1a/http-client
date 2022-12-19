@@ -9,7 +9,7 @@ use Fi1a\HttpClient\Proxy\ProxyInterface;
 /**
  * Обработчик proxy для CurlHandler
  */
-interface CurlProxyInterface
+interface CurlProxyConfiguratorInterface
 {
     public function __construct(ProxyInterface $proxy);
 

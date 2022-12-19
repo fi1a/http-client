@@ -12,6 +12,7 @@ use Fi1a\HttpClient\Handlers\HandlerInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollection;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
+use Fi1a\HttpClient\Proxy\ProxyInterface;
 use InvalidArgumentException;
 
 /**
@@ -43,6 +44,11 @@ class HttpClient implements HttpClientInterface
      * @var string|null
      */
     private $urlPrefix;
+
+    /**
+     * @var ProxyInterface|null
+     */
+    private $proxy;
 
     public function __construct(
         ConfigInterface $config,
@@ -86,6 +92,10 @@ class HttpClient implements HttpClientInterface
 
         if (!$request->getUri()->getHost()) {
             throw new InvalidArgumentException('Не передан хост для запроса');
+        }
+
+        if ($this->getProxy() && !$request->getProxy()) {
+            $request->withProxy($this->getProxy());
         }
 
         $response = new Response();
@@ -206,6 +216,24 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function withProxy(?ProxyInterface $proxy)
+    {
+        $this->proxy = $proxy;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getProxy(): ?ProxyInterface
+    {
+        return $this->proxy;
+    }
+
+    /**
      * Добавить заголовки
      */
     private function addDefaultHeaders(RequestInterface $request): void
@@ -252,7 +280,7 @@ class HttpClient implements HttpClientInterface
     /**
      * Фабричный метод для обработчика запроса
      */
-    private function factoryHandler(): HandlerInterface
+    protected function factoryHandler(): HandlerInterface
     {
         /**
          * @var HandlerInterface $instance

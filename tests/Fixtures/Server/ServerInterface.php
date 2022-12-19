@@ -12,7 +12,7 @@ interface ServerInterface
     /**
      * Запускает сервер
      */
-    public function start(int $port): bool;
+    public function start(int $httpsPort, int $httpPort): bool;
 
     /**
      * Останавливает сервер

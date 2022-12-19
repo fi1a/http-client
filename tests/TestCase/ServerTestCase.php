@@ -19,7 +19,9 @@ use PHPUnit\Framework\TestCase;
  */
 class ServerTestCase extends TestCase
 {
-    protected const HOST = WEB_SERVER_HOST . ':' . WEB_SERVER_PORT;
+    protected const HOST = WEB_SERVER_HOST . ':' . WEB_SERVER_HTTPS_PORT;
+
+    protected const HTTP_HOST = WEB_SERVER_HOST . ':' . WEB_SERVER_HTTP_PORT;
 
     /**
      * Возвращает HTTP-client
