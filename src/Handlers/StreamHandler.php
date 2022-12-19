@@ -426,8 +426,9 @@ class StreamHandler extends AbstractHandler
      */
     private function createContext(array $options, UriInterface $uri)
     {
+        $options['ssl']['peer_name'] = $uri->getHost();
+
         if ($this->config->getSslVerify() === false) {
-            $options['ssl']['peer_name'] = $uri->getHost();
             $options['ssl']['verify_peer_name'] = false;
             $options['ssl']['verify_peer'] = false;
             $options['ssl']['allow_self_signed'] = true;
