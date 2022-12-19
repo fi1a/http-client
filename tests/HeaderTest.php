@@ -70,4 +70,13 @@ class HeaderTest extends TestCase
         $header = new Header('Content-Type', 'text/html; charset=utf-8');
         $this->assertEquals('Content-Type: text/html; charset=utf-8', $header->getLine());
     }
+
+    /**
+     * Преобразование объекта заголовка в строку
+     */
+    public function testToString(): void
+    {
+        $header = new Header('Content-Type', 'text/html; charset=utf-8');
+        $this->assertEquals($header->getLine(), (string) $header);
+    }
 }

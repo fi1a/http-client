@@ -73,4 +73,12 @@ class Header implements HeaderInterface
 
         return $this->getName() . ': ' . ($value ?: '');
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function __toString()
+    {
+        return $this->getLine();
+    }
 }
