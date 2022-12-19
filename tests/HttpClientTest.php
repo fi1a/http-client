@@ -731,7 +731,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testGetDefaultHttpsPort(HttpClientInterface $client): void
     {
-        $request = Request::create()->get('https://ya.ru');
+        $request = Request::create()->get('https://httpbin.org');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($response->getBody()->has());
@@ -745,7 +745,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testGetDefaultHttpPort(HttpClientInterface $client): void
     {
-        $request = Request::create()->get('http://ya.ru');
+        $request = Request::create()->get('http://httpbin.org');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($response->getBody()->has());
@@ -775,7 +775,7 @@ class HttpClientTest extends ServerTestCase
     public function testProxyHttp(HttpClientInterface $client, ProxyInterface $proxy): void
     {
         $client->withProxy($proxy);
-        $request = Request::create()->get('http://ya.ru');
+        $request = Request::create()->get('http://httpbin.org');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($response->getBody()->has());
@@ -805,7 +805,7 @@ class HttpClientTest extends ServerTestCase
     {
         $this->expectException(LogicException::class);
         $client->withProxy(new FixtureProxy('127.0.0.1', 80));
-        $request = Request::create()->get('http://ya.ru');
+        $request = Request::create()->get('http://httpbin.org');
         $client->send($request);
     }
 
@@ -818,7 +818,7 @@ class HttpClientTest extends ServerTestCase
     {
         $this->expectException(ConnectionErrorException::class);
         $client->withProxy(new Socks5Proxy('127.0.0.1', 10000));
-        $request = Request::create()->get('http://ya.ru');
+        $request = Request::create()->get('http://httpbin.org');
         $client->send($request);
     }
 
@@ -831,7 +831,7 @@ class HttpClientTest extends ServerTestCase
     {
         $this->expectException(ConnectionErrorException::class);
         $client->withProxy(new HttpProxy('127.0.0.1', 10000));
-        $request = Request::create()->get('http://ya.ru');
+        $request = Request::create()->get('http://httpbin.org');
         $client->send($request);
     }
 
@@ -845,7 +845,7 @@ class HttpClientTest extends ServerTestCase
         $this->expectException(ConnectionErrorException::class);
         $proxy->setUserName('unknown');
         $client->withProxy($proxy);
-        $request = Request::create()->get('http://ya.ru');
+        $request = Request::create()->get('http://httpbin.org');
         $client->send($request);
     }
 

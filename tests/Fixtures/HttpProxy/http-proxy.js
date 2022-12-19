@@ -21,7 +21,3 @@ const server = new proxyChain.Server({
 server.listen(() => {
     console.log(`Proxy server is listening on port ${port}`);
 });
-
-server.on('tunnelConnectResponded', ({ proxyChainId, response, socket, head }) => {
-    console.log(`CONNECT response headers received: ${response.headers}`);
-});
