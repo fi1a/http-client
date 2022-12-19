@@ -39,10 +39,12 @@ class HttpStreamProxyConnector extends AbstractStreamProxyConnector
         $userInfo = $uri->getUserInfo();
         $port = $uri->getPort();
         if (!$port) {
+            // @codeCoverageIgnoreStart
             $port = 80;
             if ($uri->getScheme() === 'https') {
                 $port = 443;
             }
+            // @codeCoverageIgnoreEnd
         }
 
         $connect = ($userInfo ? $userInfo . '@' : '') . $uri->getHost() . ':' . $port;

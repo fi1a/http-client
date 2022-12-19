@@ -753,21 +753,6 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
-     * Использовать прокси с различными хэндлерами по HTTPS протоколу
-     *
-     * @dataProvider clientAndProxyDataProvider
-     */
-    public function testProxyHttps(HttpClientInterface $client, ProxyInterface $proxy): void
-    {
-        $client->withProxy($proxy);
-        $request = Request::create()->get('https://ya.ru');
-        $response = $client->send($request);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertTrue($response->getBody()->has());
-        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
-    }
-
-    /**
      * Использовать прокси с различными хэндлерами по HTTP протоколу
      *
      * @dataProvider clientAndProxyDataProvider
@@ -775,7 +760,7 @@ class HttpClientTest extends ServerTestCase
     public function testProxyHttp(HttpClientInterface $client, ProxyInterface $proxy): void
     {
         $client->withProxy($proxy);
-        $request = Request::create()->get('http://httpbin.org');
+        $request = Request::create()->get('http://' . self::HTTP_HOST);
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($response->getBody()->has());
@@ -845,7 +830,7 @@ class HttpClientTest extends ServerTestCase
         $this->expectException(ConnectionErrorException::class);
         $proxy->setUserName('unknown');
         $client->withProxy($proxy);
-        $request = Request::create()->get('http://httpbin.org');
+        $request = Request::create()->get('http://' . self::HTTP_HOST);
         $client->send($request);
     }
 
