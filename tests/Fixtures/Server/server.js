@@ -7,8 +7,10 @@ const express = require('express'),
     fileUpload = require('express-fileupload'),
     fs = require('fs'),
     https = require('https'),
+    http = require('http'),
     app = express(),
-    port = process.argv.length > 2 ? Number(process.argv[2]) : 3000,
+    httpsPort = process.argv.length > 2 ? Number(process.argv[2]) : 3000,
+    httpPort = process.argv.length > 2 ? Number(process.argv[3]) : 3001,
     urlencodedParser = express.urlencoded({extended: false}),
     oneYear = 1 * 365 * 24 * 60 * 60 * 1000;
 
@@ -23,7 +25,7 @@ const auth = {name: 'test', pass: 'test'}
 
 app.use(cookieParser());
 app.use(compress({threshold: 0}));
-app.use(express.static(__dirname + '/public', { maxAge: oneYear }));
+app.use(express.static(__dirname + '/public', {maxAge: oneYear}));
 passport.use(new BearerStrategy(
     function(token, done){
         if (token === '123') {
@@ -186,6 +188,10 @@ app.post('/file-upload/', urlencodedParser, (req, res, next) => {
     next();
 });
 
-https.createServer(options, app).listen(port, () => {
-    console.log(`App listening on port ${port}`)
+https.createServer(options, app).listen(httpsPort, () => {
+    console.log(`App listening on port ${httpsPort}`)
+});
+
+http.createServer(options, app).listen(httpPort, () => {
+    console.log(`App listening on port ${httpPort}`)
 });

@@ -6,6 +6,7 @@ namespace Fi1a\HttpClient;
 
 use Fi1a\HttpClient\Cookie\CookieStorageInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
+use Fi1a\HttpClient\Proxy\ProxyInterface;
 
 /**
  * HTTP-client
@@ -108,4 +109,16 @@ interface HttpClientInterface
      * @return $this
      */
     public function withUrlPrefix(?string $urlPrefix);
+
+    /**
+     * Использовать прокси для всех соединений
+     *
+     * @return $this
+     */
+    public function withProxy(?ProxyInterface $proxy);
+
+    /**
+     * Возвращает прокси
+     */
+    public function getProxy(): ?ProxyInterface;
 }

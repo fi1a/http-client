@@ -7,6 +7,8 @@ namespace Fi1a\Unit\HttpClient;
 use Fi1a\HttpClient\HttpInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\MimeInterface;
+use Fi1a\HttpClient\Proxy\HttpProxy;
+use Fi1a\HttpClient\Proxy\ProxyInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\Uri;
@@ -414,5 +416,18 @@ class RequestTest extends TestCase
         $request->withMiddleware(new StopMiddleware(), 600);
         $this->assertInstanceOf(MiddlewareCollectionInterface::class, $request->getMiddlewares());
         $this->assertCount(2, $request->getMiddlewares());
+    }
+
+    /**
+     * Использовании прокси в запросе
+     */
+    public function testWithProxy(): void
+    {
+        $request = Request::create();
+        $this->assertNull($request->getProxy());
+        $request->withProxy(new HttpProxy('127.0.0.1', 5000));
+        $this->assertInstanceOf(ProxyInterface::class, $request->getProxy());
+        $request->withProxy(null);
+        $this->assertNull($request->getProxy());
     }
 }

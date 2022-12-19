@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Fi1a\Unit\HttpClient\Fixtures\Server;
+namespace Fi1a\Unit\HttpClient\Fixtures\Socks5Proxy;
 
 use function exec;
 use function posix_kill;
@@ -10,9 +10,9 @@ use function posix_kill;
 use const SIGKILL;
 
 /**
- * Управление сервером для тестирования
+ * Управление Socks5 proxy для тестирования
  */
-class Server implements ServerInterface
+class Socks5Proxy implements Socks5ProxyInterface
 {
     /**
      * @var bool
@@ -27,13 +27,13 @@ class Server implements ServerInterface
     /**
      * @inheritDoc
      */
-    public function start(int $httpsPort, int $httpPort): bool
+    public function start(int $port, string $username, string $password): bool
     {
         if ($this->started) {
             return true;
         }
 
-        $logFilePath = '/tmp/server.log';
+        $logFilePath = '/tmp/socks5-proxy.log';
         if (is_file($logFilePath)) {
             unlink($logFilePath);
         }
@@ -41,7 +41,8 @@ class Server implements ServerInterface
         $output = [];
         exec(
             'node ' . str_replace(' ', '\ ', __DIR__)
-            . '/server.js ' . $httpsPort . ' ' . $httpPort . ' >> ' . $logFilePath . ' 2>&1 & echo $!',
+            . '/socks5-proxy.js ' . $port . ' ' . $username . ' '
+            . $password . ' >> ' . $logFilePath . ' 2>&1 & echo $!',
             $output
         );
         sleep(1);
@@ -64,7 +65,7 @@ class Server implements ServerInterface
         posix_kill($this->pid, SIGKILL);
         $this->started = false;
 
-        echo file_get_contents('/tmp/server.log');
+        echo file_get_contents('/tmp/socks5-proxy.log');
 
         return true;
     }

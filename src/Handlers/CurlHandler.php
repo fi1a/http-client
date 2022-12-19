@@ -45,8 +45,12 @@ class CurlHandler extends AbstractHandler
         $this->configure($resource);
         $this->configureByConfig($resource);
         $this->configureByRequest($resource, $request);
+        $this->configureProxy($resource, $request);
         $this->headers($resource, $response);
         $body = $this->getBody($resource);
+        if ($response->getStatusCode() === 407) {
+            throw new ConnectionErrorException('Необходима аутентификация прокси');
+        }
         $body = $this->decompress($body, $response);
         $this->setBody($body, $response);
         $this->closeHandler($resource);
@@ -186,6 +190,23 @@ class CurlHandler extends AbstractHandler
         $options[CURLOPT_MAXREDIRS] = $this->config->getAllowRedirects() ? $this->config->getMaxRedirects() : 0;
 
         curl_setopt_array($resource, $options);
+    }
+
+    /**
+     * Установка опций для использования прокси
+     *
+     * @param resource $resource
+     */
+    private function configureProxy($resource, RequestInterface $request): void
+    {
+        $proxy = $request->getProxy();
+        if (!$proxy) {
+            return;
+        }
+        $factory = new CurlProxyConfiguratorFactory();
+
+        $configurator = $factory->factory($proxy);
+        $configurator->configure($resource);
     }
 
     /**
