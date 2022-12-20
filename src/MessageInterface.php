@@ -41,6 +41,20 @@ interface MessageInterface
     public function getHeaders(): HeaderCollectionInterface;
 
     /**
+     * Устанавливает коллекцию заголовков
+     *
+     * @return $this
+     */
+    public function withHeaders(HeaderCollectionInterface $headers);
+
+    /**
+     * Добавить заголовок к коллекции
+     *
+     * @return $this
+     */
+    public function addHeader(HeaderInterface $header);
+
+    /**
      * Проверяет наличие заголовка с определенным именем
      */
     public function hasHeader(string $name): bool;

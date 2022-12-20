@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient;
 
+use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\HttpInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\MimeInterface;
@@ -429,5 +430,18 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(ProxyInterface::class, $request->getProxy());
         $request->withProxy(null);
         $this->assertNull($request->getProxy());
+    }
+
+    /**
+     * Добавление куки
+     */
+    public function testWithCookie(): void
+    {
+        $request = Request::create();
+        $cookie = $request->withCookie('cookieName1', 'cookieValue1');
+        $this->assertInstanceOf(CookieInterface::class, $cookie);
+        $this->assertEquals('', $cookie->getDomain());
+        $request->withUri(new Uri('https://domain.ru'));
+        $this->assertEquals('domain.ru', $cookie->getDomain());
     }
 }
