@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 class CookieStorageTest extends TestCase
 {
     /**
-     * Возвращает хранилище кук
+     * Возвращает хранилище cookie
      */
     private function getStorage(): CookieStorageInterface
     {
@@ -24,7 +24,7 @@ class CookieStorageTest extends TestCase
     }
 
     /**
-     * Возвращает куку
+     * Возвращает cookie
      */
     private function getCookie(): CookieInterface
     {
@@ -37,7 +37,7 @@ class CookieStorageTest extends TestCase
     }
 
     /**
-     * Добавить куку
+     * Добавить cookie
      */
     public function testAddCookie(): void
     {
@@ -48,7 +48,7 @@ class CookieStorageTest extends TestCase
     }
 
     /**
-     * Добавить куку (изменено название)
+     * Добавить cookie (изменено название)
      */
     public function testAddCookieChangeName(): void
     {
@@ -61,7 +61,7 @@ class CookieStorageTest extends TestCase
     }
 
     /**
-     * Добавить куку (изменено значение)
+     * Добавить cookie (изменено значение)
      */
     public function testAddCookieChangeValue(): void
     {
@@ -74,7 +74,7 @@ class CookieStorageTest extends TestCase
     }
 
     /**
-     * Добавить куку (изменен домен)
+     * Добавить cookie (изменен домен)
      */
     public function testAddCookieChangeDomain(): void
     {
@@ -87,7 +87,7 @@ class CookieStorageTest extends TestCase
     }
 
     /**
-     * Добавить куку (изменен путь)
+     * Добавить cookie (изменен путь)
      */
     public function testAddCookieChangePath(): void
     {
@@ -100,7 +100,7 @@ class CookieStorageTest extends TestCase
     }
 
     /**
-     * Добавить куку (изменен время жизни)
+     * Добавить cookie (изменен время жизни)
      */
     public function testAddCookieChangeExpires(): void
     {
@@ -113,7 +113,7 @@ class CookieStorageTest extends TestCase
     }
 
     /**
-     * Добавить куку (изменен флаг хранения на сессию)
+     * Добавить cookie (изменен флаг хранения на сессию)
      */
     public function testAddCookieChangeSession(): void
     {
@@ -129,7 +129,7 @@ class CookieStorageTest extends TestCase
     }
 
     /**
-     * Добавить куку (не заполненную)
+     * Добавить cookie (не заполненную)
      */
     public function testAddCookieEmpty(): void
     {
@@ -138,7 +138,10 @@ class CookieStorageTest extends TestCase
         $this->assertFalse($storage->addCookie($cookie));
     }
 
-    public function testGetCookies(): void
+    /**
+     *  Возвращает коллекцию cookie для домена и пути
+     */
+    public function testGetCookiesWithCondition(): void
     {
         $storage = $this->getStorage();
         $cookie1 = new Cookie([
@@ -172,5 +175,84 @@ class CookieStorageTest extends TestCase
         $this->assertCount(2, $storage->getCookiesWithCondition('domain.ru', '/'));
         $this->assertCount(3, $storage->getCookiesWithCondition('domain.ru', '/some/path'));
         $this->assertCount(1, $storage->getCookiesWithCondition('otherdomain.ru', '/'));
+    }
+
+    private function addCookies(CookieStorageInterface $storage): void
+    {
+        $cookie1 = new Cookie([
+            'Name' => 'name1',
+            'Value' => 'value1',
+            'Domain' => 'domain.ru',
+            'Path' => '/',
+        ]);
+        $this->assertTrue($storage->addCookie($cookie1));
+        $cookie2 = new Cookie([
+            'Name' => 'name2',
+            'Value' => 'value2',
+            'Domain' => 'domain.ru',
+            'Path' => '/',
+        ]);
+        $this->assertTrue($storage->addCookie($cookie2));
+        $cookie3 = new Cookie([
+            'Name' => 'name3',
+            'Value' => 'value3',
+            'Domain' => 'new-domain.ru',
+            'Path' => '/',
+        ]);
+        $this->assertTrue($storage->addCookie($cookie3));
+        $cookie4 = new Cookie([
+            'Name' => 'name4',
+            'Value' => 'value4',
+            'Domain' => 'new-domain.ru',
+            'Path' => '/path/',
+        ]);
+        $this->assertTrue($storage->addCookie($cookie4));
+        $cookie5 = new Cookie([
+            'Name' => 'name1',
+            'Value' => 'value1',
+            'Domain' => 'new-domain.ru',
+            'Path' => '/path/',
+        ]);
+        $this->assertTrue($storage->addCookie($cookie5));
+        $cookie6 = new Cookie([
+            'Name' => 'name1',
+            'Value' => 'value1',
+            'Domain' => 'new-domain.ru',
+            'Path' => '/path/other/',
+        ]);
+        $this->assertTrue($storage->addCookie($cookie6));
+    }
+
+    /**
+     * Удаление cookie по имени
+     */
+    public function testDeleteCookieByName(): void
+    {
+        $storage = $this->getStorage();
+        $this->addCookies($storage);
+        $storage->deleteCookie('name1');
+        $this->assertCount(3, $storage->getCookies());
+    }
+
+    /**
+     * Удаление cookie по имени и домену
+     */
+    public function testDeleteCookieByNameAndDomain(): void
+    {
+        $storage = $this->getStorage();
+        $this->addCookies($storage);
+        $storage->deleteCookie('name1', 'domain.ru');
+        $this->assertCount(5, $storage->getCookies());
+    }
+
+    /**
+     * Удаление cookie по имени и домену
+     */
+    public function testDeleteCookieByNameAndDomainAndPath(): void
+    {
+        $storage = $this->getStorage();
+        $this->addCookies($storage);
+        $storage->deleteCookie('name1', 'new-domain.ru', '/path/');
+        $this->assertCount(5, $storage->getCookies());
     }
 }

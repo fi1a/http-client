@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace Fi1a\HttpClient\Cookie;
 
 /**
- * Хранилище кук
+ * Хранилище cookie
  */
 interface CookieStorageInterface
 {
     /**
-     * Добавить куку в хранилище
+     * Добавить cookie в хранилище
      */
     public function addCookie(CookieInterface $cookie): bool;
 
     /**
-     * Возвращает коллекцию кук для домена и пути
+     * Удалить cookie из хранилища
+     */
+    public function deleteCookie(string $name, ?string $domain = null, ?string $path = null): void;
+
+    /**
+     * Возвращает коллекцию cookie для домена и пути
      */
     public function getCookiesWithCondition(
         string $domain,
@@ -24,7 +29,7 @@ interface CookieStorageInterface
     ): CookieCollectionInterface;
 
     /**
-     * Возвращает коллекцию кук
+     * Возвращает коллекцию cookie
      */
     public function getCookies(): CookieCollectionInterface;
 }

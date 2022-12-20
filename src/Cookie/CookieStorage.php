@@ -64,6 +64,27 @@ class CookieStorage implements CookieStorageInterface
     /**
      * @inheritDoc
      */
+    public function deleteCookie(string $name, ?string $domain = null, ?string $path = null): void
+    {
+        /**
+         * @var CookieCollectionInterface $cookies
+         */
+        $cookies = $this->cookies->filter(function (CookieInterface $cookie) use ($name, $domain, $path) {
+            if ($name !== $cookie->getName()) {
+                return true;
+            }
+            if ($domain && !$cookie->matchDomain($domain)) {
+                return true;
+            }
+
+            return $path && !$cookie->matchPath($path);
+        });
+        $this->cookies = $cookies;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getCookiesWithCondition(
         string $domain,
         string $path,
