@@ -179,7 +179,7 @@ class CurlHandler extends AbstractHandler
     {
         $options = [
             CURLOPT_SSL_VERIFYPEER => $this->config->getSslVerify() ? 1 : 0,
-            CURLOPT_SSL_VERIFYHOST => $this->config->getSslVerify() ? 1 : 0,
+            CURLOPT_SSL_VERIFYHOST => $this->config->getSslVerify() ? 2 : 0,
         ];
 
         if ($this->config->getTimeout() > 0) {
