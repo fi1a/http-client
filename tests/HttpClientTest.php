@@ -878,4 +878,16 @@ class HttpClientTest extends ServerTestCase
         $client->withProxy($proxy);
         $client->send($request);
     }
+
+    /**
+     * Исключение при ошибке соединения с proxy http
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testHttpsSslVerify(HttpClientInterface $client): void
+    {
+        $client->getConfig()->setSslVerify(true);
+        $response = $client->get('https://httpbin.org/get');
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }
