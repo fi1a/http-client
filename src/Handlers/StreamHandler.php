@@ -82,6 +82,7 @@ class StreamHandler extends AbstractHandler
         }
 
         $headerLocation = $response->getLastHeader('Location');
+
         if (!$headerLocation || !$headerLocation->getValue()) {
             return false;
         }
@@ -101,7 +102,17 @@ class StreamHandler extends AbstractHandler
         }
 
         $request->getUri()->replace((string) $headerLocation->getValue());
-        $response->clearHeaders();
+        $headers = $response->getHeaders();
+        /**
+         * @var int $key
+         */
+        foreach ($headers as $key => $header) {
+            assert($header instanceof HeaderInterface);
+            if (mb_strtolower($header->getName()) !== 'set-cookie') {
+                $headers->delete($key);
+            }
+        }
+        $response->withHeaders($headers);
 
         $this->redirects++;
 

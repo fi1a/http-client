@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\HttpClient;
 
 use Fi1a\HttpClient\Cookie\Cookie;
+use Fi1a\HttpClient\Cookie\CookieCollectionInterface;
 use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Cookie\CookieStorage;
 use Fi1a\HttpClient\Cookie\CookieStorageInterface;
@@ -346,10 +347,16 @@ class HttpClient implements HttpClientInterface
             return;
         }
 
+        foreach ($request->getCookies() as $cookie) {
+            assert($cookie instanceof CookieInterface);
+            $this->cookieStorage->addCookie($cookie);
+        }
+
         if ($response->hasHeader('Set-Cookie')) {
             foreach ($response->getHeader('Set-Cookie') as $header) {
                 assert($header instanceof HeaderInterface);
                 $value = $header->getValue();
+
                 if (!$value) {
                     continue;
                 }
@@ -366,7 +373,7 @@ class HttpClient implements HttpClientInterface
         }
 
         $response->withCookies(
-            $this->cookieStorage->getCookiesWithCondidition(
+            $this->cookieStorage->getCookiesWithCondition(
                 $request->getUri()->getHost(),
                 $request->getUri()->getPath()
             )
@@ -382,13 +389,15 @@ class HttpClient implements HttpClientInterface
             return;
         }
 
-        $request->withCookies(
-            $this->cookieStorage->getCookiesWithCondidition(
-                $request->getUri()->getHost(),
-                $request->getUri()->getPath(),
-                $request->getUri()->getScheme()
-            )
-        );
+        /**
+         * @var CookieCollectionInterface $cookies
+         */
+        $cookies = $this->cookieStorage->getCookiesWithCondition(
+            $request->getUri()->getHost(),
+            $request->getUri()->getPath(),
+            $request->getUri()->getScheme()
+        )->merge($request->getCookies());
+        $request->withCookies($cookies);
 
         $cookies = [];
         foreach ($request->getCookies()->getValid() as $cookie) {
@@ -403,6 +412,7 @@ class HttpClient implements HttpClientInterface
             $value = $cookie->getValue();
             $cookies[] = $name . '=' . rawurlencode($value);
         }
+
         if (count($cookies)) {
             $request->withHeader('Cookie', implode('; ', $cookies));
         }

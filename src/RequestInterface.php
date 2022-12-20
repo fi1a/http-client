@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
 use Fi1a\HttpClient\Proxy\ProxyInterface;
@@ -139,7 +140,7 @@ interface RequestInterface extends MessageInterface
     public function withBody($body, ?string $mime = null, ?UploadFileCollectionInterface $files = null);
 
     /**
-     * Возвращает payload
+     * Возвращает тело запроса
      */
     public function getBody(): RequestBodyInterface;
 
@@ -166,4 +167,11 @@ interface RequestInterface extends MessageInterface
      * Возвращает прокси
      */
     public function getProxy(): ?ProxyInterface;
+
+    /**
+     * Добавляет и возвращает куку к запросу
+     *
+     * @return CookieInterface
+     */
+    public function withCookie(string $name, string $value);
 }

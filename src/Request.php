@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\HttpClient\Cookie\Cookie;
+use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollection;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
@@ -248,6 +250,10 @@ class Request extends Message implements RequestInterface
     public function withUri(UriInterface $uri)
     {
         $this->uri = $uri;
+        foreach ($this->getCookies() as $cookie) {
+            assert($cookie instanceof CookieInterface);
+            $cookie->setDomain($uri->getHost());
+        }
 
         return $this;
     }
@@ -289,5 +295,20 @@ class Request extends Message implements RequestInterface
     public function getProxy(): ?ProxyInterface
     {
         return $this->proxy;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function withCookie(string $name, string $value)
+    {
+        $cookie = new Cookie();
+        $cookie->setName($name)
+            ->setValue($value)
+            ->setDomain($this->getUri()->getHost());
+
+        $this->getCookies()->add($cookie);
+
+        return $cookie;
     }
 }

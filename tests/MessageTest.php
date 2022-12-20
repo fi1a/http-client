@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient;
 
+use Fi1a\HttpClient\Cookie\Cookie;
+use Fi1a\HttpClient\Cookie\CookieCollectionInterface;
 use Fi1a\HttpClient\Header;
+use Fi1a\HttpClient\HeaderCollection;
 use Fi1a\HttpClient\HeaderInterface;
 use Fi1a\HttpClient\Message;
 use Fi1a\HttpClient\MessageInterface;
@@ -157,5 +160,43 @@ class MessageTest extends TestCase
         $this->assertCount(3, $message->getHeaders());
         $this->assertTrue($message->clearHeaders());
         $this->assertCount(0, $message->getHeaders());
+    }
+
+    /**
+     * Установить коллекцию заголовков
+     */
+    public function testWithHeaders(): void
+    {
+        $message = new Message();
+        $this->assertCount(0, $message->getHeaders());
+        $headers = new HeaderCollection();
+        $headers->add(new Header('Test-Header', 'Value1'));
+        $message->withHeaders($headers);
+        $this->assertCount(1, $message->getHeaders());
+    }
+
+    /**
+     * Добавить заголовок
+     */
+    public function testAddHeader(): void
+    {
+        $message = new Message();
+        $this->assertCount(0, $message->getHeaders());
+        $message->addHeader(new Header('Test-Header', 'Value1'));
+        $this->assertCount(1, $message->getHeaders());
+    }
+
+    /**
+     * Куки
+     */
+    public function testCookies(): void
+    {
+        $message = new Message();
+        $this->assertInstanceOf(CookieCollectionInterface::class, $message->getCookies());
+        $this->assertCount(0, $message->getCookies());
+        $cookies = $message->getCookies();
+        $cookies[] = new Cookie(['Name' => 'CookieName1', 'Value' => 'Value1']);
+        $message->withCookies($cookies);
+        $this->assertCount(1, $message->getCookies());
     }
 }

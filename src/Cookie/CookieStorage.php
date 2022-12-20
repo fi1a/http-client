@@ -64,7 +64,7 @@ class CookieStorage implements CookieStorageInterface
     /**
      * @inheritDoc
      */
-    public function getCookiesWithCondidition(
+    public function getCookiesWithCondition(
         string $domain,
         string $path,
         ?string $scheme = null

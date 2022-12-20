@@ -85,6 +85,26 @@ class Message implements MessageInterface
     /**
      * @inheritDoc
      */
+    public function withHeaders(HeaderCollectionInterface $headers)
+    {
+        $this->headers = $headers;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addHeader(HeaderInterface $header)
+    {
+        $this->headers->add($header);
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function hasHeader(string $name): bool
     {
         return $this->headers->hasHeader($name);
