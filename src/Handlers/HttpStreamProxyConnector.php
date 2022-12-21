@@ -7,6 +7,7 @@ namespace Fi1a\HttpClient\Handlers;
 use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
 
 use const STREAM_CLIENT_CONNECT;
+use const STREAM_CRYPTO_METHOD_ANY_CLIENT;
 
 /**
  * Http stream proxy
@@ -90,6 +91,10 @@ class HttpStreamProxyConnector extends AbstractStreamProxyConnector
 
         if ($this->response->getStatusCode() === 407) {
             throw new ConnectionErrorException('Необходима аутентификация прокси');
+        }
+
+        if ($uri->getScheme() === 'https') {
+            stream_socket_enable_crypto($resource, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
         }
 
         return $resource;

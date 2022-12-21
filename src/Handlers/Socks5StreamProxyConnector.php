@@ -8,6 +8,8 @@ use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
 
 use const FILTER_FLAG_IPV6;
 use const FILTER_VALIDATE_IP;
+use const STREAM_CLIENT_CONNECT;
+use const STREAM_CRYPTO_METHOD_ANY_CLIENT;
 
 /**
  * Socks5 stream proxy
@@ -21,16 +23,22 @@ class Socks5StreamProxyConnector extends AbstractStreamProxyConnector
      */
     public function connect()
     {
-        $resource = @fsockopen(
-            $this->proxy->getHost(),
-            $this->proxy->getPort(),
+        $address = 'tcp://' . $this->proxy->getHost() . ':' . $this->proxy->getPort();
+
+        $resource = @stream_socket_client(
+            $address,
             $errorCode,
             $errorMessage,
+            $this->config->getTimeout(),
+            STREAM_CLIENT_CONNECT,
+            $this->context
         );
 
         if ($resource === false) {
             throw new ConnectionErrorException($errorMessage, $errorCode);
         }
+
+        $uri = $this->request->getUri();
 
         $request = pack('C', 0x05);
         if ($this->proxy->getUserName() === null) {
@@ -54,7 +62,6 @@ class Socks5StreamProxyConnector extends AbstractStreamProxyConnector
             if ($response['version'] !== 0x01 || $response['status'] !== 0x00) {
                 throw new ConnectionErrorException('Необходима аутентификация прокси');
             }
-            $uri = $this->request->getUri();
             $port = $uri->getPort();
             if (!$port) {
                 $port = 80;
@@ -102,6 +109,10 @@ class Socks5StreamProxyConnector extends AbstractStreamProxyConnector
             }
         } elseif ($response['method'] !== 0x00) {
             throw new ConnectionErrorException('Запрошен недопустимый метод аутентификации');
+        }
+
+        if ($uri->getScheme() === 'https') {
+            stream_socket_enable_crypto($resource, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
         }
 
         return $resource;

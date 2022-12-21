@@ -768,6 +768,21 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
+     * Использовать прокси с различными хэндлерами по HTTPS протоколу
+     *
+     * @dataProvider clientAndProxyDataProvider
+     */
+    public function testProxyHttps(HttpClientInterface $client, ProxyInterface $proxy): void
+    {
+        $client->withProxy($proxy);
+        $request = Request::create()->get('https://' . self::HOST);
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+    }
+
+    /**
      * Использовать прокси для доступа к хосту с IP
      *
      * @dataProvider clientAndProxyDataProvider
