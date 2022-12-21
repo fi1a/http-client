@@ -9,7 +9,7 @@ use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
 
 /**
- * Basic Auth
+ * Bearer авторизация
  */
 class BearerAuthMiddleware extends AbstractMiddleware
 {

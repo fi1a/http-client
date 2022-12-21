@@ -24,7 +24,7 @@ interface MessageInterface
     public function withProtocolVersion(string $version);
 
     /**
-     * Возвращает кодировку запроса
+     * Возвращает кодировку
      */
     public function getEncoding(): string;
 
@@ -97,12 +97,12 @@ interface MessageInterface
     public function clearHeaders(): bool;
 
     /**
-     * Возвращает коллекцию кук
+     * Возвращает коллекцию cookies
      */
     public function getCookies(): CookieCollectionInterface;
 
     /**
-     * Устанавливает коллекцию кук
+     * Устанавливает коллекцию cookies
      *
      * @return $this
      */
