@@ -17,7 +17,8 @@
     "fi1a/collection": "^2.0",
     "fi1a/config": "^2.1",
     "fi1a/format": "^2.0",
-    "fi1a/filesystem": "^1.0"
+    "fi1a/filesystem": "^1.0",
+    "fi1a/http": "dev-main"
   },
   "suggest": {
     "ext-zlib": "*",
