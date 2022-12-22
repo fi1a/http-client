@@ -4,22 +4,11 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient\Cookie;
 
-use Fi1a\Collection\InstanceCollectionInterface;
+use Fi1a\Http\CookieCollectionInterface as HttpCookieCollectionInterface;
 
 /**
- * Коллекция кук
+ * Коллекция cookie
  */
-interface CookieCollectionInterface extends InstanceCollectionInterface
+interface CookieCollectionInterface extends HttpCookieCollectionInterface
 {
-    /**
-     * Возвращает куку по имени
-     *
-     * @return CookieInterface|false
-     */
-    public function getByName(string $name);
-
-    /**
-     * Возвращает валидные куки
-     */
-    public function getValid(): CookieCollectionInterface;
 }
