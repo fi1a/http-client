@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\Http\HeaderCollectionInterface;
+use Fi1a\Http\HeaderInterface;
 use Fi1a\HttpClient\Cookie\CookieCollectionInterface;
 
 /**
