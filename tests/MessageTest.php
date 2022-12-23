@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient;
 
+use Fi1a\Http\Header;
+use Fi1a\Http\HeaderCollection;
+use Fi1a\Http\HeaderInterface;
 use Fi1a\HttpClient\Cookie\Cookie;
 use Fi1a\HttpClient\Cookie\CookieCollectionInterface;
-use Fi1a\HttpClient\Header;
-use Fi1a\HttpClient\HeaderCollection;
-use Fi1a\HttpClient\HeaderInterface;
 use Fi1a\HttpClient\Message;
 use Fi1a\HttpClient\MessageInterface;
 use PHPUnit\Framework\TestCase;
