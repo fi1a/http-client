@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient\Handlers;
 
+use Fi1a\Http\HttpInterface;
 use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
-use Fi1a\HttpClient\HttpInterface;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
 use UnexpectedValueException;

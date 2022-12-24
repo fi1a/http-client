@@ -182,7 +182,7 @@ $client = new HttpClient(
 
 ```php
 use Fi1a\HttpClient\HttpClient;
-use Fi1a\HttpClient\HttpInterface;
+use Fi1a\Http\HttpInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Uri;
@@ -305,7 +305,7 @@ $response->getHeaders()->join(PHP_EOL);
 
 ```php
 use Fi1a\HttpClient\HttpClient;
-use Fi1a\HttpClient\HttpInterface;
+use Fi1a\Http\HttpInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Uri;
