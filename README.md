@@ -141,7 +141,7 @@ $client = new HttpClient(
 
 ## Использование запроса
 
-Объекты запросов обеспечивают большую гибкость в том как передается запрос, включая параметры запроса, middleware, cookie и т.п.
+Объекты запросов `Fi1a\HttpClient\RequestInterface` обеспечивают большую гибкость в том как передается запрос, включая параметры запроса, middleware, cookie и т.п.
 
 | Метод                                                                                         | Описание                                                                            |
 |-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
@@ -220,6 +220,43 @@ $response = $client->send($request);
 | addUploadFile(string $name, FileInterface $file)                                         | Добавить загружаемый файл                               |
 | getUploadFiles(): UploadFileCollectionInterface                                          | Возвращает прикрепленные файлы                          |
 | getContentTypeHeader(): ?string                                                          | Content type для заголовков                             |
+
+### Заголовки запроса
+
+Для отправки заголовков вместе с запросом, можно использовать метод `withHeader`. Пример:
+
+```php
+use Fi1a\HttpClient\Config;
+use Fi1a\HttpClient\Handlers\StreamHandler;
+use Fi1a\HttpClient\HttpClient;
+use Fi1a\HttpClient\Request;
+
+$client = new HttpClient(new Config(), StreamHandler::class);
+
+$request = Request::create()
+    ->get('https://httpbin.org/headers')
+    ->withHeader('X-Header', 'headerValue');
+
+$response = $client->send($request);
+
+$response->getStatusCode(); // 200
+```
+
+Также доступны другие методы связанные с заголовками у класса запроса `Fi1a\HttpClient\RequestInterface`:
+
+| Метод                                                         | Описание                                                                            |
+|---------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| getHeaders(): HeaderCollectionInterface                       | Возвращает коллекцию заголовков                                                     |
+| withHeaders(HeaderCollectionInterface $headers)               | Устанавливает коллекцию заголовков                                                  |
+| addHeader(HeaderInterface $header)                            | Добавить заголовок к коллекции                                                      |
+| hasHeader(string $name): bool                                 | Проверяет наличие заголовка с определенным именем                                   |
+| getHeader(string $name): HeaderCollectionInterface            | Возвращает заголовок с определенным именем                                          |
+| getFirstHeader(string $name): ?HeaderInterface                | Возвращает первый найденный заголовок с определенным именем                         |
+| getLastHeader(string $name): ?HeaderInterface                 | Возвращает последний найденный заголовок с определенным именем                      |
+| withHeader(string $name, string $value)                       | Добавляет заголовок с определенным именем и значением                               |
+| withAddedHeader(string $name, string $value): HeaderInterface | Добавляет заголовок с определенным именем и значением и возвращает объект заголовка |
+| withoutHeader(string $name): bool                             | Удаляет заголовок с определенным именем                                             |
+| clearHeaders(): bool                                          | Удаляет все заголовки                                                               |
 
 ## Использование ответа
 
@@ -625,10 +662,10 @@ $response->getStatusCode(); // 302
 `withProxy` класса `Fi1a\HttpClient\HttpClientInterface`. Данный метод принимает объект, реализующий интерфейс
 `Fi1a\HttpClient\Proxy\ProxyInterface`.
 
-- `Fi1a\HttpClient\Proxy\HttpProxy` - реализует HTTP-прокси;
-- `Fi1a\HttpClient\Proxy\Socks5Proxy` - реализует Socks5-прокси.
+- `Fi1a\HttpClient\Proxy\HttpProxy` - реализует HTTP прокси;
+- `Fi1a\HttpClient\Proxy\Socks5Proxy` - реализует Socks5 прокси.
 
-Пример использования HTTP-прокси:
+Пример использования HTTP прокси:
 
 ```php
 use Fi1a\HttpClient\Config;
