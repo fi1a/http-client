@@ -11,6 +11,7 @@ use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Cookie\CookieStorage;
 use Fi1a\HttpClient\Cookie\CookieStorageInterface;
 use Fi1a\HttpClient\Handlers\HandlerInterface;
+use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollection;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
@@ -53,10 +54,13 @@ class HttpClient implements HttpClientInterface
     private $proxy;
 
     public function __construct(
-        ConfigInterface $config,
-        string $handler,
+        ?ConfigInterface $config = null,
+        string $handler = StreamHandler::class,
         ?CookieStorageInterface $cookieStorage = null
     ) {
+        if (is_null($config)) {
+            $config = new Config();
+        }
         if (!is_subclass_of($handler, HandlerInterface::class)) {
             throw new InvalidArgumentException(
                 'Обработчик запросов должен реализовывать интерфейс ' . HandlerInterface::class

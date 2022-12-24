@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\HttpClient;
 
 use Fi1a\HttpClient\Cookie\CookieStorageInterface;
+use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
 use Fi1a\HttpClient\Proxy\ProxyInterface;
 
@@ -14,8 +15,8 @@ use Fi1a\HttpClient\Proxy\ProxyInterface;
 interface HttpClientInterface
 {
     public function __construct(
-        ConfigInterface $config,
-        string $handler,
+        ?ConfigInterface $config = null,
+        string $handler = StreamHandler::class,
         ?CookieStorageInterface $cookieStorage = null
     );
 

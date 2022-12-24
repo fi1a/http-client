@@ -20,13 +20,11 @@
 - Поддержка proxy (http и socks5 proxy).
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Uri;
 
-$client = new HttpClient(new Config(['ssl_verify' => false]), StreamHandler::class);
+$client = new HttpClient();
 
 $uri = new Uri('https://httpbin.org/get');
 $uri->withQueryParams(['foo' => 'bar']);
@@ -97,11 +95,9 @@ $client = new HttpClient(
 | options($uri): ResponseInterface                                                                                 | HTTP Метод Options |
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 
-$client = new HttpClient(new Config(), StreamHandler::class);
+$client = new HttpClient();
 
 $response = $client->get('https://httpbin.org/get');
 $response = $client->post('https://httpbin.org/post');
@@ -126,7 +122,6 @@ $response = $client->options('https://httpbin.org/get');
 
 ```php
 use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 
 $client = new HttpClient(
@@ -134,8 +129,7 @@ $client = new HttpClient(
         'ssl_verify' => false,
         'timeout' => 2,
         'cookie' => false,
-    ]),
-    StreamHandler::class
+    ])
 );
 ```
 
@@ -187,15 +181,13 @@ $client = new HttpClient(
 Вы можете создать и сконфигурировать запрос, а затем отправить его:
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\HttpInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Uri;
 
-$client = new HttpClient(new Config(), StreamHandler::class);
+$client = new HttpClient();
 
 $request = Request::create()
     ->withMethod(HttpInterface::GET)
@@ -226,12 +218,10 @@ $response = $client->send($request);
 Для отправки заголовков вместе с запросом, можно использовать метод `withHeader`. Пример:
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\Request;
 
-$client = new HttpClient(new Config(), StreamHandler::class);
+$client = new HttpClient();
 
 $request = Request::create()
     ->get('https://httpbin.org/headers')
@@ -314,15 +304,13 @@ $response->getHeaders()->join(PHP_EOL);
 Тело ответа можно получить с помощью метода getBody:
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\HttpInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Uri;
 
-$client = new HttpClient(new Config(), StreamHandler::class);
+$client = new HttpClient();
 
 $request = Request::create()
     ->withMethod(HttpInterface::GET)
@@ -420,12 +408,10 @@ $response = $client->get($uri);
 Для отправки POST-запросов application/x-www-form-urlencoded необходимо указать поля POST в виде массива в методе `post`.
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\MimeInterface;
 
-$client = new HttpClient(new Config(), StreamHandler::class);
+$client = new HttpClient();
 
 $response = $client->post(
     'https://httpbin.org/post',
@@ -442,13 +428,11 @@ $response = $client->post(
 Пример отправки JSON строки методом POST:
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
 
-$client = new HttpClient(new Config(), StreamHandler::class);
+$client = new HttpClient();
 
 $request = Request::create()->post('https://httpbin.org/post');
 $request->getBody()->withBody(['foo' => 'bar'], MimeInterface::JSON);
@@ -466,14 +450,12 @@ $response = $client->send($request);
 ```php
 use Fi1a\Filesystem\Adapters\LocalAdapter;
 use Fi1a\Filesystem\Filesystem;
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\UploadFile;
 use Fi1a\HttpClient\UploadFileCollection;
 
-$client = new HttpClient(new Config(), StreamHandler::class);
+$client = new HttpClient();
 
 $filesystem = new Filesystem(new LocalAdapter(__DIR__));
 $files = new UploadFileCollection();
@@ -622,7 +604,6 @@ $cookieStorage->deleteCookie('cookieName2');
 
 ```php
 use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 
@@ -630,8 +611,7 @@ $client = new HttpClient(
     new Config([
         'allow_redirects' => true,
         'max_redirects' => 6,
-    ]),
-    StreamHandler::class
+    ])
 );
 
 $response = $client->get('https://httpbin.org/redirect/5');
@@ -707,12 +687,10 @@ $response->getStatusCode(); // 200
 Для всех запросов можно добавить промежуточное ПО (middleware) с помощью метода `withMiddleware` класса `Fi1a\HttpClient\HttpClientInterface`.
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\Middlewares\BasicAuthMiddleware;
 
-$client = new HttpClient(new Config(), CurlHandler::class);
+$client = new HttpClient();
 
 $client->withMiddleware(new BasicAuthMiddleware('user1', 'password1'));
 $response = $client->get('https://httpbin.org/hidden-basic-auth/user1/password1');
@@ -722,13 +700,11 @@ $response->getStatusCode(); // 200
 Для одного запроса можно добавить промежуточное ПО (middleware) с помощью метода `withMiddleware` класса запроса `Fi1a\HttpClient\RequestInterface`.
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\Middlewares\BasicAuthMiddleware;
 use Fi1a\HttpClient\Request;
 
-$client = new HttpClient(new Config(), CurlHandler::class);
+$client = new HttpClient();
 
 $request = Request::create()
     ->withMiddleware(new BasicAuthMiddleware('user1', 'password1'))
@@ -750,12 +726,10 @@ $response->getStatusCode(); // 200
 | string $place | Где передать ключ (в заголовке ApiKeyAuthMiddleware::IN_HEADER или как GET параметр ApiKeyAuthMiddleware::IN_QUERY) |
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\Middlewares\ApiKeyAuthMiddleware;
 
-$client = new HttpClient(new Config(), CurlHandler::class);
+$client = new HttpClient();
 
 $response = $client->withMiddleware(
     new ApiKeyAuthMiddleware('token', 'api-token', ApiKeyAuthMiddleware::IN_HEADER)
@@ -769,12 +743,10 @@ $response->getStatusCode(); // 200
 Данное промежуточное ПО (middleware) реализует Basic авторизацию.
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\Middlewares\BasicAuthMiddleware;
 
-$client = new HttpClient(new Config(), CurlHandler::class);
+$client = new HttpClient();
 
 $response = $client->withMiddleware(
     new BasicAuthMiddleware('user1', 'password1')
@@ -788,12 +760,10 @@ $response->getStatusCode(); // 200
 Данное промежуточное ПО (middleware) реализует Bearer авторизацию.
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\Middlewares\BearerAuthMiddleware;
 
-$client = new HttpClient(new Config(), CurlHandler::class);
+$client = new HttpClient();
 
 $response = $client->withMiddleware(
     new BearerAuthMiddleware('token')
@@ -808,12 +778,10 @@ $response->getStatusCode(); // 200
 Количество попыток повторной отправки запроса передается в конструкторе первым аргументом.
 
 ```php
-use Fi1a\HttpClient\Config;
-use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\Middlewares\RetryMiddleware;
 
-$client = new HttpClient(new Config(), CurlHandler::class);
+$client = new HttpClient();
 
 $response = $client->withMiddleware(
     new RetryMiddleware(3)
