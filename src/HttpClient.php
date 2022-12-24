@@ -459,8 +459,12 @@ class HttpClient implements HttpClientInterface
         if ($prefixUri->getPort()) {
             $uri->withPort($prefixUri->getPort());
         }
-        if ($prefixUri->getPath()) {
-            $uri->withPath($prefixUri->getPath() . $uri->getPath());
+        $prefixPath = $prefixUri->getPath();
+        if ($prefixPath) {
+            if (mb_substr($uri->getPath(), 0, 1) === '/') {
+                $prefixPath = rtrim($prefixPath, '/');
+            }
+            $uri->withPath($prefixPath . $uri->getPath());
         }
     }
 }
