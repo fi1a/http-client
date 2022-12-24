@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient;
 
+use Fi1a\Http\HttpInterface;
 use Fi1a\HttpClient\Cookie\CookieInterface;
-use Fi1a\HttpClient\HttpInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Proxy\HttpProxy;
