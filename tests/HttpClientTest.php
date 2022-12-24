@@ -40,6 +40,18 @@ use PHPUnit\Framework\MockObject\MockObject;
 class HttpClientTest extends ServerTestCase
 {
     /**
+     * Значения по умолчанию в конструктор
+     */
+    public function testEmptyConstructorArgs(): void
+    {
+        $client = new HttpClient();
+        $request = Request::create()->get('http://' . self::HTTP_HOST . '/200-ok-text-plain/');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+    }
+
+    /**
      * Отправка запроса
      *
      * @dataProvider clientDataProvider
