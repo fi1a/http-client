@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient\ContentTypeEncodes;
 
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\ContentTypeEncodes\JsonContentTypeEncode;
-use Fi1a\HttpClient\MimeInterface;
 use Fi1a\Unit\HttpClient\TestCase\UploadFileTestCase;
 
 /**

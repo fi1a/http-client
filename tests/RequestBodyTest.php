@@ -6,7 +6,7 @@ namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\Filesystem\Adapters\LocalAdapter;
 use Fi1a\Filesystem\Filesystem;
-use Fi1a\HttpClient\MimeInterface;
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\RequestBody;
 use Fi1a\HttpClient\RequestBodyInterface;
 use Fi1a\HttpClient\UploadFileCollectionInterface;

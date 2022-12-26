@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient;
 
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\ContentTypeEncodeRegistry;
 use Fi1a\HttpClient\ContentTypeEncodes\ContentTypeEncodeInterface;
-use Fi1a\HttpClient\MimeInterface;
 use Fi1a\Unit\HttpClient\Fixtures\XContentTypeEncode;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;

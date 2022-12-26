@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Fi1a\Unit\HttpClient\Handlers;
 
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\Config;
 use Fi1a\HttpClient\Handlers\CurlHandler;
 use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
 use Fi1a\HttpClient\Handlers\HandlerInterface;
-use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Response;
 use Fi1a\Unit\HttpClient\TestCase\ServerTestCase;

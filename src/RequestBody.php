@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\HttpClient;
 
 use Fi1a\Filesystem\FileInterface;
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\ContentTypeEncodes\ContentTypeEncodeInterface;
 
 /**

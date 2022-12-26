@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\Http\Mime;
 use Fi1a\HttpClient\ContentTypeEncodes\ContentTypeEncodeInterface;
 use InvalidArgumentException;
 

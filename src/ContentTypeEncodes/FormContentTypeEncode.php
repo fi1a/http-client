@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient\ContentTypeEncodes;
 
-use Fi1a\HttpClient\MimeInterface;
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\UploadFileCollectionInterface;
 use Fi1a\HttpClient\UploadFileInterface;
 use InvalidArgumentException;
