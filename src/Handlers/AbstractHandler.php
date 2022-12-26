@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient\Handlers;
 
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\ConfigInterface;
-use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\ResponseInterface;
 
 /**

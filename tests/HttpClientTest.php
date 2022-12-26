@@ -6,6 +6,7 @@ namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\Filesystem\Adapters\LocalAdapter;
 use Fi1a\Filesystem\Filesystem;
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\Config;
 use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
@@ -15,7 +16,6 @@ use Fi1a\HttpClient\Handlers\HttpStreamProxyConnector;
 use Fi1a\HttpClient\Handlers\StreamHandler;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\HttpClientInterface;
-use Fi1a\HttpClient\MimeInterface;
 use Fi1a\HttpClient\Proxy\HttpProxy;
 use Fi1a\HttpClient\Proxy\ProxyInterface;
 use Fi1a\HttpClient\Proxy\Socks5Proxy;

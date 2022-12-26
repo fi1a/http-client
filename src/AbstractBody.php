@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Fi1a\Http\Mime;
+
 /**
  * Тело запроса/ответа
  */

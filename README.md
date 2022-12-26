@@ -21,7 +21,7 @@
 
 ```php
 use Fi1a\HttpClient\HttpClient;
-use Fi1a\HttpClient\MimeInterface;
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\Uri;
 
 $client = new HttpClient();
@@ -183,7 +183,7 @@ $client = new HttpClient(
 ```php
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\Http\HttpInterface;
-use Fi1a\HttpClient\MimeInterface;
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Uri;
 
@@ -306,7 +306,7 @@ $response->getHeaders()->join(PHP_EOL);
 ```php
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\Http\HttpInterface;
-use Fi1a\HttpClient\MimeInterface;
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Uri;
 
@@ -409,7 +409,7 @@ $response = $client->get($uri);
 
 ```php
 use Fi1a\HttpClient\HttpClient;
-use Fi1a\HttpClient\MimeInterface;
+use Fi1a\Http\MimeInterface;
 
 $client = new HttpClient();
 
@@ -429,7 +429,7 @@ $response = $client->post(
 
 ```php
 use Fi1a\HttpClient\HttpClient;
-use Fi1a\HttpClient\MimeInterface;
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\Request;
 
 $client = new HttpClient();
@@ -451,7 +451,7 @@ $response = $client->send($request);
 use Fi1a\Filesystem\Adapters\LocalAdapter;
 use Fi1a\Filesystem\Filesystem;
 use Fi1a\HttpClient\HttpClient;
-use Fi1a\HttpClient\MimeInterface;
+use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\UploadFile;
 use Fi1a\HttpClient\UploadFileCollection;
 
