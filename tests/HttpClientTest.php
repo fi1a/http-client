@@ -340,8 +340,8 @@ class HttpClientTest extends ServerTestCase
      */
     public function testSortResponseMiddleware(HttpClientInterface $client): void
     {
-        $client->withMiddleware(new ResponseStopMiddleware(), 600);
-        $client->withMiddleware(new ResponseSet500StatusMiddleware(), 100);
+        $client->withMiddleware(new ResponseStopMiddleware(), 100);
+        $client->withMiddleware(new ResponseSet500StatusMiddleware(), 600);
         $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(500, $response->getStatusCode());
     }

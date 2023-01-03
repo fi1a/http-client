@@ -22,7 +22,7 @@ class MiddlewareCollection extends Collection implements MiddlewareCollectionInt
     /**
      * @inheritDoc
      */
-    public function sortByField(): MiddlewareCollectionInterface
+    public function sortDirect(): MiddlewareCollectionInterface
     {
         /**
          * @var MiddlewareInterface[] $middlewares
@@ -32,6 +32,25 @@ class MiddlewareCollection extends Collection implements MiddlewareCollectionInt
             $middlewares,
             function (MiddlewareInterface $middlewareA, MiddlewareInterface $middlewareB): int {
                 return $middlewareA->getSort() - $middlewareB->getSort();
+            }
+        );
+
+        return new MiddlewareCollection($middlewares);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function sortBack(): MiddlewareCollectionInterface
+    {
+        /**
+         * @var MiddlewareInterface[] $middlewares
+         */
+        $middlewares = $this->getArrayCopy();
+        usort(
+            $middlewares,
+            function (MiddlewareInterface $middlewareA, MiddlewareInterface $middlewareB): int {
+                return $middlewareB->getSort() - $middlewareA->getSort();
             }
         );
 
