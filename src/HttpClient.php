@@ -305,7 +305,20 @@ class HttpClient implements HttpClientInterface
      */
     private function callRequestMiddlewares(RequestInterface $request, ResponseInterface $response)
     {
-        return $this->callMiddlewares($request, $response, 'handleRequest');
+        $middlewares = $this->middlewares->merge($request->getMiddlewares());
+
+        foreach ($middlewares->sortDirect() as $middleware) {
+            assert($middleware instanceof MiddlewareInterface);
+            $result = $middleware->handleRequest($request, $response, $this);
+            if (!$result) {
+                return false;
+            }
+            if ($result instanceof ResponseInterface) {
+                $response = $result;
+            }
+        }
+
+        return $response;
     }
 
     /**
@@ -315,24 +328,11 @@ class HttpClient implements HttpClientInterface
      */
     private function callResponseMiddlewares(RequestInterface $request, ResponseInterface $response)
     {
-        return $this->callMiddlewares($request, $response, 'handleResponse');
-    }
-
-    /**
-     * Вызывает промежуточное ПО
-     *
-     * @return ResponseInterface|bool
-     */
-    private function callMiddlewares(RequestInterface $request, ResponseInterface $response, string $function)
-    {
         $middlewares = $this->middlewares->merge($request->getMiddlewares());
 
-        foreach ($middlewares->sortByField() as $middleware) {
+        foreach ($middlewares->sortBack() as $middleware) {
             assert($middleware instanceof MiddlewareInterface);
-            /**
-             * @var bool|ResponseInterface $result
-             */
-            $result = call_user_func_array([$middleware, $function], [$request, $response, $this]);
+            $result = $middleware->handleResponse($request, $response, $this);
             if (!$result) {
                 return false;
             }

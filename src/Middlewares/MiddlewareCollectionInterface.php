@@ -14,5 +14,10 @@ interface MiddlewareCollectionInterface extends CollectionInterface
     /**
      * Сортирует промежуточное ПО
      */
-    public function sortByField(): MiddlewareCollectionInterface;
+    public function sortDirect(): MiddlewareCollectionInterface;
+
+    /**
+     * Сортирует промежуточное ПО
+     */
+    public function sortBack(): MiddlewareCollectionInterface;
 }

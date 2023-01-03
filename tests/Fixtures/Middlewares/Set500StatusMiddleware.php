@@ -24,7 +24,7 @@ class Set500StatusMiddleware extends AbstractMiddleware
     ) {
         $response->withStatus(500);
 
-        return true;
+        return $response;
     }
 
     /**
@@ -35,6 +35,6 @@ class Set500StatusMiddleware extends AbstractMiddleware
         ResponseInterface $response,
         HttpClientInterface $httpClient
     ) {
-        return true;
+        return $response;
     }
 }

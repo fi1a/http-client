@@ -28,14 +28,28 @@ class MiddlewareCollectionTest extends TestCase
     /**
      * Тестирование сортировки
      */
-    public function testSortByField(): void
+    public function testSortDirect(): void
     {
         $collection = new MiddlewareCollection();
         $collection[] = (new ResponseStopMiddleware())->setSort(600);
         $collection[] = (new Set500StatusMiddleware())->setSort(200);
-        $newCollection = $collection->sortByField();
+        $newCollection = $collection->sortDirect();
         $this->assertCount(2, $newCollection);
         $this->assertEquals(200, $newCollection[0]->getSort());
         $this->assertEquals(600, $newCollection[1]->getSort());
+    }
+
+    /**
+     * Тестирование сортировки
+     */
+    public function testSortBack(): void
+    {
+        $collection = new MiddlewareCollection();
+        $collection[] = (new Set500StatusMiddleware())->setSort(200);
+        $collection[] = (new ResponseStopMiddleware())->setSort(600);
+        $newCollection = $collection->sortBack();
+        $this->assertCount(2, $newCollection);
+        $this->assertEquals(600, $newCollection[0]->getSort());
+        $this->assertEquals(200, $newCollection[1]->getSort());
     }
 }
