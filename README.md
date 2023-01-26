@@ -23,7 +23,7 @@
 ```php
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\Http\MimeInterface;
-use Fi1a\HttpClient\Uri;
+use Fi1a\Http\Uri;
 
 $client = new HttpClient();
 
@@ -182,11 +182,11 @@ $client = new HttpClient(
 Вы можете создать и сконфигурировать запрос, а затем отправить его:
 
 ```php
+use Fi1a\Http\Uri;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\Http\HttpInterface;
 use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\Request;
-use Fi1a\HttpClient\Uri;
 
 $client = new HttpClient();
 
@@ -305,11 +305,11 @@ $response->getHeaders()->join(PHP_EOL);
 Тело ответа можно получить с помощью метода getBody:
 
 ```php
+use Fi1a\Http\Uri;
 use Fi1a\HttpClient\HttpClient;
 use Fi1a\Http\HttpInterface;
 use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\Request;
-use Fi1a\HttpClient\Uri;
 
 $client = new HttpClient();
 
@@ -343,7 +343,7 @@ if ($response->getBody()->has()) {
 В адресе запроса:
 
 ```php
-use Fi1a\HttpClient\Uri;
+use Fi1a\Http\Uri;
 
 $uri = new Uri('https://httpbin.org/get?foo=bar&baz=qux');
 
@@ -353,7 +353,7 @@ $response = $client->get($uri);
 Строкой с помощью метода `withQuery`:
 
 ```php
-use Fi1a\HttpClient\Uri;
+use Fi1a\Http\Uri;
 
 $uri = new Uri('https://httpbin.org/get');
 $uri->withQuery('foo=bar&baz=qux');
@@ -364,7 +364,7 @@ $response = $client->get($uri);
 Массивом с помощью метода `withQueryParams`:
 
 ```php
-use Fi1a\HttpClient\Uri;
+use Fi1a\Http\Uri;
 
 $uri = new Uri('https://httpbin.org/get');
 $uri->withQueryParams([
