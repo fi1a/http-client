@@ -351,7 +351,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testConstructor(): void
     {
-        $client = new HttpClient(new Config(['ssl_verify' => false]), StreamHandler::class);
+        $client = new HttpClient(new Config(['sslVerify' => false]), StreamHandler::class);
         $this->assertInstanceOf(HttpClientInterface::class, $client);
     }
 
@@ -361,7 +361,7 @@ class HttpClientTest extends ServerTestCase
     public function testConstructorHandlerException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new HttpClient(new Config(['ssl_verify' => false]), static::class);
+        new HttpClient(new Config(['sslVerify' => false]), static::class);
     }
 
     /**
@@ -868,7 +868,7 @@ class HttpClientTest extends ServerTestCase
     {
         $this->expectException(ConnectionErrorException::class);
         $proxy = $this->getHttpProxy();
-        $config = new Config(['ssl_verify' => false]);
+        $config = new Config(['sslVerify' => false]);
         $request = Request::create()->get('http://' . self::HTTP_HOST . '/200-ok-text-plain/');
 
         $options = [];

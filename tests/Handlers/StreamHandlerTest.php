@@ -25,7 +25,7 @@ class StreamHandlerTest extends ServerTestCase
      */
     private function getHandler(): HandlerInterface
     {
-        return new StreamHandler(new Config(['ssl_verify' => false]));
+        return new StreamHandler(new Config(['sslVerify' => false]));
     }
 
     /**
@@ -83,7 +83,7 @@ class StreamHandlerTest extends ServerTestCase
     {
         $this->expectException(ErrorException::class);
         $handler = $this->getMockBuilder(StreamHandler::class)
-            ->setConstructorArgs([new Config(['ssl_verify' => false])])
+            ->setConstructorArgs([new Config(['sslVerify' => false])])
             ->onlyMethods(['readContentLine'])
             ->getMock();
 
@@ -99,7 +99,7 @@ class StreamHandlerTest extends ServerTestCase
     {
         $this->expectException(TimeoutErrorException::class);
         $handler = $this->getMockBuilder(StreamHandler::class)
-            ->setConstructorArgs([new Config(['ssl_verify' => false,])])
+            ->setConstructorArgs([new Config(['sslVerify' => false,])])
             ->onlyMethods(['getMetaData'])
             ->getMock();
 
@@ -115,7 +115,7 @@ class StreamHandlerTest extends ServerTestCase
     {
         $this->expectException(ConnectionErrorException::class);
         $handler = $this->getMockBuilder(StreamHandler::class)
-            ->setConstructorArgs([new Config(['ssl_verify' => false,])])
+            ->setConstructorArgs([new Config(['sslVerify' => false,])])
             ->onlyMethods(['isConnectionError'])
             ->getMock();
 

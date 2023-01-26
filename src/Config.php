@@ -12,7 +12,7 @@ use InvalidArgumentException;
  */
 class Config extends ValueObject implements ConfigInterface
 {
-    protected $modelKeys = ['ssl_verify', 'timeout', 'compress', 'allow_redirects', 'max_redirects', 'cookie'];
+    protected $modelKeys = ['sslVerify', 'timeout', 'compress', 'allowRedirects', 'maxRedirects', 'cookie'];
 
     /**
      * @inheritDoc
@@ -20,11 +20,11 @@ class Config extends ValueObject implements ConfigInterface
     protected function getDefaultModelValues()
     {
         return [
-            'ssl_verify' => true,
+            'sslVerify' => true,
             'timeout'  => 10,
             'compress' => null,
-            'allow_redirects' => true,
-            'max_redirects' => 10,
+            'allowRedirects' => true,
+            'maxRedirects' => 10,
             'cookie' => false,
         ];
     }
@@ -34,7 +34,7 @@ class Config extends ValueObject implements ConfigInterface
      */
     public function getSslVerify(): bool
     {
-        return (bool) $this->modelGet('ssl_verify');
+        return (bool) $this->modelGet('sslVerify');
     }
 
     /**
@@ -42,7 +42,7 @@ class Config extends ValueObject implements ConfigInterface
      */
     public function setSslVerify(bool $sslVerify)
     {
-        $this->modelSet('ssl_verify', $sslVerify);
+        $this->modelSet('sslVerify', $sslVerify);
 
         return $this;
     }
@@ -100,7 +100,7 @@ class Config extends ValueObject implements ConfigInterface
      */
     public function getAllowRedirects(): bool
     {
-        return (bool) $this->modelGet('allow_redirects');
+        return (bool) $this->modelGet('allowRedirects');
     }
 
     /**
@@ -109,7 +109,7 @@ class Config extends ValueObject implements ConfigInterface
      */
     public function setAllowRedirects(bool $allowRedirects = true)
     {
-        $this->modelSet('allow_redirects', $allowRedirects);
+        $this->modelSet('allowRedirects', $allowRedirects);
 
         return $this;
     }
@@ -119,7 +119,7 @@ class Config extends ValueObject implements ConfigInterface
      */
     public function getMaxRedirects(): int
     {
-        return (int) $this->modelGet('max_redirects');
+        return (int) $this->modelGet('maxRedirects');
     }
 
     /**
@@ -131,7 +131,7 @@ class Config extends ValueObject implements ConfigInterface
             throw new InvalidArgumentException('Значение не может быть меньше 0');
         }
 
-        $this->modelSet('max_redirects', $maxRedirects);
+        $this->modelSet('maxRedirects', $maxRedirects);
 
         return $this;
     }
