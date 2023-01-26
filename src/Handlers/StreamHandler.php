@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Fi1a\HttpClient\Handlers;
 
 use Fi1a\Http\HeaderInterface;
+use Fi1a\Http\UriInterface;
 use Fi1a\HttpClient\Handlers\Exceptions\ConnectionErrorException;
 use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 use Fi1a\HttpClient\Handlers\Exceptions\TimeoutErrorException;
 use Fi1a\HttpClient\Proxy\ProxyInterface;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
-use Fi1a\HttpClient\UriInterface;
 
 use const FILTER_FLAG_IPV4;
 use const FILTER_FLAG_IPV6;

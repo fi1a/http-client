@@ -6,14 +6,14 @@ namespace Fi1a\Unit\HttpClient;
 
 use Fi1a\Http\HttpInterface;
 use Fi1a\Http\MimeInterface;
+use Fi1a\Http\Uri;
+use Fi1a\Http\UriInterface;
 use Fi1a\HttpClient\Cookie\CookieInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\Proxy\HttpProxy;
 use Fi1a\HttpClient\Proxy\ProxyInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\RequestInterface;
-use Fi1a\HttpClient\Uri;
-use Fi1a\HttpClient\UriInterface;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\Set500StatusMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\StopMiddleware;
 use PHPUnit\Framework\TestCase;
