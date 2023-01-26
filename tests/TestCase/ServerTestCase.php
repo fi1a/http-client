@@ -28,7 +28,7 @@ class ServerTestCase extends TestCase
      */
     protected function getStreamClient(): HttpClientInterface
     {
-        return new HttpClient(new Config(['ssl_verify' => false]), StreamHandler::class);
+        return new HttpClient(new Config(['sslVerify' => false]), StreamHandler::class);
     }
 
     /**
@@ -36,7 +36,7 @@ class ServerTestCase extends TestCase
      */
     protected function getCurlClient(): HttpClientInterface
     {
-        return new HttpClient(new Config(['ssl_verify' => false]), CurlHandler::class);
+        return new HttpClient(new Config(['sslVerify' => false]), CurlHandler::class);
     }
 
     /**

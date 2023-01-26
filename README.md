@@ -59,7 +59,7 @@ use Fi1a\HttpClient\HttpClient;
 
 $client = new HttpClient(
     new Config([
-        'ssl_verify' => false,
+        'sslVerify' => false,
         'timeout' => 2,
         'cookie' => false,
     ]),
@@ -114,11 +114,11 @@ $response = $client->options('https://httpbin.org/get');
 Объект настроек `Fi1a\HttpClient\ConfigInterface` передается в качестве аргумента конструктору класса `Fi1a\HttpClient\HttpClientInterface`
 и может содержать следующие опции:
 
-- ssl_verify (true) - проверка сертификата при https соединении;
+- sslVerify (true) - проверка сертификата при https соединении;
 - timeout (10) - таймаут запросов;
 - compress (null) - если значение задано, то выставляется заголовок Accept-Encoding (доступное значение - "gzip");
-- allow_redirects (true) - автоматическое следование перенаправлениям;
-- max_redirects (10) - максимальное число перенаправлений;
+- allowRedirects (true) - автоматическое следование перенаправлениям;
+- maxRedirects (10) - максимальное число перенаправлений;
 - cookie (false) - определяет использование cookie.
 
 ```php
@@ -127,7 +127,7 @@ use Fi1a\HttpClient\HttpClient;
 
 $client = new HttpClient(
     new Config([
-        'ssl_verify' => false,
+        'sslVerify' => false,
         'timeout' => 2,
         'cookie' => false,
     ])
@@ -600,8 +600,8 @@ $cookieStorage->deleteCookie('cookieName2');
 
 ## Редиректы
 
-Если опция `allow_redirects` в конфигурации выставлена в `true`, то будет осуществлено автоматическое следование перенаправлениям (по умолчанию true).
-Также доступна опция `max_redirects`, определяющая максимальное количество переходов по перенаправлениям (по умолчанию равно 10).
+Если опция `allowRedirects` в конфигурации выставлена в `true`, то будет осуществлено автоматическое следование перенаправлениям (по умолчанию true).
+Также доступна опция `maxRedirects`, определяющая максимальное количество переходов по перенаправлениям (по умолчанию равно 10).
 
 ```php
 use Fi1a\HttpClient\Config;
@@ -610,8 +610,8 @@ use Fi1a\HttpClient\Handlers\Exceptions\ErrorException;
 
 $client = new HttpClient(
     new Config([
-        'allow_redirects' => true,
-        'max_redirects' => 6,
+        'allowRedirects' => true,
+        'maxRedirects' => 6,
     ])
 );
 

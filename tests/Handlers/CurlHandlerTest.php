@@ -24,7 +24,7 @@ class CurlHandlerTest extends ServerTestCase
      */
     private function getHandler(): HandlerInterface
     {
-        return new CurlHandler(new Config(['ssl_verify' => false]));
+        return new CurlHandler(new Config(['sslVerify' => false]));
     }
 
     /**
@@ -82,7 +82,7 @@ class CurlHandlerTest extends ServerTestCase
     {
         $this->expectException(ConnectionErrorException::class);
         $handler = $this->getMockBuilder(CurlHandler::class)
-            ->setConstructorArgs([new Config(['ssl_verify' => false])])
+            ->setConstructorArgs([new Config(['sslVerify' => false])])
             ->onlyMethods(['curlInit'])
             ->getMock();
 
@@ -99,7 +99,7 @@ class CurlHandlerTest extends ServerTestCase
     {
         $this->expectException(UnexpectedValueException::class);
         $handler = $this->getMockBuilder(CurlHandler::class)
-            ->setConstructorArgs([new Config(['ssl_verify' => false,])])
+            ->setConstructorArgs([new Config(['sslVerify' => false,])])
             ->onlyMethods(['isSupportHttp20'])
             ->getMock();
         $handler->method('isSupportHttp20')->willReturn(false);
