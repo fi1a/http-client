@@ -89,7 +89,7 @@ class HttpClientTest extends ServerTestCase
     public function testGetSendJsonResponse(HttpClientInterface $client): void
     {
         $uri = new Uri('https://' . self::HOST . '/200-ok-json/');
-        $uri->withQueryParams(['foo' => 'bar']);
+        $uri = $uri->withQueryParams(['foo' => 'bar']);
         $request = Request::create()->get($uri);
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
@@ -127,7 +127,7 @@ class HttpClientTest extends ServerTestCase
     public function testGet(HttpClientInterface $client): void
     {
         $uri = new Uri('https://' . self::HOST . '/200-ok-json/');
-        $uri->withQueryParams(['foo' => 'bar']);
+        $uri = $uri->withQueryParams(['foo' => 'bar']);
         $response = $client->get($uri, 'json');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -230,7 +230,7 @@ class HttpClientTest extends ServerTestCase
     public function testDelete(HttpClientInterface $client): void
     {
         $uri = new Uri('https://' . self::HOST . '/200-ok-delete/');
-        $uri->withQueryParams(['foo' => 'bar']);
+        $uri = $uri->withQueryParams(['foo' => 'bar']);
         $response = $client->delete($uri);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());

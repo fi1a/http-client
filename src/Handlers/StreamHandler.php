@@ -101,7 +101,7 @@ class StreamHandler extends AbstractHandler
             );
         }
 
-        $request->getUri()->replace((string) $headerLocation->getValue());
+        $request->withUri($request->getUri()->replace((string) $headerLocation->getValue()));
         $headers = $response->getHeaders();
         /**
          * @var int $key

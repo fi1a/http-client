@@ -450,23 +450,24 @@ class HttpClient implements HttpClientInterface
         $prefixUri = new Uri($this->urlPrefix);
         $uri = $request->getUri();
         if ($prefixUri->getScheme()) {
-            $uri->withScheme($prefixUri->getScheme());
+            $uri = $uri->withScheme($prefixUri->getScheme());
         }
         if ($prefixUri->getUserInfo()) {
-            $uri->withUserInfo($prefixUri->getUser(), $prefixUri->getPassword());
+            $uri = $uri->withUserInfo($prefixUri->getUser(), $prefixUri->getPassword());
         }
         if ($prefixUri->getHost()) {
-            $uri->withHost($prefixUri->getHost());
+            $uri = $uri->withHost($prefixUri->getHost());
         }
         if ($prefixUri->getPort()) {
-            $uri->withPort($prefixUri->getPort());
+            $uri = $uri->withPort($prefixUri->getPort());
         }
         $prefixPath = $prefixUri->getPath();
         if ($prefixPath) {
             if (mb_substr($uri->getPath(), 0, 1) === '/') {
                 $prefixPath = rtrim($prefixPath, '/');
             }
-            $uri->withPath($prefixPath . $uri->getPath());
+            $uri = $uri->withPath($prefixPath . $uri->getPath());
         }
+        $request->withUri($uri);
     }
 }

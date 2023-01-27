@@ -28,7 +28,7 @@ use Fi1a\Http\Uri;
 $client = new HttpClient();
 
 $uri = new Uri('https://httpbin.org/get');
-$uri->withQueryParams(['foo' => 'bar']);
+$uri = $uri->withQueryParams(['foo' => 'bar']);
 
 $response = $client->get($uri, MimeInterface::JSON);
 
@@ -356,7 +356,7 @@ $response = $client->get($uri);
 use Fi1a\Http\Uri;
 
 $uri = new Uri('https://httpbin.org/get');
-$uri->withQuery('foo=bar&baz=qux');
+$uri = $uri->withQuery('foo=bar&baz=qux');
 
 $response = $client->get($uri);
 ```
@@ -367,7 +367,7 @@ $response = $client->get($uri);
 use Fi1a\Http\Uri;
 
 $uri = new Uri('https://httpbin.org/get');
-$uri->withQueryParams([
+$uri = $uri->withQueryParams([
     'foo' => 'bar',
     'baz' => 'qux',
 ]);

@@ -11,6 +11,7 @@
       "email": "support@fi1a.ru"
     }
   ],
+  "minimum-stability": "dev",
   "require": {
     "php": "^7.3 || ^8",
     "ext-json": "*",
