@@ -901,7 +901,7 @@ class HttpClientTest extends ServerTestCase
         $request = Request::create()->get('http://' . self::HTTP_HOST . '/200-ok-text-plain/');
 
         $options = [];
-        $options['ssl']['peer_name'] = $request->getUri()->getHost();
+        $options['ssl']['peer_name'] = $request->getUri()->host();
         $options['ssl']['verify_peer_name'] = false;
         $options['ssl']['verify_peer'] = false;
         $options['ssl']['allow_self_signed'] = true;

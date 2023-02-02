@@ -37,18 +37,18 @@ class HttpStreamProxyConnector extends AbstractStreamProxyConnector
         }
 
         $uri = $this->request->getUri();
-        $userInfo = $uri->getUserInfo();
-        $port = $uri->getPort();
+        $userInfo = $uri->userInfo();
+        $port = $uri->port();
         if (!$port) {
             // @codeCoverageIgnoreStart
             $port = 80;
-            if ($uri->getScheme() === 'https') {
+            if ($uri->scheme() === 'https') {
                 $port = 443;
             }
             // @codeCoverageIgnoreEnd
         }
 
-        $connect = ($userInfo ? $userInfo . '@' : '') . $uri->getHost() . ':' . $port;
+        $connect = ($userInfo ? $userInfo . '@' : '') . $uri->host() . ':' . $port;
 
         $payload = 'CONNECT ' . $connect . ' HTTP/' . $this->request->getProtocolVersion() . "\r\n";
         $payload .= 'Host: ' . $connect . "\r\n";
@@ -93,7 +93,7 @@ class HttpStreamProxyConnector extends AbstractStreamProxyConnector
             throw new ConnectionErrorException('Необходима аутентификация прокси');
         }
 
-        if ($uri->getScheme() === 'https') {
+        if ($uri->scheme() === 'https') {
             stream_socket_enable_crypto($resource, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
         }
 

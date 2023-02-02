@@ -218,7 +218,7 @@ class CurlHandler extends AbstractHandler
     {
         $options = [
             CURLOPT_CUSTOMREQUEST => $request->getMethod(),
-            CURLOPT_URL => $request->getUri()->getUri(),
+            CURLOPT_URL => $request->getUri()->uri(),
             CURLOPT_HTTPHEADER => $request->getHeaders()->getLine(),
         ];
 

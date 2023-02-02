@@ -62,7 +62,7 @@ class ApiKeyAuthMiddleware extends AbstractMiddleware
         }
 
         $uri = $request->getUri();
-        $queryParams = $uri->getQueryParams();
+        $queryParams = $uri->queryParams();
         $queryParams[$this->key] = $this->value;
         $request->withUri($uri->withQueryParams($queryParams));
 
