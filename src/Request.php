@@ -259,7 +259,7 @@ class Request extends Message implements RequestInterface
         $this->uri = $uri;
         foreach ($this->getCookies() as $cookie) {
             assert($cookie instanceof CookieInterface);
-            $cookie->setDomain($uri->getHost());
+            $cookie->setDomain($uri->host());
         }
 
         return $this;
@@ -312,7 +312,7 @@ class Request extends Message implements RequestInterface
         $cookie = new Cookie();
         $cookie->setName($name)
             ->setValue($value)
-            ->setDomain($this->getUri()->getHost());
+            ->setDomain($this->getUri()->host());
 
         $this->getCookies()->add($cookie);
 

@@ -62,21 +62,21 @@ class Socks5StreamProxyConnector extends AbstractStreamProxyConnector
             if ($response['version'] !== 0x01 || $response['status'] !== 0x00) {
                 throw new ConnectionErrorException('Необходима аутентификация прокси');
             }
-            $port = $uri->getPort();
+            $port = $uri->port();
             if (!$port) {
                 $port = 80;
-                if ($uri->getScheme() === 'https') {
+                if ($uri->scheme() === 'https') {
                     $port = 443;
                 }
             }
 
-            $ip = @inet_pton($uri->getHost());
+            $ip = @inet_pton($uri->host());
 
             $request = pack('C3', 0x05, 0x01, 0x00);
 
             if ($ip === false) {
                 // not an IP, send as hostname
-                $request .= pack('C2', 0x03, mb_strlen($uri->getHost())) . $uri->getHost();
+                $request .= pack('C2', 0x03, mb_strlen($uri->host())) . $uri->host();
             } else {
                 // send as IPv4 / IPv6
                 $request .= pack(
@@ -111,7 +111,7 @@ class Socks5StreamProxyConnector extends AbstractStreamProxyConnector
             throw new ConnectionErrorException('Запрошен недопустимый метод аутентификации');
         }
 
-        if ($uri->getScheme() === 'https') {
+        if ($uri->scheme() === 'https') {
             stream_socket_enable_crypto($resource, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
         }
 

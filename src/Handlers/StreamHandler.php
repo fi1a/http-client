@@ -90,7 +90,7 @@ class StreamHandler extends AbstractHandler
         }
 
         if (!$this->fromUrl) {
-            $this->fromUrl = $request->getUri()->getMaskedUri();
+            $this->fromUrl = $request->getUri()->maskedUri();
         }
 
         if ($this->config->getMaxRedirects() !== 0 && $this->redirects >= $this->config->getMaxRedirects()) {
@@ -307,9 +307,9 @@ class StreamHandler extends AbstractHandler
      */
     private function sendRequest($resource, RequestInterface $request): void
     {
-        $path = $request->getUri()->getPath();
+        $path = $request->getUri()->path();
         $payload = $request->getMethod() . ' ' . $path
-            . ($request->getUri()->getQuery() ? '?' . $request->getUri()->getQuery() : '')
+            . ($request->getUri()->query() ? '?' . $request->getUri()->query() : '')
             . ' HTTP/' . $this->getProtocolVersion($request->getProtocolVersion()) . "\r\n";
 
         /**
@@ -391,15 +391,15 @@ class StreamHandler extends AbstractHandler
         }
 
         $ip = filter_var(
-            $uri->getHost(),
+            $uri->host(),
             FILTER_VALIDATE_IP,
             FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6
-        ) ? $uri->getHost() : gethostbyname($request->getUri()->getHost());
+        ) ? $uri->host() : gethostbyname($request->getUri()->host());
 
-        $port = $uri->getPort();
+        $port = $uri->port();
 
         $address = 'tcp://';
-        if ($uri->getScheme() === 'https') {
+        if ($uri->scheme() === 'https') {
             $address = 'ssl://';
             if (!$port) {
                 $port = 443;
@@ -437,7 +437,7 @@ class StreamHandler extends AbstractHandler
      */
     private function createContext(array $options, UriInterface $uri)
     {
-        $options['ssl']['peer_name'] = idn_to_ascii($uri->getHost());
+        $options['ssl']['peer_name'] = idn_to_ascii($uri->host());
 
         if ($this->config->getSslVerify() === false) {
             $options['ssl']['verify_peer_name'] = false;

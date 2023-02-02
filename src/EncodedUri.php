@@ -17,15 +17,15 @@ class EncodedUri extends Uri implements EncodedUriInterface
      */
     public static function create(UriInterface $uri): EncodedUriInterface
     {
-        return new EncodedUri($uri->getUri());
+        return new EncodedUri($uri->uri());
     }
 
     /**
      * @inheritDoc
      */
-    public function getHost(): string
+    public function host(): string
     {
-        $host = parent::getHost();
+        $host = parent::host();
         if (!$host) {
             return $host;
         }
@@ -39,11 +39,11 @@ class EncodedUri extends Uri implements EncodedUriInterface
     /**
      * @inheritDoc
      */
-    public function getPath(): string
+    public function path(): string
     {
         return implode(
             '/',
-            array_map('rawurlencode', explode('/', parent::getPath()))
+            array_map('rawurlencode', explode('/', parent::path()))
         );
     }
 }

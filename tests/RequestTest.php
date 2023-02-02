@@ -74,7 +74,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
         $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
@@ -95,7 +95,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
         $this->assertEquals(MimeInterface::FORM, $request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
@@ -118,7 +118,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
         $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
@@ -140,7 +140,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
         $this->assertEquals(MimeInterface::FORM, $request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
@@ -163,7 +163,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
         $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
@@ -185,7 +185,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
         $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
@@ -206,7 +206,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
         $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
@@ -225,7 +225,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
         $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
@@ -244,7 +244,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
         $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
@@ -260,7 +260,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
-            $request->getUri()->getUri()
+            $request->getUri()->uri()
         );
     }
 

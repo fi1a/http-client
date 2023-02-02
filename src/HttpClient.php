@@ -98,7 +98,7 @@ class HttpClient implements HttpClientInterface
     {
         $this->setUrlPrefix($request);
 
-        if (!$request->getUri()->getHost()) {
+        if (!$request->getUri()->host()) {
             throw new InvalidArgumentException('Не передан хост для запроса');
         }
 
@@ -247,7 +247,7 @@ class HttpClient implements HttpClientInterface
     private function addDefaultHeaders(RequestInterface $request): void
     {
         if (!$request->hasHeader('Host')) {
-            $request->withHeader('Host', $request->getUri()->getHost());
+            $request->withHeader('Host', $request->getUri()->host());
         }
         if (!$request->hasHeader('Connection')) {
             $request->withHeader('Connection', 'close');
@@ -369,10 +369,10 @@ class HttpClient implements HttpClientInterface
                 }
                 $cookie = Cookie::fromString($value);
                 if (!$cookie->getDomain()) {
-                    $cookie->setDomain($request->getUri()->getHost());
+                    $cookie->setDomain($request->getUri()->host());
                 }
                 if (mb_strpos($cookie->getPath(), '/') !== 0) {
-                    $cookie->setPath($this->getCookiePath($request->getUri()->getPath()));
+                    $cookie->setPath($this->getCookiePath($request->getUri()->path()));
                 }
 
                 $this->cookieStorage->addCookie($cookie);
@@ -381,8 +381,8 @@ class HttpClient implements HttpClientInterface
 
         $response->withCookies(
             $this->cookieStorage->getCookiesWithCondition(
-                $request->getUri()->getHost(),
-                $request->getUri()->getPath()
+                $request->getUri()->host(),
+                $request->getUri()->path()
             )
         );
     }
@@ -400,9 +400,9 @@ class HttpClient implements HttpClientInterface
          * @var CookieCollectionInterface $cookies
          */
         $cookies = $this->cookieStorage->getCookiesWithCondition(
-            $request->getUri()->getHost(),
-            $request->getUri()->getPath(),
-            $request->getUri()->getScheme()
+            $request->getUri()->host(),
+            $request->getUri()->path(),
+            $request->getUri()->scheme()
         )->merge($request->getCookies());
         $request->withCookies($cookies);
 
@@ -449,24 +449,24 @@ class HttpClient implements HttpClientInterface
 
         $prefixUri = new Uri($this->urlPrefix);
         $uri = $request->getUri();
-        if ($prefixUri->getScheme()) {
-            $uri = $uri->withScheme($prefixUri->getScheme());
+        if ($prefixUri->scheme()) {
+            $uri = $uri->withScheme($prefixUri->scheme());
         }
-        if ($prefixUri->getUserInfo()) {
-            $uri = $uri->withUserInfo($prefixUri->getUser(), $prefixUri->getPassword());
+        if ($prefixUri->userInfo()) {
+            $uri = $uri->withUserInfo($prefixUri->user(), $prefixUri->password());
         }
-        if ($prefixUri->getHost()) {
-            $uri = $uri->withHost($prefixUri->getHost());
+        if ($prefixUri->host()) {
+            $uri = $uri->withHost($prefixUri->host());
         }
-        if ($prefixUri->getPort()) {
-            $uri = $uri->withPort($prefixUri->getPort());
+        if ($prefixUri->port()) {
+            $uri = $uri->withPort($prefixUri->port());
         }
-        $prefixPath = $prefixUri->getPath();
+        $prefixPath = $prefixUri->path();
         if ($prefixPath) {
-            if (mb_substr($uri->getPath(), 0, 1) === '/') {
+            if (mb_substr($uri->path(), 0, 1) === '/') {
                 $prefixPath = rtrim($prefixPath, '/');
             }
-            $uri = $uri->withPath($prefixPath . $uri->getPath());
+            $uri = $uri->withPath($prefixPath . $uri->path());
         }
         $request->withUri($uri);
     }
