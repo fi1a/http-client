@@ -253,6 +253,9 @@ class Request extends Message implements RequestInterface
      */
     public function withUri(UriInterface $uri)
     {
+        if (!$uri instanceof EncodedUriInterface) {
+            $uri = EncodedUri::create($uri);
+        }
         $this->uri = $uri;
         foreach ($this->getCookies() as $cookie) {
             assert($cookie instanceof CookieInterface);
