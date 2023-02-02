@@ -387,28 +387,28 @@ $response = $client->get($uri);
 | Метод                                                | Описание                                      |
 |------------------------------------------------------|-----------------------------------------------|
 | __construct(string $uri = '', array $variables = []) | Конструктор                                   |
-| getScheme(): string                                  | Схема                                         |
+| scheme(): string                                     | Схема                                         |
 | withScheme(string $scheme)                           | Задать схему                                  |
-| getUserInfo(): string                                | Компонент информации о пользователе URI       |
-| getUser(): string                                    | Возвращает имя пользователя                   |
-| getPassword(): ?string                               | Возвращает пароль                             |
+| userInfo(): string                                   | Компонент информации о пользователе URI       |
+| user(): string                                       | Возвращает имя пользователя                   |
+| password(): ?string                                  | Возвращает пароль                             |
 | withUserInfo(string $user, ?string $password = null) | Задать информацию о пользователе              |
-| getHost(): string                                    | Хост                                          |
+| host(): string                                       | Хост                                          |
 | withHost(string $host)                               | Задать хост                                   |
-| getPort(): ?int                                      | Порт                                          |
+| port(): ?int                                         | Порт                                          |
 | withPort(?int $port)                                 | Задать порт                                   |
-| getPath(): string                                    | Часть пути URI                                |
+| path(): string                                       | Часть пути URI                                |
 | withPath(string $path)                               | Установить часть пути URI                     |
-| getQuery(): string                                   | Строка запроса в URI                          |
+| query(): string                                      | Строка запроса в URI                          |
 | withQuery(string $query)                             | Задать строку запроса URI                     |
-| getQueryParams(): array                              | Массив запроса в URI                          |
+| queryParams(): array                                 | Массив запроса в URI                          |
 | withQueryParams(array $queryParams)                  | Задать массив запроса в URI                   |
-| getFragment(): string                                | Фрагмент URI                                  |
+| fragment(): string                                   | Фрагмент URI                                  |
 | withFragment(string $fragment)                       | Задать фрагмент URI                           |
-| getUrl(): string                                     | Возвращает URL                                |
-| getUri(): string                                     | Возвращает URI                                |
-| getAuthority(): string                               | Компонент полномочий URI                      |
-| getMaskedUri(): string                               | Возвращает URI с маской на данных авторизации |
+| url(): string                                        | Возвращает URL                                |
+| uri(): string                                        | Возвращает URI                                |
+| authority(): string                                  | Компонент полномочий URI                      |
+| maskedUri(): string                                  | Возвращает URI с маской на данных авторизации |
 | replace(string $uri = '', array $variables = [])     | Заменить адрес переданным значением           |
 
 ## Отправить POST/Form запрос
