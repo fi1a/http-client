@@ -13,6 +13,8 @@ use Fi1a\HttpClient\Proxy\ProxyInterface;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
 
+use function idn_to_ascii;
+
 use const FILTER_FLAG_IPV4;
 use const FILTER_FLAG_IPV6;
 use const FILTER_VALIDATE_IP;
@@ -392,7 +394,8 @@ class StreamHandler extends AbstractHandler
             $uri->getHost(),
             FILTER_VALIDATE_IP,
             FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6
-        ) ? $uri->getHost() : gethostbyname($uri->getHost());
+        ) ? $uri->getHost() : gethostbyname($request->getUri()->getHost());
+
         $port = $uri->getPort();
 
         $address = 'tcp://';
@@ -434,7 +437,7 @@ class StreamHandler extends AbstractHandler
      */
     private function createContext(array $options, UriInterface $uri)
     {
-        $options['ssl']['peer_name'] = $uri->getHost();
+        $options['ssl']['peer_name'] = idn_to_ascii($uri->getHost());
 
         if ($this->config->getSslVerify() === false) {
             $options['ssl']['verify_peer_name'] = false;

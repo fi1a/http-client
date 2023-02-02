@@ -82,6 +82,35 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
+     * Отправка GET запроса с проверкой кодирования адреса
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testGetEncoded(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://' . self::HOST . '/путь/для теста.html');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals('для теста', $response->getBody()->getRaw());
+    }
+
+    /**
+     * Отправка GET запроса с проверкой punycode преобразования домена
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testGetPunycode(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://уфа.рф');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+    }
+
+    /**
      * Отправка GET запроса
      *
      * @dataProvider clientDataProvider
