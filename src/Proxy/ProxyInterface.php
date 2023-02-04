@@ -9,8 +9,6 @@ namespace Fi1a\HttpClient\Proxy;
  */
 interface ProxyInterface
 {
-    public function __construct(string $host, int $port, ?string $username = null, ?string $password = null);
-
     /**
      * Хост
      */
