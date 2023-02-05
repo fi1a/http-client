@@ -75,7 +75,7 @@ class Response extends Message implements ResponseInterface
      */
     public function isSuccess(): bool
     {
-        return !$this->hasErrors();
+        return !$this->hasErrors() && $this->statusCode !== 0;
     }
 
     /**
