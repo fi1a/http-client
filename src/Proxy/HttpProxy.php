@@ -9,4 +9,11 @@ namespace Fi1a\HttpClient\Proxy;
  */
 class HttpProxy extends AbstractProxy
 {
+    /**
+     * @inheritDoc
+     */
+    public function getType(): string
+    {
+        return 'http';
+    }
 }

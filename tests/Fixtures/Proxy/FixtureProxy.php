@@ -11,4 +11,11 @@ use Fi1a\HttpClient\Proxy\AbstractProxy;
  */
 class FixtureProxy extends AbstractProxy
 {
+    /**
+     * @inheritDoc
+     */
+    public function getType(): string
+    {
+        return 'test';
+    }
 }

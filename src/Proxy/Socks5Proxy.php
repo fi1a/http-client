@@ -9,4 +9,11 @@ namespace Fi1a\HttpClient\Proxy;
  */
 class Socks5Proxy extends AbstractProxy
 {
+    /**
+     * @inheritDoc
+     */
+    public function getType(): string
+    {
+        return 'socks5';
+    }
 }
