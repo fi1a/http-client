@@ -10,6 +10,11 @@ namespace Fi1a\HttpClient\Proxy;
 interface ProxyInterface
 {
     /**
+     * Возвращает тип прокси
+     */
+    public function getType(): string;
+
+    /**
      * Хост
      */
     public function getHost(): string;

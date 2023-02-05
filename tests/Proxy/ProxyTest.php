@@ -53,6 +53,7 @@ class ProxyTest extends TestCase
             'username',
             'password'
         );
+        $this->assertEquals('http', $proxy->getType());
         $this->assertEquals('127.0.0.1', $proxy->getHost());
         $this->assertEquals(5000, $proxy->getPort());
         $this->assertEquals('username', $proxy->getUserName());
@@ -70,6 +71,7 @@ class ProxyTest extends TestCase
             'username',
             'password'
         );
+        $this->assertEquals('socks5', $proxy->getType());
         $this->assertEquals('127.0.0.1', $proxy->getHost());
         $this->assertEquals(5000, $proxy->getPort());
         $this->assertEquals('username', $proxy->getUserName());
