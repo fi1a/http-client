@@ -80,6 +80,7 @@ class ResponseTest extends TestCase
     public function testIsSuccess(): void
     {
         $response = $this->getResponse();
+        $this->assertFalse($response->isSuccess());
         $response->withStatus(200, 'OK');
         $this->assertTrue($response->isSuccess());
     }
@@ -90,7 +91,18 @@ class ResponseTest extends TestCase
     public function testIsNotSuccess(): void
     {
         $response = $this->getResponse();
+        $this->assertFalse($response->isSuccess());
         $response->withStatus(400, 'Bad Request');
+        $this->assertFalse($response->isSuccess());
+    }
+
+    /**
+     * Успешно выполнен (статус 0)
+     */
+    public function testIsNotSuccessZeroStatus(): void
+    {
+        $response = $this->getResponse();
+        $response->withStatus(0);
         $this->assertFalse($response->isSuccess());
     }
 
