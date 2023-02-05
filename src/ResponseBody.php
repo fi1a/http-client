@@ -67,4 +67,12 @@ class ResponseBody extends AbstractBody implements ResponseBodyInterface
             }
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSize(): int
+    {
+        return mb_strlen($this->raw, '8bit');
+    }
 }

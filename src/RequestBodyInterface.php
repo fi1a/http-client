@@ -31,11 +31,6 @@ interface RequestBodyInterface extends BodyInterface
     public function getRaw();
 
     /**
-     * Возвращает размер тела запроса
-     */
-    public function getSize(): int;
-
-    /**
      * Есть тело запроса или нет
      */
     public function has(): bool;

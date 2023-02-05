@@ -90,4 +90,15 @@ class ResponseBodyTest extends TestCase
         $body->withBody('');
         $this->assertFalse($body->has());
     }
+
+    /**
+     * Размер тела ответа
+     */
+    public function testGetSize(): void
+    {
+        $body = new ResponseBody();
+        $body->withBody('content');
+        $this->assertTrue($body->has());
+        $this->assertEquals(7, $body->getSize());
+    }
 }
