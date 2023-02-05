@@ -76,7 +76,7 @@ class RequestBody extends AbstractBody implements RequestBodyInterface
      */
     public function getSize(): int
     {
-        return mb_strlen($this->body);
+        return mb_strlen($this->body, '8bit');
     }
 
     /**

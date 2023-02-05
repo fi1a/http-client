@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+/**
+ * Тело
+ */
 interface BodyInterface
 {
     /**
@@ -17,4 +20,9 @@ interface BodyInterface
      * Content type
      */
     public function getContentType(): ?string;
+
+    /**
+     * Возвращает размер тела
+     */
+    public function getSize(): int;
 }
