@@ -693,6 +693,11 @@ class HttpClientTest extends ServerTestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
+        $client->withUrlPrefix('https://' . self::HOST . '/');
+        $response = $client->get('/200-ok-text-plain/');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
     }
 
     /**
