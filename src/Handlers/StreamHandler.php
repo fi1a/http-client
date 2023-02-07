@@ -308,6 +308,9 @@ class StreamHandler extends AbstractHandler
     private function sendRequest($resource, RequestInterface $request): void
     {
         $path = $request->getUri()->path();
+        if (!$path) {
+            $path = '/';
+        }
         $payload = $request->getMethod() . ' ' . $path
             . ($request->getUri()->query() ? '?' . $request->getUri()->query() : '')
             . ' HTTP/' . $this->getProtocolVersion($request->getProtocolVersion()) . "\r\n";
