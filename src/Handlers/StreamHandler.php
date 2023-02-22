@@ -50,12 +50,12 @@ class StreamHandler extends AbstractHandler
             $resource = $this->connect($request, $response);
             @stream_set_timeout($resource, $this->config->getTimeout());
             $this->sendRequest($resource, $request);
-            $this->getHeaders($resource, $response);
+            $response = $this->getHeaders($resource, $response);
         } while ($this->redirect($request, $response));
 
         $body = $this->getBody($resource, $response);
         $body = $this->decompress($body, $response);
-        $this->setBody($body, $response);
+        $response = $this->setBody($body, $response);
 
         if ($this->isConnectionError($response)) {
             throw new ConnectionErrorException('Пустой ответ сервера');
@@ -77,7 +77,7 @@ class StreamHandler extends AbstractHandler
     /**
      * Редиректы
      */
-    private function redirect(RequestInterface $request, ResponseInterface $response): bool
+    private function redirect(RequestInterface &$request, ResponseInterface &$response): bool
     {
         if (!$this->config->getAllowRedirects()) {
             return false;
@@ -103,7 +103,7 @@ class StreamHandler extends AbstractHandler
             );
         }
 
-        $request->withUri($request->getUri()->replace((string) $headerLocation->getValue()));
+        $request = $request->withUri($request->getUri()->replace((string) $headerLocation->getValue()));
         $headers = $response->getHeaders();
         /**
          * @var int $key
@@ -114,7 +114,7 @@ class StreamHandler extends AbstractHandler
                 $headers->delete($key);
             }
         }
-        $response->withHeaders($headers);
+        $response = $response->withHeaders($headers);
 
         $this->redirects++;
 
@@ -245,10 +245,11 @@ class StreamHandler extends AbstractHandler
      * @throws ErrorException
      * @throws TimeoutErrorException
      */
-    private function getHeaders($resource, ResponseInterface $response): void
+    private function getHeaders($resource, ResponseInterface $response): ResponseInterface
     {
         while (!feof($resource)) {
             $headerLine = $this->readContentLine($resource, self::STREAM_READ_LENGTH);
+
             if ($headerLine === "\r\n") {
                 break;
             }
@@ -258,8 +259,8 @@ class StreamHandler extends AbstractHandler
              * @psalm-suppress PossiblyFalseArgument
              */
             if (preg_match('#^HTTP/(\S+) (\d+) (.+)\r\n$#', $headerLine, $httpVersionAndStatus)) {
-                $response->withStatus((int) $httpVersionAndStatus[2], $httpVersionAndStatus[3]);
-                $response->withProtocolVersion(trim($httpVersionAndStatus[1]));
+                $response = $response->withStatus((int) $httpVersionAndStatus[2], $httpVersionAndStatus[3]);
+                $response = $response->withProtocolVersion(trim($httpVersionAndStatus[1]));
 
                 continue;
             }
@@ -268,8 +269,10 @@ class StreamHandler extends AbstractHandler
              * @psalm-suppress PossiblyFalseArgument
              */
             [$headerName, $headerValue] = array_map('trim', explode(':', $headerLine, 2));
-            $response->withHeader($headerName, $headerValue);
+            $response = $response->withHeader($headerName, $headerValue);
         }
+
+        return $response;
     }
 
     /**
@@ -361,8 +364,8 @@ class StreamHandler extends AbstractHandler
      */
     protected function factoryProxy(
         $context,
-        RequestInterface $request,
-        ResponseInterface $response
+        RequestInterface &$request,
+        ResponseInterface &$response
     ): StreamProxyConnectorInterface {
         $proxy = $request->getProxy();
         assert($proxy instanceof ProxyInterface);

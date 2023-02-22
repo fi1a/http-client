@@ -15,8 +15,10 @@ interface RequestBodyInterface extends BodyInterface
      * Установить тело запроса
      *
      * @param mixed $raw
+     *
+     * @return $this
      */
-    public function withBody($raw, ?string $mime = null, ?UploadFileCollectionInterface $files = null): void;
+    public function setBody($raw, ?string $mime = null, ?UploadFileCollectionInterface $files = null);
 
     /**
      * Возвращает тело запроса
@@ -40,7 +42,7 @@ interface RequestBodyInterface extends BodyInterface
      *
      * @return $this
      */
-    public function withUploadFiles(?UploadFileCollectionInterface $files);
+    public function setUploadFiles(?UploadFileCollectionInterface $files);
 
     /**
      * Добавить загружаемый файл

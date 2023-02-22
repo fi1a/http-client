@@ -20,8 +20,8 @@ interface StreamProxyConnectorInterface
     public function __construct(
         $context,
         ConfigInterface $config,
-        RequestInterface $request,
-        ResponseInterface $response,
+        RequestInterface &$request,
+        ResponseInterface &$response,
         ProxyInterface $proxy
     );
 

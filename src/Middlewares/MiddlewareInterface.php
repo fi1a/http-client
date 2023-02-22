@@ -28,22 +28,24 @@ interface MiddlewareInterface
     /**
      * Обработчик для запроса
      *
-     * @return ResponseInterface|bool
+     * @param callable(RequestInterface, ResponseInterface, HttpClientInterface): RequestInterface $next
      */
     public function handleRequest(
         RequestInterface $request,
         ResponseInterface $response,
-        HttpClientInterface $httpClient
-    );
+        HttpClientInterface $httpClient,
+        callable $next
+    ): RequestInterface;
 
     /**
      * Обработчик для ответа
      *
-     * @return ResponseInterface|bool
+     * @param callable(RequestInterface, ResponseInterface, HttpClientInterface): ResponseInterface $next
      */
     public function handleResponse(
         RequestInterface $request,
         ResponseInterface $response,
-        HttpClientInterface $httpClient
-    );
+        HttpClientInterface $httpClient,
+        callable $next
+    ): ResponseInterface;
 }

@@ -41,24 +41,14 @@ class RetryMiddleware extends AbstractMiddleware
     /**
      * @inheritDoc
      */
-    public function handleRequest(
-        RequestInterface $request,
-        ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function handleResponse(
         RequestInterface $request,
         ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
+        HttpClientInterface $httpClient,
+        callable $next
+    ): ResponseInterface {
         if ($response->isSuccess() || $this->try >= $this->count) {
-            return true;
+            return $next($request, $response, $httpClient);
         }
 
         $delay = (int) call_user_func_array($this->delayFn, [$this->try]);

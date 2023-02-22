@@ -8,21 +8,22 @@ use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\Middlewares\AbstractMiddleware;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
+use LogicException;
 
 /**
- * Промежуточное ПО для запроса (останаливает запрос)
+ * Промежуточное ПО для запроса (устанавливает тело запроса)
  */
-class ResponseStopMiddleware extends AbstractMiddleware
+class ExceptionMiddleware extends AbstractMiddleware
 {
     /**
      * @inheritDoc
      */
-    public function handleResponse(
+    public function handleRequest(
         RequestInterface $request,
         ResponseInterface $response,
         HttpClientInterface $httpClient,
         callable $next
-    ): ResponseInterface {
-        return $response;
+    ): RequestInterface {
+        throw new LogicException();
     }
 }

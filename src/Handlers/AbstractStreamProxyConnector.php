@@ -45,14 +45,14 @@ abstract class AbstractStreamProxyConnector implements StreamProxyConnectorInter
     public function __construct(
         $context,
         ConfigInterface $config,
-        RequestInterface $request,
-        ResponseInterface $response,
+        RequestInterface &$request,
+        ResponseInterface &$response,
         ProxyInterface $proxy
     ) {
         $this->context = $context;
         $this->proxy = $proxy;
         $this->config = $config;
-        $this->request = $request;
-        $this->response = $response;
+        $this->request = &$request;
+        $this->response = &$response;
     }
 }

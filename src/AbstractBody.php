@@ -24,7 +24,7 @@ abstract class AbstractBody implements BodyInterface
     /**
      * @inheritDoc
      */
-    public function withContentType(?string $mime = null)
+    public function setContentType(?string $mime = null)
     {
         $this->contentType = $mime ? Mime::getMime($mime) : null;
         $this->transform();

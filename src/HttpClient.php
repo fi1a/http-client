@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Fi1a\HttpClient;
 
+use Closure;
 use Fi1a\Http\HeaderInterface;
 use Fi1a\Http\MimeInterface;
 use Fi1a\Http\Uri;
+use Fi1a\Http\UriInterface;
 use Fi1a\HttpClient\Cookie\Cookie;
 use Fi1a\HttpClient\Cookie\CookieCollectionInterface;
 use Fi1a\HttpClient\Cookie\CookieInterface;
@@ -14,6 +16,7 @@ use Fi1a\HttpClient\Cookie\CookieStorage;
 use Fi1a\HttpClient\Cookie\CookieStorageInterface;
 use Fi1a\HttpClient\Handlers\HandlerInterface;
 use Fi1a\HttpClient\Handlers\StreamHandler;
+use Fi1a\HttpClient\Middlewares\Exceptions\StopException;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollection;
 use Fi1a\HttpClient\Middlewares\MiddlewareCollectionInterface;
 use Fi1a\HttpClient\Middlewares\MiddlewareInterface;
@@ -28,32 +31,37 @@ class HttpClient implements HttpClientInterface
     /**
      * @var string
      */
-    private $handler;
+    protected $handler;
 
     /**
      * @var ConfigInterface
      */
-    private $config;
+    protected $config;
 
     /**
      * @var MiddlewareCollectionInterface
      */
-    private $middlewares;
+    protected $middlewares;
 
     /**
      * @var CookieStorageInterface
      */
-    private $cookieStorage;
+    protected $cookieStorage;
 
     /**
      * @var string|null
      */
-    private $urlPrefix;
+    protected $urlPrefix;
 
     /**
      * @var ProxyInterface|null
      */
-    private $proxy;
+    protected $proxy;
+
+    /**
+     * @var RequestInterface|null
+     */
+    protected $request;
 
     public function __construct(
         ?ConfigInterface $config = null,
@@ -81,7 +89,7 @@ class HttpClient implements HttpClientInterface
      * @inheritDoc
      * @psalm-suppress InvalidReturnType
      */
-    public function withMiddleware(MiddlewareInterface $middleware, ?int $sort = null)
+    public function addMiddleware(MiddlewareInterface $middleware, ?int $sort = null)
     {
         if (!is_null($sort)) {
             $middleware->setSort($sort);
@@ -96,45 +104,34 @@ class HttpClient implements HttpClientInterface
      */
     public function send(RequestInterface $request): ResponseInterface
     {
-        $this->setUrlPrefix($request);
+        if ($this->urlPrefix) {
+            $request = $request->withUri($this->getUrlPrefix($request->getUri()));
+        }
 
         if (!$request->getUri()->host()) {
             throw new InvalidArgumentException('Не передан хост для запроса');
         }
 
         if ($this->getProxy() && !$request->getProxy()) {
-            $request->withProxy($this->getProxy());
+            $request = $request->withProxy($this->getProxy());
         }
 
         $response = new Response();
 
-        $this->addDefaultHeaders($request);
-        $this->addAcceptHeaders($request);
-        $this->addContentHeaders($request);
-        $this->setCookieToRequest($request);
+        $request = $this->addDefaultHeaders($request);
+        $request = $this->addAcceptHeaders($request);
+        $request = $this->addContentHeaders($request);
+        $request = $this->setCookieToRequest($request);
 
-        /**
-         * @var false|ResponseInterface $resultMiddleware
-         */
-        $resultMiddleware = $this->callRequestMiddlewares($request, $response);
-        if (!$resultMiddleware) {
-            return $response;
-        }
-        $response = $resultMiddleware;
-
-        $instance = $this->factoryHandler();
-        $response = $instance->send($request, $response);
-        $this->setCookieToResponse($request, $response);
-
-        /**
-         * @var false|ResponseInterface $resultMiddleware
-         */
-        $resultMiddleware = $this->callResponseMiddlewares($request, $response);
-        if (!$resultMiddleware) {
-            return $response;
+        try {
+            $this->request = $request = $this->callRequestMiddlewares($request, $response);
+            $instance = $this->factoryHandler();
+            $response = $instance->send($request, $response);
+            $response = $this->setCookieToResponse($request, $response);
+        } catch (StopException $exception) {
         }
 
-        return $resultMiddleware;
+        return $this->callResponseMiddlewares($request, $response);
     }
 
     /**
@@ -216,7 +213,7 @@ class HttpClient implements HttpClientInterface
     /**
      * @inheritDoc
      */
-    public function withUrlPrefix(?string $urlPrefix)
+    public function setUrlPrefix(?string $urlPrefix)
     {
         $this->urlPrefix = $urlPrefix;
 
@@ -226,7 +223,7 @@ class HttpClient implements HttpClientInterface
     /**
      * @inheritDoc
      */
-    public function withProxy(?ProxyInterface $proxy)
+    public function setProxy(?ProxyInterface $proxy)
     {
         $this->proxy = $proxy;
 
@@ -242,47 +239,61 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
-     * Добавить заголовки
+     * @inheritDoc
      */
-    private function addDefaultHeaders(RequestInterface $request): void
+    public function getRequest(): ?RequestInterface
     {
-        if (!$request->hasHeader('Host')) {
-            $request->withHeader('Host', $request->getUri()->host());
-        }
-        if (!$request->hasHeader('Connection')) {
-            $request->withHeader('Connection', 'close');
-        }
+        return $this->request;
     }
 
     /**
      * Добавить заголовки
      */
-    private function addAcceptHeaders(RequestInterface $request): void
+    protected function addDefaultHeaders(RequestInterface $request): RequestInterface
+    {
+        if (!$request->hasHeader('Host')) {
+            $request = $request->withHeader('Host', $request->getUri()->host());
+        }
+        if (!$request->hasHeader('Connection')) {
+            $request = $request->withHeader('Connection', 'close');
+        }
+
+        return $request;
+    }
+
+    /**
+     * Добавить заголовки
+     */
+    protected function addAcceptHeaders(RequestInterface $request): RequestInterface
     {
         if (!$request->hasHeader('Accept') && $request->getExpectedType()) {
-            $request->withHeader('Accept', (string) $request->getExpectedType());
+            $request = $request->withHeader('Accept', (string) $request->getExpectedType());
         }
         $compress = $this->config->getCompress();
         if ($compress && !$request->hasHeader('Accept-Encoding')) {
-            $request->withHeader('Accept-Encoding', $compress);
+            $request = $request->withHeader('Accept-Encoding', $compress);
         }
+
+        return $request;
     }
 
     /**
      * Добавить заголовки
      */
-    private function addContentHeaders(RequestInterface $request): void
+    protected function addContentHeaders(RequestInterface $request): RequestInterface
     {
         if (!$request->hasHeader('Content-Type') && $request->getBody()->has()) {
             $contentTypeHeader = $request->getBody()->getContentTypeHeader();
             if (!$contentTypeHeader) {
                 $contentTypeHeader = MimeInterface::PLAIN;
             }
-            $request->withHeader('Content-Type', $contentTypeHeader);
+            $request = $request->withHeader('Content-Type', $contentTypeHeader);
         }
         if (!$request->hasHeader('Content-Length') && $request->getBody()->getSize()) {
-            $request->withHeader('Content-Length', (string) $request->getBody()->getSize());
+            $request = $request->withHeader('Content-Length', (string) $request->getBody()->getSize());
         }
+
+        return $request;
     }
 
     /**
@@ -300,58 +311,95 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
-     * Вызывает промежуточное ПО запросов
-     *
-     * @return ResponseInterface|bool
+     * Следующий middleware для запроса
      */
-    private function callRequestMiddlewares(RequestInterface $request, ResponseInterface $response)
-    {
+    protected function nextRequestMiddleware(
+        RequestInterface $request,
+        ResponseInterface $response,
+        HttpClient $httpClient,
+        int $index
+    ): RequestInterface {
         $middlewares = $this->middlewares->merge($request->getMiddlewares());
+        /** @var MiddlewareInterface|null $middleware */
+        $middleware = $middlewares->sortDirect()->get($index);
 
-        foreach ($middlewares->sortDirect() as $middleware) {
-            assert($middleware instanceof MiddlewareInterface);
-            $result = $middleware->handleRequest($request, $response, $this);
-            if (!$result) {
-                return false;
-            }
-            if ($result instanceof ResponseInterface) {
-                $response = $result;
-            }
+        if (!$middleware) {
+            return $request;
         }
 
-        return $response;
+        $next = Closure::bind(function (
+            RequestInterface $request,
+            ResponseInterface $response,
+            HttpClient $httpClient
+        ) use ($index): RequestInterface {
+            $index++;
+
+            return $this->nextRequestMiddleware($request, $response, $httpClient, $index);
+        }, $this);
+
+        return $middleware->handleRequest($request, $response, $this, $next);
+    }
+
+    /**
+     * Вызывает промежуточное ПО запросов
+     */
+    protected function callRequestMiddlewares(RequestInterface $request, ResponseInterface $response): RequestInterface
+    {
+        return $this->nextRequestMiddleware($request, $response, $this, 0);
+    }
+
+    /**
+     * Следующий middleware для ответа
+     */
+    protected function nextResponseMiddleware(
+        RequestInterface $request,
+        ResponseInterface $response,
+        HttpClient $httpClient,
+        int $index
+    ): ResponseInterface {
+        $middlewares = $this->middlewares->merge($request->getMiddlewares());
+        /** @var MiddlewareInterface|null $middleware */
+        $middleware = $middlewares->sortBack()->get($index);
+
+        if (!$middleware) {
+            return $response;
+        }
+
+        $next = Closure::bind(function (
+            RequestInterface $request,
+            ResponseInterface $response,
+            HttpClient $httpClient
+        ) use ($index): ResponseInterface {
+            $index++;
+
+            return $this->nextResponseMiddleware(
+                $request,
+                $response,
+                $httpClient,
+                $index
+            );
+        }, $this);
+
+        return $middleware->handleResponse($request, $response, $this, $next);
     }
 
     /**
      * Вызывает промежуточное ПО ответа
-     *
-     * @return ResponseInterface|bool
      */
-    private function callResponseMiddlewares(RequestInterface $request, ResponseInterface $response)
-    {
-        $middlewares = $this->middlewares->merge($request->getMiddlewares());
-
-        foreach ($middlewares->sortBack() as $middleware) {
-            assert($middleware instanceof MiddlewareInterface);
-            $result = $middleware->handleResponse($request, $response, $this);
-            if (!$result) {
-                return false;
-            }
-            if ($result instanceof ResponseInterface) {
-                $response = $result;
-            }
-        }
-
-        return $response;
+    protected function callResponseMiddlewares(
+        RequestInterface $request,
+        ResponseInterface $response
+    ): ResponseInterface {
+        return $this->nextResponseMiddleware($request, $response, $this, 0);
     }
 
     /**
      * Устанавливает куки для ответа
      */
-    private function setCookieToResponse(RequestInterface $request, ResponseInterface $response): void
+    protected function setCookieToResponse(RequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         if (!$this->config->getCookie()) {
-            return;
+            return $response;
         }
 
         foreach ($request->getCookies() as $cookie) {
@@ -379,7 +427,7 @@ class HttpClient implements HttpClientInterface
             }
         }
 
-        $response->withCookies(
+        return $response->withCookies(
             $this->cookieStorage->getCookiesWithCondition(
                 $request->getUri()->host(),
                 $request->getUri()->path()
@@ -390,10 +438,10 @@ class HttpClient implements HttpClientInterface
     /**
      * Устанавливает куки для запроса
      */
-    private function setCookieToRequest(RequestInterface $request): void
+    protected function setCookieToRequest(RequestInterface $request): RequestInterface
     {
         if (!$this->config->getCookie()) {
-            return;
+            return $request;
         }
 
         /**
@@ -404,7 +452,7 @@ class HttpClient implements HttpClientInterface
             $request->getUri()->path(),
             $request->getUri()->scheme()
         )->merge($request->getCookies());
-        $request->withCookies($cookies);
+        $request = $request->withCookies($cookies);
 
         $cookies = [];
         foreach ($request->getCookies()->getValid() as $cookie) {
@@ -421,14 +469,16 @@ class HttpClient implements HttpClientInterface
         }
 
         if (count($cookies)) {
-            $request->withHeader('Cookie', implode('; ', $cookies));
+            $request = $request->withHeader('Cookie', implode('; ', $cookies));
         }
+
+        return $request;
     }
 
     /**
      * Возвращает путь куки
      */
-    private function getCookiePath(string $url): string
+    protected function getCookiePath(string $url): string
     {
         $lastSlashes = mb_strrpos($url, '/');
         if ($url === '' || mb_strpos($url, '/') !== 0 || $url === '/' || !$lastSlashes) {
@@ -439,16 +489,12 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
-     * Устанавливает префикс для адреса
+     * Возвращает uri с установленныс префиксом для адреса
      */
-    private function setUrlPrefix(RequestInterface $request): void
+    protected function getUrlPrefix(UriInterface $uri): UriInterface
     {
-        if (!$this->urlPrefix) {
-            return;
-        }
-
+        /** @psalm-suppress PossiblyNullArgument */
         $prefixUri = new Uri($this->urlPrefix);
-        $uri = $request->getUri();
         if ($prefixUri->scheme()) {
             $uri = $uri->withScheme($prefixUri->scheme());
         }
@@ -468,6 +514,7 @@ class HttpClient implements HttpClientInterface
             }
             $uri = $uri->withPath($prefixPath . $uri->path());
         }
-        $request->withUri($uri);
+
+        return $uri;
     }
 }

@@ -23,9 +23,9 @@ use Fi1a\HttpClient\Proxy\Socks5Proxy;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\Response;
 use Fi1a\HttpClient\UploadFileCollection;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ExceptionMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ResponseSet500StatusMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ResponseStopMiddleware;
-use Fi1a\Unit\HttpClient\Fixtures\Middlewares\Set500StatusMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\StopMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\UnknownContentEncodingMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Proxy\FixtureProxy;
@@ -324,7 +324,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testStopMiddleware(HttpClientInterface $client): void
     {
-        $client->withMiddleware(new StopMiddleware());
+        $client->addMiddleware(new StopMiddleware());
         $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(0, $response->getStatusCode());
         $this->assertEquals('', $response->getReasonPhrase());
@@ -338,10 +338,10 @@ class HttpClientTest extends ServerTestCase
      */
     public function testSortRequestMiddleware(HttpClientInterface $client): void
     {
-        $client->withMiddleware(new StopMiddleware(), 600);
-        $client->withMiddleware(new Set500StatusMiddleware(), 100);
-        $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
-        $this->assertEquals(500, $response->getStatusCode());
+        $this->expectException(LogicException::class);
+        $client->addMiddleware(new StopMiddleware(), 600);
+        $client->addMiddleware(new ExceptionMiddleware(), 100);
+        $client->get('https://' . self::HOST . '/200-ok-text-plain/');
     }
 
     /**
@@ -351,15 +351,11 @@ class HttpClientTest extends ServerTestCase
      */
     public function testSetMiddlewareInRequest(HttpClientInterface $client): void
     {
-        $client->withMiddleware(new StopMiddleware(), 600);
+        $this->expectException(LogicException::class);
+        $client->addMiddleware(new StopMiddleware(), 600);
         $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/')
-            ->withMiddleware(new Set500StatusMiddleware(), 100);
-        $response = $client->send($request);
-        $this->assertEquals(500, $response->getStatusCode());
-
-        $request = Request::create()->get('https://' . self::HOST . '/200-ok-text-plain/');
-        $response = $client->send($request);
-        $this->assertEquals(0, $response->getStatusCode());
+            ->withMiddleware(new ExceptionMiddleware(), 100);
+        $client->send($request);
     }
 
     /**
@@ -369,8 +365,8 @@ class HttpClientTest extends ServerTestCase
      */
     public function testSortResponseMiddleware(HttpClientInterface $client): void
     {
-        $client->withMiddleware(new ResponseStopMiddleware(), 100);
-        $client->withMiddleware(new ResponseSet500StatusMiddleware(), 600);
+        $client->addMiddleware(new ResponseStopMiddleware(), 100);
+        $client->addMiddleware(new ResponseSet500StatusMiddleware(), 600);
         $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(500, $response->getStatusCode());
     }
@@ -404,7 +400,7 @@ class HttpClientTest extends ServerTestCase
             ->withExpectedType('json');
 
         $response = $client->send($request);
-        $this->assertEquals(MimeInterface::JSON, $request->getLastHeader('Accept')->getValue());
+        $this->assertEquals(MimeInterface::JSON, $client->getRequest()->getLastHeader('Accept')->getValue());
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
@@ -423,7 +419,7 @@ class HttpClientTest extends ServerTestCase
     {
         $request = Request::create()->post('https://' . self::HOST . '/200-ok-post/', ['foo' => 'bar']);
         $response = $client->send($request);
-        $this->assertEquals(MimeInterface::FORM, $request->getLastHeader('Content-Type')->getValue());
+        $this->assertEquals(MimeInterface::FORM, $client->getRequest()->getLastHeader('Content-Type')->getValue());
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
@@ -454,13 +450,32 @@ class HttpClientTest extends ServerTestCase
     }
 
     /**
+     * Сжатие ответа
+     *
+     * @dataProvider clientDataProvider
+     */
+    public function testGetUnknownContentEncoding(HttpClientInterface $client): void
+    {
+        $request = Request::create()->get('https://' . self::HOST . '/encoding/', 'html');
+        $response = $client->send($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $this->assertTrue($response->getBody()->has());
+        $this->assertEquals(MimeInterface::HTML, $response->getBody()->getContentType());
+        $this->assertEquals('utf-8', $response->getEncoding());
+        $this->assertEquals('unknown', $response->getLastHeader('Content-Encoding')->getValue());
+        $this->assertEquals('success', $response->getBody()->getRaw());
+        $this->assertEquals('success', $response->getBody()->get());
+    }
+
+    /**
      * Неизвестное сжатие ответа
      *
      * @dataProvider clientDataProvider
      */
     public function testUnknownContentEncoding(HttpClientInterface $client): void
     {
-        $client->withMiddleware(new UnknownContentEncodingMiddleware());
+        $client->addMiddleware(new UnknownContentEncodingMiddleware());
         $request = Request::create()->get('https://' . self::HOST . '/index.html', 'html');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
@@ -621,13 +636,13 @@ class HttpClientTest extends ServerTestCase
 
         $request = Request::create()->get('https://' . self::HOST . '/send-cookie/');
         $response = $client->send($request);
-        $this->assertCount(2, $request->getCookies());
+        $this->assertCount(2, $client->getRequest()->getCookies());
         $this->assertInstanceOf(
             CookieInterface::class,
-            $request->getCookies()->getByName('cookieName1')
+            $client->getRequest()->getCookies()->getByName('cookieName1')
         );
-        $this->assertEquals(1, (int) $request->getCookies()->getByName('cookieName1')->getValue());
-        $this->assertEquals('value2=value2', $request->getCookies()->getByName('cookieName2')->getValue());
+        $this->assertEquals(1, (int) $client->getRequest()->getCookies()->getByName('cookieName1')->getValue());
+        $this->assertEquals('value2=value2', $client->getRequest()->getCookies()->getByName('cookieName2')->getValue());
         $this->assertCount(3, $response->getCookies());
         $this->assertInstanceOf(
             CookieInterface::class,
@@ -683,17 +698,17 @@ class HttpClientTest extends ServerTestCase
      */
     public function testWithUrlPrefix(HttpClientInterface $client): void
     {
-        $client->withUrlPrefix('https://user:pass@' . self::HOST . '/200-ok-text-plain/');
+        $client->setUrlPrefix('https://user:pass@' . self::HOST . '/200-ok-text-plain/');
         $response = $client->get('');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
-        $client->withUrlPrefix(null);
+        $client->setUrlPrefix(null);
         $response = $client->get('https://' . self::HOST . '/200-ok-text-plain/');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
         $this->assertTrue($response->getBody()->has());
-        $client->withUrlPrefix('https://' . self::HOST . '/');
+        $client->setUrlPrefix('https://' . self::HOST . '/');
         $response = $client->get('/200-ok-text-plain/');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -805,7 +820,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testProxyHttp(HttpClientInterface $client, ProxyInterface $proxy): void
     {
-        $client->withProxy($proxy);
+        $client->setProxy($proxy);
         $request = Request::create()->get('http://' . self::HTTP_HOST);
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
@@ -820,7 +835,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testProxyHttps(HttpClientInterface $client, ProxyInterface $proxy): void
     {
-        $client->withProxy($proxy);
+        $client->setProxy($proxy);
         $request = Request::create()->get('https://' . self::HOST);
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
@@ -835,7 +850,7 @@ class HttpClientTest extends ServerTestCase
      */
     public function testProxyRequestIp(HttpClientInterface $client, ProxyInterface $proxy): void
     {
-        $client->withProxy($proxy);
+        $client->setProxy($proxy);
         $request = Request::create()->get('http://' . self::HTTP_HOST . '/200-ok-text-plain/');
         $response = $client->send($request);
         $this->assertEquals(200, $response->getStatusCode());
@@ -850,7 +865,7 @@ class HttpClientTest extends ServerTestCase
     public function testProxyFactoryException(HttpClientInterface $client): void
     {
         $this->expectException(LogicException::class);
-        $client->withProxy(new FixtureProxy('127.0.0.1', 80));
+        $client->setProxy(new FixtureProxy('127.0.0.1', 80));
         $request = Request::create()->get('http://httpbin.org');
         $client->send($request);
     }
@@ -863,7 +878,7 @@ class HttpClientTest extends ServerTestCase
     public function testSocks5ProxyConnectionFail(HttpClientInterface $client): void
     {
         $this->expectException(ConnectionErrorException::class);
-        $client->withProxy(new Socks5Proxy('127.0.0.1', 10000));
+        $client->setProxy(new Socks5Proxy('127.0.0.1', 10000));
         $request = Request::create()->get('http://httpbin.org');
         $client->send($request);
     }
@@ -876,7 +891,7 @@ class HttpClientTest extends ServerTestCase
     public function testHttpProxyConnectionFail(HttpClientInterface $client): void
     {
         $this->expectException(ConnectionErrorException::class);
-        $client->withProxy(new HttpProxy('127.0.0.1', 10000));
+        $client->setProxy(new HttpProxy('127.0.0.1', 10000));
         $request = Request::create()->get('http://httpbin.org');
         $client->send($request);
     }
@@ -890,7 +905,7 @@ class HttpClientTest extends ServerTestCase
     {
         $this->expectException(ConnectionErrorException::class);
         $proxy->setUserName('unknown');
-        $client->withProxy($proxy);
+        $client->setProxy($proxy);
         $request = Request::create()->get('http://' . self::HTTP_HOST);
         $client->send($request);
     }
@@ -912,9 +927,10 @@ class HttpClientTest extends ServerTestCase
         $options['ssl']['allow_self_signed'] = true;
         $context = stream_context_create($options);
 
+        $response = new Response();
         $connector = $this->getMockBuilder(HttpStreamProxyConnector::class)
             ->onlyMethods(['readContentLine'])
-            ->setConstructorArgs([$context, $config, $request, new Response(), $proxy])
+            ->setConstructorArgs([$context, $config, &$request, &$response, $proxy])
             ->getMock();
 
         $connector->method('readContentLine')->willReturn(false);
@@ -936,7 +952,7 @@ class HttpClientTest extends ServerTestCase
 
         $client->method('factoryHandler')->willReturn($handler);
 
-        $client->withProxy($proxy);
+        $client->setProxy($proxy);
         $client->send($request);
     }
 

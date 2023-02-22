@@ -23,10 +23,12 @@ class ResponseBody extends AbstractBody implements ResponseBodyInterface
     /**
      * @inheritDoc
      */
-    public function withBody(string $raw, ?string $mime = null): void
+    public function setBody(string $raw, ?string $mime = null)
     {
         $this->raw = $raw;
-        $this->withContentType($mime);
+        $this->setContentType($mime);
+
+        return $this;
     }
 
     /**

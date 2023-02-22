@@ -52,7 +52,7 @@ class CurlHandler extends AbstractHandler
             throw new ConnectionErrorException('Необходима аутентификация прокси');
         }
         $body = $this->decompress($body, $response);
-        $this->setBody($body, $response);
+        $response = $this->setBody($body, $response);
         $this->closeHandler($resource);
 
         return $response;
@@ -82,33 +82,30 @@ class CurlHandler extends AbstractHandler
      * @psalm-suppress UnusedClosureParam
      * @psalm-suppress MissingClosureParamType
      */
-    private function headers($resource, ResponseInterface $response): void
+    private function headers($resource, ResponseInterface &$response): void
     {
         $endHeaders = false;
         curl_setopt(
             $resource,
             CURLOPT_HEADERFUNCTION,
-            function ($curl, string $headerLine) use ($response, $endHeaders) {
+            function ($curl, string $headerLine) use (&$response, $endHeaders) {
+                assert($response instanceof ResponseInterface);
                 if ($headerLine === "\r\n") {
                     $endHeaders = true;
                 }
 
                 if (!$endHeaders) {
-                    /**
-                     * @psalm-suppress PossiblyFalseArgument
-                     */
+                    /** @psalm-suppress PossiblyFalseArgument */
                     if (preg_match('#^HTTP/(\S+) (\d+) (.+)\r\n$#', $headerLine, $httpVersionAndStatus)) {
-                        $response->withStatus((int) $httpVersionAndStatus[2], $httpVersionAndStatus[3]);
-                        $response->withProtocolVersion(trim($httpVersionAndStatus[1]));
+                        $response = $response->withStatus((int) $httpVersionAndStatus[2], $httpVersionAndStatus[3]);
+                        $response = $response->withProtocolVersion(trim($httpVersionAndStatus[1]));
 
                         return mb_strlen($headerLine);
                     }
 
-                    /**
-                     * @psalm-suppress PossiblyFalseArgument
-                     */
+                    /** @psalm-suppress PossiblyFalseArgument */
                     [$headerName, $headerValue] = array_map('trim', explode(':', $headerLine, 2));
-                    $response->withHeader($headerName, $headerValue);
+                    $response = $response->withHeader($headerName, $headerValue);
                 }
 
                 return mb_strlen($headerLine);

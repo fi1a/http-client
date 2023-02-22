@@ -11,8 +11,10 @@ interface ResponseBodyInterface extends BodyInterface
 {
     /**
      * Установить тело ответа
+     *
+     * @return $this
      */
-    public function withBody(string $raw, ?string $mime = null): void;
+    public function setBody(string $raw, ?string $mime = null);
 
     /**
      * Возвращает тело ответа

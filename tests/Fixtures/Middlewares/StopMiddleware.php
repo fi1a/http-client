@@ -6,6 +6,7 @@ namespace Fi1a\Unit\HttpClient\Fixtures\Middlewares;
 
 use Fi1a\HttpClient\HttpClientInterface;
 use Fi1a\HttpClient\Middlewares\AbstractMiddleware;
+use Fi1a\HttpClient\Middlewares\Exceptions\StopException;
 use Fi1a\HttpClient\RequestInterface;
 use Fi1a\HttpClient\ResponseInterface;
 
@@ -20,9 +21,10 @@ class StopMiddleware extends AbstractMiddleware
     public function handleRequest(
         RequestInterface $request,
         ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        return false;
+        HttpClientInterface $httpClient,
+        callable $next
+    ): RequestInterface {
+        throw new StopException();
     }
 
     /**
@@ -31,8 +33,9 @@ class StopMiddleware extends AbstractMiddleware
     public function handleResponse(
         RequestInterface $request,
         ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        return true;
+        HttpClientInterface $httpClient,
+        callable $next
+    ): ResponseInterface {
+        return $next($request, $response, $httpClient);
     }
 }

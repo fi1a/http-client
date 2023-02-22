@@ -45,8 +45,8 @@ class CurlHandlerTest extends ServerTestCase
     {
         $handler = $this->getHandler();
         $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
-        $request->withHeader('Content-Type', $request->getBody()->getContentType());
-        $request->withHeader('Content-Length', (string) $request->getBody()->getSize());
+        $request = $request->withHeader('Content-Type', $request->getBody()->getContentType());
+        $request = $request->withHeader('Content-Length', (string) $request->getBody()->getSize());
         $response = $handler->send($request, new Response());
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());

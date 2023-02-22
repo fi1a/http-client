@@ -76,8 +76,8 @@ class HttpStreamProxyConnector extends AbstractStreamProxyConnector
              * @psalm-suppress PossiblyFalseArgument
              */
             if (preg_match('#^HTTP/(\S+) (\d+) (.+)\r\n$#', $headerLine, $httpVersionAndStatus)) {
-                $this->response->withStatus((int) $httpVersionAndStatus[2], $httpVersionAndStatus[3]);
-                $this->response->withProtocolVersion(trim($httpVersionAndStatus[1]));
+                $this->response = $this->response->withStatus((int) $httpVersionAndStatus[2], $httpVersionAndStatus[3]);
+                $this->response = $this->response->withProtocolVersion(trim($httpVersionAndStatus[1]));
 
                 continue;
             }
@@ -86,7 +86,7 @@ class HttpStreamProxyConnector extends AbstractStreamProxyConnector
              * @psalm-suppress PossiblyFalseArgument
              */
             [$headerName, $headerValue] = array_map('trim', explode(':', $headerLine, 2));
-            $this->response->withHeader($headerName, $headerValue);
+            $this->response = $this->response->withHeader($headerName, $headerValue);
         }
 
         if ($this->response->getStatusCode() === 407) {

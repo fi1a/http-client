@@ -21,7 +21,7 @@ class RetryMiddlewareTest extends ServerTestCase
      */
     public function testSuccessRetry(HttpClientInterface $client): void
     {
-        $client->withMiddleware(new RetryMiddleware(3));
+        $client->addMiddleware(new RetryMiddleware(3));
         $response = $client->get('https://' . self::HOST . '/retry-success/');
         $this->assertTrue($response->isSuccess());
         $this->assertEquals(200, $response->getStatusCode());
@@ -34,7 +34,7 @@ class RetryMiddlewareTest extends ServerTestCase
      */
     public function testSuccessRetryCustomDelay(HttpClientInterface $client): void
     {
-        $client->withMiddleware(new RetryMiddleware(3, function (int $try) {
+        $client->addMiddleware(new RetryMiddleware(3, function (int $try) {
             return $try;
         }));
         $response = $client->get('https://' . self::HOST . '/retry-success/');
@@ -49,7 +49,7 @@ class RetryMiddlewareTest extends ServerTestCase
      */
     public function testNotSuccessRetry(HttpClientInterface $client): void
     {
-        $client->withMiddleware(new RetryMiddleware(3));
+        $client->addMiddleware(new RetryMiddleware(3));
         $response = $client->get('https://' . self::HOST . '/retry-not-success/');
         $this->assertFalse($response->isSuccess());
         $this->assertEquals(401, $response->getStatusCode());
