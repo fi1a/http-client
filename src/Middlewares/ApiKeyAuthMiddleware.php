@@ -53,30 +53,20 @@ class ApiKeyAuthMiddleware extends AbstractMiddleware
     public function handleRequest(
         RequestInterface $request,
         ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
+        HttpClientInterface $httpClient,
+        callable $next
+    ): RequestInterface {
         if ($this->place === self::IN_HEADER) {
-            $request->withHeader($this->key, $this->value);
+            $request = $request->withHeader($this->key, $this->value);
 
-            return true;
+            return $next($request, $response, $httpClient);
         }
 
         $uri = $request->getUri();
         $queryParams = $uri->queryParams();
         $queryParams[$this->key] = $this->value;
-        $request->withUri($uri->withQueryParams($queryParams));
+        $request = $request->withUri($uri->withQueryParams($queryParams));
 
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function handleResponse(
-        RequestInterface $request,
-        ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        return true;
+        return $next($request, $response, $httpClient);
     }
 }

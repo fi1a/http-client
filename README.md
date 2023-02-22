@@ -137,47 +137,48 @@ $client = new HttpClient(
 ## Использование запроса
 
 Объекты запросов `Fi1a\HttpClient\RequestInterface` обеспечивают большую гибкость в том как передается запрос, включая параметры запроса, middleware, cookie и т.п.
+Данный объект является неизменяемым (immutable).
 
-| Метод                                                                                         | Описание                                                                            |
-|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| create()                                                                                      | Создать объект запроса                                                              |
-| withMethod(string $method)                                                                    | Метод запроса                                                                       |
-| getMethod(): string                                                                           | Возвращает метод запроса                                                            |
-| get($uri, ?string $mime = null)                                                               | HTTP Метод Get                                                                      |
-| post($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null)  | HTTP Метод Post                                                                     |
-| put($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null)   | HTTP Метод Put                                                                      |
-| patch($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null) | HTTP Метод Patch                                                                    |
-| delete($uri, ?string $mime = null)                                                            | HTTP Метод Delete                                                                   |
-| head($uri)                                                                                    | HTTP Метод Head                                                                     |
-| options($uri)                                                                                 | HTTP Метод Options                                                                  |
-| getUri(): UriInterface                                                                        | Возвращает URI запроса                                                              |
-| withUri(UriInterface $uri)                                                                    | Устанавливает URI запроса                                                           |
-| withMime(?string $mime = null)                                                                | Устанавливаем Content type и Expected type                                          |
-| withExpectedType(?string $mime = null)                                                        | Устанавливаем expected type                                                         |
-| getExpectedType(): ?string                                                                    | Expected type                                                                       |
-| withBody($body, ?string $mime = null, ?UploadFileCollectionInterface $files = null)           | Тело запроса                                                                        |
-| getBody(): RequestBodyInterface                                                               | Возвращает тело запроса                                                             |
-| withMiddleware(MiddlewareInterface $middleware, ?int $sort = null)                            | Добавить промежуточное ПО                                                           |
-| getMiddlewares(): MiddlewareCollectionInterface                                               | Возвращает промежуточное ПО                                                         |
-| withProxy(?ProxyInterface $proxy)                                                             | Использовать прокси для соединения                                                  |
-| getProxy(): ?ProxyInterface                                                                   | Возвращает прокси                                                                   |
-| getProtocolVersion(): string                                                                  | Возвращает версию протокола HTTP                                                    |
-| withProtocolVersion(string $version)                                                          | Устанавливает версию протокола HTTP                                                 |
-| getEncoding(): string                                                                         | Возвращает кодировку                                                                |
-| withEncoding(string $encoding)                                                                | Устанавливает кодировку                                                             |
-| getHeaders(): HeaderCollectionInterface                                                       | Возвращает коллекцию заголовков                                                     |
-| withHeaders(HeaderCollectionInterface $headers)                                               | Устанавливает коллекцию заголовков                                                  |
-| addHeader(HeaderInterface $header)                                                            | Добавить заголовок к коллекции                                                      |
-| hasHeader(string $name): bool                                                                 | Проверяет наличие заголовка с определенным именем                                   |
-| getHeader(string $name): HeaderCollectionInterface                                            | Возвращает заголовок с определенным именем                                          |
-| getFirstHeader(string $name): ?HeaderInterface                                                | Возвращает первый найденный заголовок с определенным именем                         |
-| getLastHeader(string $name): ?HeaderInterface                                                 | Возвращает последний найденный заголовок с определенным именем                      |
-| withHeader(string $name, string $value)                                                       | Добавляет заголовок с определенным именем и значением                               |
-| withAddedHeader(string $name, string $value): HeaderInterface                                 | Добавляет заголовок с определенным именем и значением и возвращает объект заголовка |
-| withoutHeader(string $name): bool                                                             | Удаляет заголовок с определенным именем                                             |
-| clearHeaders(): bool                                                                          | Удаляет все заголовки                                                               |
-| getCookies(): CookieCollectionInterface                                                       | Возвращает коллекцию cookies                                                        |
-| withCookies(CookieCollectionInterface $collection)                                            | Устанавливает коллекцию cookies                                                     |
+| Метод                                                                                         | Описание                                                       |
+|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------|
+| create()                                                                                      | Создать объект запроса                                         |
+| withMethod(string $method)                                                                    | Метод запроса                                                  |
+| getMethod(): string                                                                           | Возвращает метод запроса                                       |
+| get($uri, ?string $mime = null)                                                               | HTTP Метод Get                                                 |
+| post($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null)  | HTTP Метод Post                                                |
+| put($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null)   | HTTP Метод Put                                                 |
+| patch($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null) | HTTP Метод Patch                                               |
+| delete($uri, ?string $mime = null)                                                            | HTTP Метод Delete                                              |
+| head($uri)                                                                                    | HTTP Метод Head                                                |
+| options($uri)                                                                                 | HTTP Метод Options                                             |
+| getUri(): UriInterface                                                                        | Возвращает URI запроса                                         |
+| withUri(UriInterface $uri)                                                                    | Устанавливает URI запроса                                      |
+| withMime(?string $mime = null)                                                                | Устанавливаем Content type и Expected type                     |
+| withExpectedType(?string $mime = null)                                                        | Устанавливаем expected type                                    |
+| getExpectedType(): ?string                                                                    | Expected type                                                  |
+| withBody($body, ?string $mime = null, ?UploadFileCollectionInterface $files = null)           | Тело запроса                                                   |
+| getBody(): RequestBodyInterface                                                               | Возвращает тело запроса                                        |
+| withMiddleware(MiddlewareInterface $middleware, ?int $sort = null)                            | Добавить промежуточное ПО                                      |
+| getMiddlewares(): MiddlewareCollectionInterface                                               | Возвращает промежуточное ПО                                    |
+| withProxy(?ProxyInterface $proxy)                                                             | Использовать прокси для соединения                             |
+| getProxy(): ?ProxyInterface                                                                   | Возвращает прокси                                              |
+| getProtocolVersion(): string                                                                  | Возвращает версию протокола HTTP                               |
+| withProtocolVersion(string $version)                                                          | Устанавливает версию протокола HTTP                            |
+| getEncoding(): string                                                                         | Возвращает кодировку                                           |
+| withEncoding(string $encoding)                                                                | Устанавливает кодировку                                        |
+| getHeaders(): HeaderCollectionInterface                                                       | Возвращает коллекцию заголовков                                |
+| withHeaders(HeaderCollectionInterface $headers)                                               | Устанавливает коллекцию заголовков                             |
+| addHeader(HeaderInterface $header)                                                            | Добавить заголовок к коллекции                                 |
+| hasHeader(string $name): bool                                                                 | Проверяет наличие заголовка с определенным именем              |
+| getHeader(string $name): HeaderCollectionInterface                                            | Возвращает заголовок с определенным именем                     |
+| getFirstHeader(string $name): ?HeaderInterface                                                | Возвращает первый найденный заголовок с определенным именем    |
+| getLastHeader(string $name): ?HeaderInterface                                                 | Возвращает последний найденный заголовок с определенным именем |
+| withHeader(string $name, string $value)                                                       | Добавляет заголовок с определенным именем и значением          |
+| withoutHeader(string $name)                                                                   | Удаляет заголовок с определенным именем                        |
+| clearHeaders()                                                                                | Удаляет все заголовки                                          |
+| getCookies(): CookieCollectionInterface                                                       | Возвращает коллекцию cookies                                   |
+| addCookie(string $name, string $value)                                                        | Добавляет и возвращает куку к запросу                          |
+| withCookies(CookieCollectionInterface $collection)                                            | Устанавливает коллекцию cookies                                |
 
 Вы можете создать и сконфигурировать запрос, а затем отправить его:
 
@@ -202,17 +203,18 @@ $response = $client->send($request);
 
 Тело запроса релизованно классом `Fi1a\HttpClient\RequestBodyInterface` и имеет следующие методы:
 
-| Метод                                                                                    | Описание                                                |
-|------------------------------------------------------------------------------------------|---------------------------------------------------------|
-| withBody($raw, ?string $mime = null, ?UploadFileCollectionInterface $files = null): void | Установить тело запроса                                 |
-| get(): string                                                                            | Возвращает тело запроса                                 |
-| getRaw()                                                                                 | Возвращает тело запроса без примененного преобразования |
-| getSize(): int                                                                           | Возвращает размер тела запроса                          |
-| has(): bool                                                                              | Есть тело запроса или нет                               |
-| withUploadFiles(?UploadFileCollectionInterface $files)                                   | Прикрепить файлы к телу запроса                         |
-| addUploadFile(string $name, FileInterface $file)                                         | Добавить загружаемый файл                               |
-| getUploadFiles(): UploadFileCollectionInterface                                          | Возвращает прикрепленные файлы                          |
-| getContentTypeHeader(): ?string                                                          | Content type для заголовков                             |
+| Метод                                                                                   | Описание                                                |
+|-----------------------------------------------------------------------------------------|---------------------------------------------------------|
+| setBody($raw, ?string $mime = null, ?UploadFileCollectionInterface $files = null): void | Установить тело запроса                                 |
+| get(): string                                                                           | Возвращает тело запроса                                 |
+| getRaw()                                                                                | Возвращает тело запроса без примененного преобразования |
+| getSize(): int                                                                          | Возвращает размер тела запроса                          |
+| has(): bool                                                                             | Есть тело запроса или нет                               |
+| setUploadFiles(?UploadFileCollectionInterface $files)                                   | Прикрепить файлы к телу запроса                         |
+| addUploadFile(string $name, FileInterface $file)                                        | Добавить загружаемый файл                               |
+| getUploadFiles(): UploadFileCollectionInterface                                         | Возвращает прикрепленные файлы                          |
+| getContentTypeHeader(): ?string                                                         | Content type для заголовков                             |
+| setContentType(?string $mime = null)                                                    | Устанавливаем content type                              |
 
 ### Заголовки запроса
 
@@ -252,6 +254,7 @@ $response->getStatusCode(); // 200
 ## Использование ответа
 
 Объект ответа реализует `Fi1a\HttpClient\ResponseInterface` и содержит информацию полученную в результате выполнения запроса.
+Данный объект является неизменяемым (immutable).
 
 Получить код состояния и фразу ответа:
 
@@ -328,13 +331,15 @@ if ($response->getBody()->has()) {
 
 Тело ответа релизованно классом `Fi1a\HttpClient\ResponseBodyInterface` и имеет следующие методы:
 
-| Метод                                             | Описание                                               |
-|---------------------------------------------------|--------------------------------------------------------|
-| withBody(string $raw, ?string $mime = null): void | Установить тело ответа                                 |
-| get()                                             | Возвращает тело ответа                                 |
-| getRaw(): string                                  | Возвращает тело ответа без примененного преобразования |
-| has(): bool                                       | Есть тело ответа или нет                               |
-| getSize(): int                                    | Возвращает размер тела ответа                          |
+| Метод                                            | Описание                                               |
+|--------------------------------------------------|--------------------------------------------------------|
+| setBody(string $raw, ?string $mime = null): void | Установить тело ответа                                 |
+| get()                                            | Возвращает тело ответа                                 |
+| getRaw(): string                                 | Возвращает тело ответа без примененного преобразования |
+| has(): bool                                      | Есть тело ответа или нет                               |
+| getSize(): int                                   | Возвращает размер тела ответа                          |
+| setContentType(?string $mime = null)             | Устанавливаем content type                             |
+| getContentType(): ?string                        | Content type                                           |
 
 ## Кириллический домен
 
@@ -444,7 +449,7 @@ use Fi1a\HttpClient\Request;
 $client = new HttpClient();
 
 $request = Request::create()->post('https://httpbin.org/post');
-$request->getBody()->withBody(['foo' => 'bar'], MimeInterface::JSON);
+$request->getBody()->setBody(['foo' => 'bar'], MimeInterface::JSON);
 
 $response = $client->send($request);
 ```
@@ -523,7 +528,7 @@ $response->getCookies(); // Fi1a\HttpClient\Cookie\CookieCollection
 // Установить новую cookie
 $request = Request::create()
     ->get('https://httpbin.org/cookies');
-$request->withCookie('cookieName2', 'cookieValue2');
+$request->addCookie('cookieName2', 'cookieValue2');
 
 $response = $client->send($request);
 $response->getCookies(); // Fi1a\HttpClient\Cookie\CookieCollection
@@ -648,7 +653,7 @@ $response->getStatusCode(); // 302
 ## Прокси
 
 Пакет предоставляет возможность использовать HTTP и Socks5 прокси при запросах. Установить прокси можно с помощью метода
-`withProxy` класса `Fi1a\HttpClient\HttpClientInterface`. Данный метод принимает объект, реализующий интерфейс
+`setProxy` класса `Fi1a\HttpClient\HttpClientInterface`. Данный метод принимает объект, реализующий интерфейс
 `Fi1a\HttpClient\Proxy\ProxyInterface`.
 
 - `Fi1a\HttpClient\Proxy\HttpProxy` - реализует HTTP прокси;
@@ -663,7 +668,7 @@ use Fi1a\HttpClient\HttpClient;
 use Fi1a\HttpClient\Proxy\HttpProxy;
 
 $client = new HttpClient(new Config(), CurlHandler::class);
-$client->withProxy(new HttpProxy('127.0.0.1', 50100, 'user1', 'password1'));
+$client->setProxy(new HttpProxy('127.0.0.1', 50100, 'user1', 'password1'));
 
 $response = $client->get('https://httpbin.org/get');
 $response->getStatusCode(); // 200
@@ -679,7 +684,7 @@ use Fi1a\HttpClient\Proxy\Socks5Proxy;
 
 $client = new HttpClient(new Config(), CurlHandler::class);
 
-$client->withProxy(new Socks5Proxy('127.0.0.1', 50101, 'user1', 'password1'));
+$client->setProxy(new Socks5Proxy('127.0.0.1', 50101, 'user1', 'password1'));
 
 $response = $client->get('https://httpbin.org/get');
 $response->getStatusCode(); // 200
@@ -693,7 +698,7 @@ $response->getStatusCode(); // 200
 (RequestInterface $request, ResponseInterface $response, HttpClientInterface $httpClient), а ответа `handleResponse`
 с параметрами (RequestInterface $request, ResponseInterface $response, HttpClientInterface $httpClient).
 
-Для всех запросов можно добавить промежуточное ПО (middleware) с помощью метода `withMiddleware` класса `Fi1a\HttpClient\HttpClientInterface`.
+Для всех запросов можно добавить промежуточное ПО (middleware) с помощью метода `addMiddleware` класса `Fi1a\HttpClient\HttpClientInterface`.
 
 ```php
 use Fi1a\HttpClient\HttpClient;
@@ -701,7 +706,7 @@ use Fi1a\HttpClient\Middlewares\BasicAuthMiddleware;
 
 $client = new HttpClient();
 
-$client->withMiddleware(new BasicAuthMiddleware('user1', 'password1'));
+$client->addMiddleware(new BasicAuthMiddleware('user1', 'password1'));
 $response = $client->get('https://httpbin.org/hidden-basic-auth/user1/password1');
 $response->getStatusCode(); // 200
 ```
@@ -740,7 +745,7 @@ use Fi1a\HttpClient\Middlewares\ApiKeyAuthMiddleware;
 
 $client = new HttpClient();
 
-$response = $client->withMiddleware(
+$response = $client->addMiddleware(
     new ApiKeyAuthMiddleware('token', 'api-token', ApiKeyAuthMiddleware::IN_HEADER)
 )->get('https://some-domain.ru/api-key-auth');
 
@@ -757,7 +762,7 @@ use Fi1a\HttpClient\Middlewares\BasicAuthMiddleware;
 
 $client = new HttpClient();
 
-$response = $client->withMiddleware(
+$response = $client->addMiddleware(
     new BasicAuthMiddleware('user1', 'password1')
 )->get('https://httpbin.org/hidden-basic-auth/user1/password1');
 
@@ -774,7 +779,7 @@ use Fi1a\HttpClient\Middlewares\BearerAuthMiddleware;
 
 $client = new HttpClient();
 
-$response = $client->withMiddleware(
+$response = $client->addMiddleware(
     new BearerAuthMiddleware('token')
 )->get('https://domain.ru/bearer-auth');
 
@@ -792,7 +797,7 @@ use Fi1a\HttpClient\Middlewares\RetryMiddleware;
 
 $client = new HttpClient();
 
-$response = $client->withMiddleware(
+$response = $client->addMiddleware(
     new RetryMiddleware(3)
 )->get('https://httpbin.org/status/400');
 

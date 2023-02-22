@@ -55,10 +55,12 @@ class Request extends Message implements RequestInterface
     protected function __construct()
     {
         parent::__construct();
+        $this->mutable = true;
         $this->middlewares = new MiddlewareCollection();
         $this->body = new RequestBody();
         $this->withMethod(HttpInterface::GET)
             ->withUri(new Uri());
+        $this->mutable = false;
     }
 
     /**
@@ -74,9 +76,11 @@ class Request extends Message implements RequestInterface
      */
     public function withMethod(string $method)
     {
-        $this->method = mb_strtoupper($method);
+        $object = $this->getObject();
 
-        return $this;
+        $object->method = mb_strtoupper($method);
+
+        return $object;
     }
 
     /**
@@ -92,12 +96,14 @@ class Request extends Message implements RequestInterface
      */
     public function get($uri, ?string $mime = null)
     {
-        $this->withMethod(HttpInterface::GET)
+        $object = $this->getObject();
+
+        $object = $object->withMethod(HttpInterface::GET)
             ->withUri($this->createUri($uri));
 
-        $this->body->withContentType($mime);
+        $object->body = $object->body->setContentType($mime);
 
-        return $this;
+        return $object;
     }
 
     /**
@@ -119,15 +125,15 @@ class Request extends Message implements RequestInterface
      */
     public function post($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null)
     {
+        $object = $this->getObject();
+
         if (!$mime) {
             $mime = 'form';
         }
 
-        $this->withMethod(HttpInterface::POST)
+        return $object->withMethod(HttpInterface::POST)
             ->withUri($this->createUri($uri))
             ->withBody($body, $mime, $files);
-
-        return $this;
     }
 
     /**
@@ -135,15 +141,15 @@ class Request extends Message implements RequestInterface
      */
     public function put($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null)
     {
+        $object = $this->getObject();
+
         if (!$mime) {
             $mime = 'form';
         }
 
-        $this->withMethod(HttpInterface::PUT)
+        return $object->withMethod(HttpInterface::PUT)
             ->withUri($this->createUri($uri))
             ->withBody($body, $mime, $files);
-
-        return $this;
     }
 
     /**
@@ -151,11 +157,9 @@ class Request extends Message implements RequestInterface
      */
     public function patch($uri, $body = null, ?string $mime = null, ?UploadFileCollectionInterface $files = null)
     {
-        $this->withMethod(HttpInterface::PATCH)
+        return $this->getObject()->withMethod(HttpInterface::PATCH)
             ->withUri($this->createUri($uri))
             ->withBody($body, $mime, $files);
-
-        return $this;
     }
 
     /**
@@ -163,12 +167,14 @@ class Request extends Message implements RequestInterface
      */
     public function delete($uri, ?string $mime = null)
     {
-        $this->withMethod(HttpInterface::DELETE)
+        $object = $this->getObject();
+
+        $object = $object->withMethod(HttpInterface::DELETE)
             ->withUri($this->createUri($uri));
 
-        $this->body->withContentType($mime);
+        $object->body = $object->body->setContentType($mime);
 
-        return $this;
+        return $object;
     }
 
     /**
@@ -176,10 +182,8 @@ class Request extends Message implements RequestInterface
      */
     public function head($uri)
     {
-        $this->withMethod(HttpInterface::HEAD)
+        return $this->getObject()->withMethod(HttpInterface::HEAD)
             ->withUri($this->createUri($uri));
-
-        return $this;
     }
 
     /**
@@ -187,10 +191,8 @@ class Request extends Message implements RequestInterface
      */
     public function options($uri)
     {
-        $this->withMethod(HttpInterface::OPTIONS)
+        return $this->getObject()->withMethod(HttpInterface::OPTIONS)
             ->withUri($this->createUri($uri));
-
-        return $this;
     }
 
     /**
@@ -198,10 +200,11 @@ class Request extends Message implements RequestInterface
      */
     public function withMime(?string $mime = null)
     {
-        $this->body->withContentType($mime);
-        $this->withExpectedType($mime);
+        $object = $this->getObject();
 
-        return $this;
+        $object->body = $object->body->setContentType($mime);
+
+        return $object->withExpectedType($mime);
     }
 
     /**
@@ -209,9 +212,11 @@ class Request extends Message implements RequestInterface
      */
     public function withExpectedType(?string $mime = null)
     {
-        $this->expectedType = $mime ? Mime::getMime($mime) : null;
+        $object = $this->getObject();
 
-        return $this;
+        $object->expectedType = $mime ? Mime::getMime($mime) : null;
+
+        return $object;
     }
 
     /**
@@ -227,9 +232,11 @@ class Request extends Message implements RequestInterface
      */
     public function withBody($body, ?string $mime = null, ?UploadFileCollectionInterface $files = null)
     {
-        $this->body->withBody($body, $mime, $files);
+        $object = $this->getObject();
 
-        return $this;
+        $object->body->setBody($body, $mime, $files);
+
+        return $object;
     }
 
     /**
@@ -253,16 +260,18 @@ class Request extends Message implements RequestInterface
      */
     public function withUri(UriInterface $uri)
     {
+        $object = $this->getObject();
+
         if (!$uri instanceof EncodedUriInterface) {
             $uri = EncodedUri::create($uri);
         }
-        $this->uri = $uri;
+        $object->uri = $uri;
         foreach ($this->getCookies() as $cookie) {
             assert($cookie instanceof CookieInterface);
             $cookie->setDomain($uri->host());
         }
 
-        return $this;
+        return $object;
     }
 
     /**
@@ -270,12 +279,14 @@ class Request extends Message implements RequestInterface
      */
     public function withMiddleware(MiddlewareInterface $middleware, ?int $sort = null)
     {
+        $object = $this->getObject();
+
         if (!is_null($sort)) {
             $middleware->setSort($sort);
         }
-        $this->middlewares[] = $middleware;
+        $object->middlewares[] = $middleware;
 
-        return $this;
+        return $object;
     }
 
     /**
@@ -291,9 +302,11 @@ class Request extends Message implements RequestInterface
      */
     public function withProxy(?ProxyInterface $proxy)
     {
-        $this->proxy = $proxy;
+        $object = $this->getObject();
 
-        return $this;
+        $object->proxy = $proxy;
+
+        return $object;
     }
 
     /**
@@ -307,7 +320,7 @@ class Request extends Message implements RequestInterface
     /**
      * @inheritDoc
      */
-    public function withCookie(string $name, string $value)
+    public function addCookie(string $name, string $value)
     {
         $cookie = new Cookie();
         $cookie->setName($name)
@@ -317,5 +330,19 @@ class Request extends Message implements RequestInterface
         $this->getCookies()->add($cookie);
 
         return $cookie;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __clone()
+    {
+        parent::__clone();
+        $this->uri = clone $this->uri;
+        $this->body = clone $this->body;
+        $this->middlewares = clone $this->middlewares;
+        if ($this->proxy) {
+            $this->proxy = clone $this->proxy;
+        }
     }
 }

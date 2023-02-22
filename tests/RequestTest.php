@@ -14,7 +14,7 @@ use Fi1a\HttpClient\Proxy\HttpProxy;
 use Fi1a\HttpClient\Proxy\ProxyInterface;
 use Fi1a\HttpClient\Request;
 use Fi1a\HttpClient\RequestInterface;
-use Fi1a\Unit\HttpClient\Fixtures\Middlewares\Set500StatusMiddleware;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ExceptionMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\StopMiddleware;
 use PHPUnit\Framework\TestCase;
 
@@ -46,7 +46,7 @@ class RequestTest extends TestCase
     public function testWithMethod(): void
     {
         $request = Request::create();
-        $request->withMethod(HttpInterface::POST);
+        $request = $request->withMethod(HttpInterface::POST);
         $this->assertEquals(HttpInterface::POST, $request->getMethod());
     }
 
@@ -56,7 +56,7 @@ class RequestTest extends TestCase
     public function testWithMethodCustom(): void
     {
         $request = Request::create();
-        $request->withMethod('custom');
+        $request = $request->withMethod('custom');
         $this->assertEquals('CUSTOM', $request->getMethod());
     }
 
@@ -66,7 +66,7 @@ class RequestTest extends TestCase
     public function testGet(): void
     {
         $request = Request::create();
-        $request->get(
+        $request = $request->get(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             'json'
         )->withExpectedType('json');
@@ -87,7 +87,7 @@ class RequestTest extends TestCase
     {
         $post = ['foo' => 'bar'];
         $request = Request::create();
-        $request->post(
+        $request = $request->post(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             $post
         );
@@ -109,7 +109,7 @@ class RequestTest extends TestCase
     public function testPost(): void
     {
         $request = Request::create();
-        $request->post(
+        $request = $request->post(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             ['foo' => 'bar'],
             'json'
@@ -132,7 +132,7 @@ class RequestTest extends TestCase
     {
         $put = ['foo' => 'bar'];
         $request = Request::create();
-        $request->put(
+        $request = $request->put(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             $put
         );
@@ -154,7 +154,7 @@ class RequestTest extends TestCase
     public function testPut(): void
     {
         $request = Request::create();
-        $request->put(
+        $request = $request->put(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             ['foo' => 'bar'],
             'json'
@@ -176,7 +176,7 @@ class RequestTest extends TestCase
     public function testPatch(): void
     {
         $request = Request::create();
-        $request->patch(
+        $request = $request->patch(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             ['foo' => 'bar'],
             'json'
@@ -198,7 +198,7 @@ class RequestTest extends TestCase
     public function testDelete(): void
     {
         $request = Request::create();
-        $request->delete(
+        $request = $request->delete(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
             'json'
         )->withExpectedType('json');
@@ -218,7 +218,7 @@ class RequestTest extends TestCase
     public function testHead(): void
     {
         $request = Request::create();
-        $request->head(
+        $request = $request->head(
             'https://username:password@host.ru:8080/some/path/?foo=bar'
         );
         $this->assertEquals(HttpInterface::HEAD, $request->getMethod());
@@ -237,7 +237,7 @@ class RequestTest extends TestCase
     public function testOptions(): void
     {
         $request = Request::create();
-        $request->options(
+        $request = $request->options(
             'https://username:password@host.ru:8080/some/path/?foo=bar'
         );
         $this->assertEquals(HttpInterface::OPTIONS, $request->getMethod());
@@ -256,7 +256,7 @@ class RequestTest extends TestCase
     public function testUri(): void
     {
         $request = Request::create();
-        $request->withUri(new Uri('https://username:password@host.ru:8080/some/path/?foo=bar'));
+        $request = $request->withUri(new Uri('https://username:password@host.ru:8080/some/path/?foo=bar'));
         $this->assertInstanceOf(UriInterface::class, $request->getUri());
         $this->assertEquals(
             'https://username:password@host.ru:8080/some/path/?foo=bar',
@@ -279,7 +279,7 @@ class RequestTest extends TestCase
     public function testMime(): void
     {
         $request = Request::create();
-        $request->withMime('json');
+        $request = $request->withMime('json');
         $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
     }
@@ -290,7 +290,7 @@ class RequestTest extends TestCase
     public function testCustomMime(): void
     {
         $request = Request::create();
-        $request->withMime('application/pdf');
+        $request = $request->withMime('application/pdf');
         $this->assertEquals('application/pdf', $request->getBody()->getContentType());
         $this->assertEquals('application/pdf', $request->getExpectedType());
     }
@@ -323,7 +323,7 @@ class RequestTest extends TestCase
     public function testContentType(): void
     {
         $request = Request::create();
-        $request->getBody()->withContentType('json');
+        $request->getBody()->setContentType('json');
         $this->assertEquals(MimeInterface::JSON, $request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
@@ -334,7 +334,7 @@ class RequestTest extends TestCase
     public function testCustomContentType(): void
     {
         $request = Request::create();
-        $request->getBody()->withContentType('application/pdf');
+        $request->getBody()->setContentType('application/pdf');
         $this->assertEquals('application/pdf', $request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
@@ -345,7 +345,7 @@ class RequestTest extends TestCase
     public function testEmptyContentType(): void
     {
         $request = Request::create();
-        $request->getBody()->withContentType('');
+        $request->getBody()->setContentType('');
         $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
@@ -356,7 +356,7 @@ class RequestTest extends TestCase
     public function testNullContentType(): void
     {
         $request = Request::create();
-        $request->getBody()->withContentType();
+        $request->getBody()->setContentType();
         $this->assertNull($request->getBody()->getContentType());
         $this->assertNull($request->getExpectedType());
     }
@@ -367,7 +367,7 @@ class RequestTest extends TestCase
     public function testExpectedType(): void
     {
         $request = Request::create();
-        $request->withExpectedType('json');
+        $request = $request->withExpectedType('json');
         $this->assertEquals(MimeInterface::JSON, $request->getExpectedType());
         $this->assertNull($request->getBody()->getContentType());
     }
@@ -378,7 +378,7 @@ class RequestTest extends TestCase
     public function testCustomExpectedType(): void
     {
         $request = Request::create();
-        $request->withExpectedType('application/pdf');
+        $request = $request->withExpectedType('application/pdf');
         $this->assertEquals('application/pdf', $request->getExpectedType());
         $this->assertNull($request->getBody()->getContentType());
     }
@@ -413,8 +413,8 @@ class RequestTest extends TestCase
         $request = Request::create();
         $this->assertInstanceOf(MiddlewareCollectionInterface::class, $request->getMiddlewares());
         $this->assertCount(0, $request->getMiddlewares());
-        $request->withMiddleware(new Set500StatusMiddleware(), 100);
-        $request->withMiddleware(new StopMiddleware(), 600);
+        $request = $request->withMiddleware(new ExceptionMiddleware(), 100);
+        $request = $request->withMiddleware(new StopMiddleware(), 600);
         $this->assertInstanceOf(MiddlewareCollectionInterface::class, $request->getMiddlewares());
         $this->assertCount(2, $request->getMiddlewares());
     }
@@ -426,9 +426,9 @@ class RequestTest extends TestCase
     {
         $request = Request::create();
         $this->assertNull($request->getProxy());
-        $request->withProxy(new HttpProxy('127.0.0.1', 5000));
+        $request = $request->withProxy(new HttpProxy('127.0.0.1', 5000));
         $this->assertInstanceOf(ProxyInterface::class, $request->getProxy());
-        $request->withProxy(null);
+        $request = $request->withProxy(null);
         $this->assertNull($request->getProxy());
     }
 
@@ -438,7 +438,7 @@ class RequestTest extends TestCase
     public function testWithCookie(): void
     {
         $request = Request::create();
-        $cookie = $request->withCookie('cookieName1', 'cookieValue1');
+        $cookie = $request->addCookie('cookieName1', 'cookieValue1');
         $this->assertInstanceOf(CookieInterface::class, $cookie);
         $this->assertEquals('', $cookie->getDomain());
         $request->withUri(new Uri('https://domain.ru'));

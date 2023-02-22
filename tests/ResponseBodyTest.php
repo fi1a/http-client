@@ -22,7 +22,7 @@ class ResponseBodyTest extends TestCase
         $json = json_encode($array);
 
         $body = new ResponseBody();
-        $body->withBody($json, 'json');
+        $body->setBody($json, 'json');
         $this->assertEquals(MimeInterface::JSON, $body->getContentType());
         $this->assertEquals($json, $body->getRaw());
         $this->assertEquals($array, $body->get());
@@ -37,11 +37,11 @@ class ResponseBodyTest extends TestCase
         $json = json_encode($array);
 
         $body = new ResponseBody();
-        $body->withBody($json);
+        $body->setBody($json);
         $this->assertNull($body->getContentType());
         $this->assertEquals($json, $body->getRaw());
         $this->assertEquals($json, $body->get());
-        $body->withContentType('json');
+        $body->setContentType('json');
         $this->assertEquals(MimeInterface::JSON, $body->getContentType());
         $this->assertEquals($json, $body->getRaw());
         $this->assertEquals($array, $body->get());
@@ -54,7 +54,7 @@ class ResponseBodyTest extends TestCase
     {
         $content = 'content';
         $body = new ResponseBody();
-        $body->withBody($content);
+        $body->setBody($content);
         $this->assertEquals($content, $body->getRaw());
         $this->assertEquals($content, $body->get());
     }
@@ -66,7 +66,7 @@ class ResponseBodyTest extends TestCase
     {
         $content = '';
         $body = new ResponseBody();
-        $body->withBody($content);
+        $body->setBody($content);
         $this->assertEquals($content, $body->getRaw());
         $this->assertEquals($content, $body->get());
     }
@@ -77,7 +77,7 @@ class ResponseBodyTest extends TestCase
     public function testHas(): void
     {
         $body = new ResponseBody();
-        $body->withBody('content');
+        $body->setBody('content');
         $this->assertTrue($body->has());
     }
 
@@ -87,7 +87,7 @@ class ResponseBodyTest extends TestCase
     public function testHasEmptyString(): void
     {
         $body = new ResponseBody();
-        $body->withBody('');
+        $body->setBody('');
         $this->assertFalse($body->has());
     }
 
@@ -97,7 +97,7 @@ class ResponseBodyTest extends TestCase
     public function testGetSize(): void
     {
         $body = new ResponseBody();
-        $body->withBody('content');
+        $body->setBody('content');
         $this->assertTrue($body->has());
         $this->assertEquals(7, $body->getSize());
     }

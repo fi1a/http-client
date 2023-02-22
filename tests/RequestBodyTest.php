@@ -35,7 +35,7 @@ class RequestBodyTest extends UploadFileTestCase
         $json = json_encode($array);
 
         $body = $this->getRequestBody();
-        $body->withBody($array, 'json');
+        $body = $body->setBody($array, 'json');
         $this->assertEquals(MimeInterface::JSON, $body->getContentType());
         $this->assertEquals($array, $body->getRaw());
         $this->assertEquals($json, $body->get());
@@ -50,10 +50,10 @@ class RequestBodyTest extends UploadFileTestCase
         $json = json_encode($array);
 
         $body = $this->getRequestBody();
-        $body->withBody($array);
+        $body = $body->setBody($array);
         $this->assertNull($body->getContentType());
         $this->assertEquals($array, $body->getRaw());
-        $body->withContentType('json');
+        $body = $body->setContentType('json');
         $this->assertEquals(MimeInterface::JSON, $body->getContentType());
         $this->assertEquals($array, $body->getRaw());
         $this->assertEquals($json, $body->get());
@@ -66,7 +66,7 @@ class RequestBodyTest extends UploadFileTestCase
     {
         $content = 'content';
         $body = $this->getRequestBody();
-        $body->withBody($content);
+        $body = $body->setBody($content);
         $this->assertEquals($content, $body->getRaw());
         $this->assertEquals($content, $body->get());
     }
@@ -78,7 +78,7 @@ class RequestBodyTest extends UploadFileTestCase
     {
         $content = '';
         $body = $this->getRequestBody();
-        $body->withBody($content);
+        $body->setBody($content);
         $this->assertEquals($content, $body->getRaw());
         $this->assertEquals($content, $body->get());
     }
@@ -90,7 +90,7 @@ class RequestBodyTest extends UploadFileTestCase
     {
         $content = ['foo' => 'bar'];
         $body = $this->getRequestBody();
-        $body->withBody($content);
+        $body = $body->setBody($content);
         $this->assertEquals($content, $body->getRaw());
         $this->assertEquals('', $body->get());
     }
@@ -101,7 +101,7 @@ class RequestBodyTest extends UploadFileTestCase
     public function testHas(): void
     {
         $body = $this->getRequestBody();
-        $body->withBody('content');
+        $body = $body->setBody('content');
         $this->assertTrue($body->has());
     }
 
@@ -111,7 +111,7 @@ class RequestBodyTest extends UploadFileTestCase
     public function testHasEmptyString(): void
     {
         $body = $this->getRequestBody();
-        $body->withBody('');
+        $body->setBody('');
         $this->assertFalse($body->has());
     }
 
@@ -124,7 +124,7 @@ class RequestBodyTest extends UploadFileTestCase
         $json = json_encode($array);
 
         $body = $this->getRequestBody();
-        $body->withBody($array, 'json');
+        $body = $body->setBody($array, 'json');
         $this->assertEquals(mb_strlen($json), $body->getSize());
     }
 
@@ -136,7 +136,7 @@ class RequestBodyTest extends UploadFileTestCase
         $body = $this->getRequestBody();
         $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
         $this->assertCount(0, $body->getUploadFiles());
-        $body->withUploadFiles($this->getUploadFiles());
+        $body = $body->setUploadFiles($this->getUploadFiles());
         $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
         $this->assertCount(3, $body->getUploadFiles());
     }
@@ -147,10 +147,10 @@ class RequestBodyTest extends UploadFileTestCase
     public function testWithFilesEmpty(): void
     {
         $body = $this->getRequestBody();
-        $body->withUploadFiles($this->getUploadFiles());
+        $body = $body->setUploadFiles($this->getUploadFiles());
         $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
         $this->assertCount(3, $body->getUploadFiles());
-        $body->withUploadFiles(null);
+        $body = $body->setUploadFiles(null);
         $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
         $this->assertCount(0, $body->getUploadFiles());
     }
@@ -164,7 +164,7 @@ class RequestBodyTest extends UploadFileTestCase
         $body = $this->getRequestBody();
         $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
         $this->assertCount(0, $body->getUploadFiles());
-        $body->addUploadFile('file1', $filesystem->factoryFile('./file1.txt'));
+        $body = $body->addUploadFile('file1', $filesystem->factoryFile('./file1.txt'));
         $this->assertInstanceOf(UploadFileCollectionInterface::class, $body->getUploadFiles());
         $this->assertCount(1, $body->getUploadFiles());
         /**
@@ -181,7 +181,7 @@ class RequestBodyTest extends UploadFileTestCase
     {
         $body = $this->getRequestBody();
         $this->assertNull($body->getContentTypeHeader());
-        $body->withContentType(MimeInterface::FORM);
+        $body = $body->setContentType(MimeInterface::FORM);
         $this->assertEquals(MimeInterface::FORM, $body->getContentTypeHeader());
     }
 
@@ -191,7 +191,7 @@ class RequestBodyTest extends UploadFileTestCase
     public function testMimeUploadContentTypeSet(): void
     {
         $body = $this->getRequestBody();
-        $body->withBody(['foo' => 'bar'], MimeInterface::FORM, $this->getUploadFiles());
+        $body = $body->setBody(['foo' => 'bar'], MimeInterface::FORM, $this->getUploadFiles());
         $this->assertEquals(MimeInterface::UPLOAD, $body->getContentType());
     }
 }

@@ -17,24 +17,14 @@ class UnknownContentEncodingMiddleware extends AbstractMiddleware
     /**
      * @inheritDoc
      */
-    public function handleRequest(
-        RequestInterface $request,
-        ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        $response->withHeader('Content-Encoding', 'unknown');
-
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function handleResponse(
         RequestInterface $request,
         ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        return true;
+        HttpClientInterface $httpClient,
+        callable $next
+    ): ResponseInterface {
+        $response = $response->withHeader('Content-Encoding', 'unknown');
+
+        return $next($request, $response, $httpClient);
     }
 }

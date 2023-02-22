@@ -17,24 +17,14 @@ class ResponseSet500StatusMiddleware extends AbstractMiddleware
     /**
      * @inheritDoc
      */
-    public function handleRequest(
-        RequestInterface $request,
-        ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function handleResponse(
         RequestInterface $request,
         ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        $response->withStatus(500);
+        HttpClientInterface $httpClient,
+        callable $next
+    ): ResponseInterface {
+        $response = $response->withStatus(500);
 
-        return true;
+        return $next($request, $response, $httpClient);
     }
 }

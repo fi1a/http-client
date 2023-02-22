@@ -30,7 +30,7 @@ class ResponseTest extends TestCase
     public function testStatus(): void
     {
         $response = $this->getResponse();
-        $response->withStatus(400, 'Bad Request');
+        $response = $response->withStatus(400, 'Bad Request');
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals('Bad Request', $response->getReasonPhrase());
     }
@@ -60,7 +60,7 @@ class ResponseTest extends TestCase
     public function testHasErrors(): void
     {
         $response = $this->getResponse();
-        $response->withStatus(400, 'Bad Request');
+        $response = $response->withStatus(400, 'Bad Request');
         $this->assertTrue($response->hasErrors());
     }
 
@@ -81,7 +81,7 @@ class ResponseTest extends TestCase
     {
         $response = $this->getResponse();
         $this->assertFalse($response->isSuccess());
-        $response->withStatus(200, 'OK');
+        $response = $response->withStatus(200, 'OK');
         $this->assertTrue($response->isSuccess());
     }
 
@@ -126,7 +126,7 @@ class ResponseTest extends TestCase
         $json = json_encode($array);
 
         $response = $this->getResponse();
-        $response->withBody($json, 'json');
+        $response = $response->withBody($json, 'json');
         $this->assertEquals(MimeInterface::JSON, $response->getBody()->getContentType());
         $this->assertEquals($json, $response->getBody()->getRaw());
         $this->assertEquals($array, $response->getBody()->get());

@@ -188,6 +188,13 @@ app.post('/file-upload/', urlencodedParser, (req, res, next) => {
     next();
 });
 
+app.get('/encoding/', (req, res, next) => {
+    res.status(200);
+    res.setHeader('Content-Encoding', 'unknown');
+    res.send('success');
+    next();
+});
+
 https.createServer(options, app).listen(httpsPort, () => {
     console.log(`App listening on port ${httpsPort}`)
 });

@@ -36,10 +36,16 @@ class Message implements MessageInterface
      */
     private $cookies;
 
+    /**
+     * @var bool
+     */
+    protected $mutable = true;
+
     public function __construct()
     {
         $this->headers = new HeaderCollection();
         $this->cookies = new CookieCollection();
+        $this->mutable = false;
     }
 
     /**
@@ -55,9 +61,11 @@ class Message implements MessageInterface
      */
     public function withProtocolVersion(string $version)
     {
-        $this->protocol = $version;
+        $object = $this->getObject();
 
-        return $this;
+        $object->protocol = $version;
+
+        return $object;
     }
 
     /**
@@ -73,9 +81,11 @@ class Message implements MessageInterface
      */
     public function withEncoding(string $encoding)
     {
-        $this->encoding = mb_strtolower($encoding);
+        $object = $this->getObject();
 
-        return $this;
+        $object->encoding = mb_strtolower($encoding);
+
+        return $object;
     }
 
     /**
@@ -91,9 +101,11 @@ class Message implements MessageInterface
      */
     public function withHeaders(HeaderCollectionInterface $headers)
     {
-        $this->headers = $headers;
+        $object = $this->getObject();
 
-        return $this;
+        $object->headers = $headers;
+
+        return $object;
     }
 
     /**
@@ -143,38 +155,36 @@ class Message implements MessageInterface
      */
     public function withHeader(string $name, string $value)
     {
-        $this->withAddedHeader($name, $value);
+        $object = $this->getObject();
 
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withAddedHeader(string $name, string $value): HeaderInterface
-    {
         $header = new Header($name, $value);
-        $this->headers[] = $header;
+        $object->headers[] = $header;
 
-        return $header;
+        return $object;
     }
 
     /**
      * @inheritDoc
      */
-    public function withoutHeader(string $name): bool
+    public function withoutHeader(string $name)
     {
-        return $this->headers->withoutHeader($name);
+        $object = $this->getObject();
+
+        $object->headers->withoutHeader($name);
+
+        return $object;
     }
 
     /**
      * @inheritDoc
      */
-    public function clearHeaders(): bool
+    public function clearHeaders()
     {
-        $this->headers->exchangeArray([]);
+        $object = $this->getObject();
 
-        return true;
+        $object->headers->exchangeArray([]);
+
+        return $object;
     }
 
     /**
@@ -190,8 +200,29 @@ class Message implements MessageInterface
      */
     public function withCookies(CookieCollectionInterface $collection)
     {
-        $this->cookies = $collection;
+        $object = $this->getObject();
 
-        return $this;
+        $object->cookies = $collection;
+
+        return $object;
+    }
+
+    /**
+     * Возвращает объет для установки значений
+     *
+     * @return $this
+     */
+    protected function getObject()
+    {
+        return $this->mutable ? $this : clone $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __clone()
+    {
+        $this->headers = clone $this->headers;
+        $this->cookies = clone $this->cookies;
     }
 }

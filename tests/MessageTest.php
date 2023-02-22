@@ -44,7 +44,7 @@ class MessageTest extends TestCase
     public function testProtocol(): void
     {
         $message = $this->getMessage();
-        $message->withProtocolVersion('1.0');
+        $message = $message->withProtocolVersion('1.0');
         $this->assertEquals('1.0', $message->getProtocolVersion());
     }
 
@@ -54,22 +54,10 @@ class MessageTest extends TestCase
     public function testWithHeader(): void
     {
         $message = new Message();
-        $message->withHeader('Content-Type', 'text/html; charset=utf-8');
+        $message = $message->withHeader('Content-Type', 'text/html; charset=utf-8');
         $this->assertCount(1, $message->getHeaders());
-        $message->withHeader('Content-Type', '');
+        $message = $message->withHeader('Content-Type', '');
         $this->assertCount(2, $message->getHeaders());
-    }
-
-    /**
-     * Добавляет заголовок с определенным именем и значением и возвращает объект заголовка
-     */
-    public function testWithAddedHeader(): void
-    {
-        $message = new Message();
-        $this->assertInstanceOf(
-            HeaderInterface::class,
-            $message->withAddedHeader('Content-Type', 'text/html; charset=utf-8')
-        );
     }
 
     /**
@@ -124,11 +112,14 @@ class MessageTest extends TestCase
     public function testWithoutHeader(): void
     {
         $message = $this->getMessage();
-        $this->assertTrue($message->withoutHeader('Content-Type'));
+        $message = $message->withoutHeader('Content-Type');
+        $this->assertFalse($message->hasHeader('Content-Type'));
         $this->assertCount(0, $message->getHeader('Content-Type'));
         $message = $this->getMessage();
-        $this->assertTrue($message->withoutHeader('CONTENT-TYPE'));
-        $this->assertFalse($message->withoutHeader('CONTENT-TYPE'));
+        $message = $message->withoutHeader('CONTENT-TYPE');
+        $this->assertFalse($message->hasHeader('Content-Type'));
+        $message = $message->withoutHeader('CONTENT-TYPE');
+        $this->assertFalse($message->hasHeader('Content-Type'));
         $this->assertCount(0, $message->getHeader('Content-Type'));
     }
 
@@ -147,7 +138,7 @@ class MessageTest extends TestCase
     public function testEncoding(): void
     {
         $message = $this->getMessage();
-        $message->withEncoding('windows-1251');
+        $message = $message->withEncoding('windows-1251');
         $this->assertEquals('windows-1251', $message->getEncoding());
     }
 
@@ -158,7 +149,7 @@ class MessageTest extends TestCase
     {
         $message = $this->getMessage();
         $this->assertCount(3, $message->getHeaders());
-        $this->assertTrue($message->clearHeaders());
+        $message = $message->clearHeaders();
         $this->assertCount(0, $message->getHeaders());
     }
 
@@ -171,7 +162,7 @@ class MessageTest extends TestCase
         $this->assertCount(0, $message->getHeaders());
         $headers = new HeaderCollection();
         $headers->add(new Header('Test-Header', 'Value1'));
-        $message->withHeaders($headers);
+        $message = $message->withHeaders($headers);
         $this->assertCount(1, $message->getHeaders());
     }
 

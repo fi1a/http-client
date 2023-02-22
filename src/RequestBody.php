@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fi1a\HttpClient;
 
 use Fi1a\Filesystem\FileInterface;
+use Fi1a\Http\Mime;
 use Fi1a\Http\MimeInterface;
 use Fi1a\HttpClient\ContentTypeEncodes\ContentTypeEncodeInterface;
 
@@ -42,7 +43,7 @@ class RequestBody extends AbstractBody implements RequestBodyInterface
     /**
      * @inheritDoc
      */
-    public function withBody($raw, ?string $mime = null, ?UploadFileCollectionInterface $files = null): void
+    public function setBody($raw, ?string $mime = null, ?UploadFileCollectionInterface $files = null)
     {
         $this->raw = $raw;
         if (is_null($files)) {
@@ -52,7 +53,9 @@ class RequestBody extends AbstractBody implements RequestBodyInterface
         if ($files->count()) {
             $mime = MimeInterface::UPLOAD;
         }
-        $this->withContentType($mime);
+        $this->setContentType($mime);
+
+        return $this;
     }
 
     /**
@@ -90,14 +93,14 @@ class RequestBody extends AbstractBody implements RequestBodyInterface
     /**
      * @inheritDoc
      */
-    public function withUploadFiles(?UploadFileCollectionInterface $files)
+    public function setUploadFiles(?UploadFileCollectionInterface $files)
     {
         if (is_null($files)) {
             $files = new UploadFileCollection();
         }
         $this->uploadFiles = $files;
         if ($files->count()) {
-            $this->withContentType(MimeInterface::UPLOAD);
+            $this->setContentType(MimeInterface::UPLOAD);
         }
 
         return $this;
@@ -136,14 +139,17 @@ class RequestBody extends AbstractBody implements RequestBodyInterface
     /**
      * @inheritDoc
      */
-    public function withContentType(?string $mime = null)
+    public function setContentType(?string $mime = null)
     {
         $this->encode = false;
         if ($mime) {
             $this->encode = ContentTypeEncodeRegistry::get($mime);
         }
 
-        return parent::withContentType($mime);
+        $this->contentType = $mime ? Mime::getMime($mime) : null;
+        $this->transform();
+
+        return $this;
     }
 
     /**
@@ -159,5 +165,13 @@ class RequestBody extends AbstractBody implements RequestBodyInterface
         if ($this->encode) {
             $this->body = $this->encode->encode($this->raw, $this->uploadFiles);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __clone()
+    {
+        $this->uploadFiles = clone $this->uploadFiles;
     }
 }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Fi1a\Unit\HttpClient\Middlewares;
 
 use Fi1a\HttpClient\Middlewares\MiddlewareCollection;
+use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ExceptionMiddleware;
 use Fi1a\Unit\HttpClient\Fixtures\Middlewares\ResponseStopMiddleware;
-use Fi1a\Unit\HttpClient\Fixtures\Middlewares\Set500StatusMiddleware;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,7 +21,7 @@ class MiddlewareCollectionTest extends TestCase
     {
         $collection = new MiddlewareCollection();
         $collection[] = new ResponseStopMiddleware();
-        $collection[] = new Set500StatusMiddleware();
+        $collection[] = new ExceptionMiddleware();
         $this->assertCount(2, $collection);
     }
 
@@ -32,7 +32,7 @@ class MiddlewareCollectionTest extends TestCase
     {
         $collection = new MiddlewareCollection();
         $collection[] = (new ResponseStopMiddleware())->setSort(600);
-        $collection[] = (new Set500StatusMiddleware())->setSort(200);
+        $collection[] = (new ExceptionMiddleware())->setSort(200);
         $newCollection = $collection->sortDirect();
         $this->assertCount(2, $newCollection);
         $this->assertEquals(200, $newCollection[0]->getSort());
@@ -45,7 +45,7 @@ class MiddlewareCollectionTest extends TestCase
     public function testSortBack(): void
     {
         $collection = new MiddlewareCollection();
-        $collection[] = (new Set500StatusMiddleware())->setSort(200);
+        $collection[] = (new ExceptionMiddleware())->setSort(200);
         $collection[] = (new ResponseStopMiddleware())->setSort(600);
         $newCollection = $collection->sortBack();
         $this->assertCount(2, $newCollection);

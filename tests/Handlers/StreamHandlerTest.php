@@ -46,8 +46,8 @@ class StreamHandlerTest extends ServerTestCase
     {
         $handler = $this->getHandler();
         $request = Request::create()->post('https://' . self::HOST . '/200-ok-post', ['foo' => 'bar']);
-        $request->withHeader('Content-Type', $request->getBody()->getContentType());
-        $request->withHeader('Content-Length', (string) $request->getBody()->getSize());
+        $request = $request->withHeader('Content-Type', $request->getBody()->getContentType());
+        $request = $request->withHeader('Content-Length', (string) $request->getBody()->getSize());
         $response = $handler->send($request, new Response());
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getReasonPhrase());
@@ -61,7 +61,7 @@ class StreamHandlerTest extends ServerTestCase
     /**
      * POST запрос
      */
-    public function testGetSendNullContentLenght(): void
+    public function testGetSendNullContentLength(): void
     {
         $handler = $this->getHandler();
         $request = Request::create()->get('https://' . self::HOST . '/200-ok-null-content-length');

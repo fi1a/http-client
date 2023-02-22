@@ -53,13 +53,15 @@ class Response extends Message implements ResponseInterface
      */
     public function withStatus(int $statusCode, string $reasonPhrase = '')
     {
+        $object = $this->getObject();
+
         if ($statusCode < 0) {
             throw new InvalidArgumentException('Код статуса не может быть меньше 0');
         }
-        $this->statusCode = $statusCode;
-        $this->reasonPhrase = $reasonPhrase;
+        $object->statusCode = $statusCode;
+        $object->reasonPhrase = $reasonPhrase;
 
-        return $this;
+        return $object;
     }
 
     /**
@@ -83,9 +85,11 @@ class Response extends Message implements ResponseInterface
      */
     public function withBody(string $rawBody, ?string $mime = null)
     {
-        $this->body->withBody($rawBody, $mime);
+        $object = $this->getObject();
 
-        return $this;
+        $object->body->setBody($rawBody, $mime);
+
+        return $object;
     }
 
     /**
@@ -94,5 +98,14 @@ class Response extends Message implements ResponseInterface
     public function getBody(): ResponseBodyInterface
     {
         return $this->body;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __clone()
+    {
+        parent::__clone();
+        $this->body = clone $this->body;
     }
 }

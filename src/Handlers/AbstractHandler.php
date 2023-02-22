@@ -26,7 +26,7 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * Устанавливает полученное тело ответа в объет ответа
      */
-    protected function setBody(string $body, ResponseInterface $response): void
+    protected function setBody(string $body, ResponseInterface $response): ResponseInterface
     {
         $mime = MimeInterface::HTML;
         $contentTypeHeader = $response->getLastHeader('Content-Type');
@@ -36,11 +36,13 @@ abstract class AbstractHandler implements HandlerInterface
                 $mime = $contentType;
                 if (preg_match('#(.+); charset=(.+)#mui', $contentType, $matches) > 0) {
                     $mime = $matches[1];
-                    $response->withEncoding($matches[2]);
+                    $response = $response->withEncoding($matches[2]);
                 }
             }
         }
-        $response->withBody($body, $mime);
+        $response = $response->withBody($body, $mime);
+
+        return $response;
     }
 
     /**

@@ -174,5 +174,5 @@ interface RequestInterface extends MessageInterface
      *
      * @return CookieInterface
      */
-    public function withCookie(string $name, string $value);
+    public function addCookie(string $name, string $value);
 }

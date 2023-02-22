@@ -14,7 +14,7 @@ interface BodyInterface
      *
      * @return $this
      */
-    public function withContentType(?string $mime = null);
+    public function setContentType(?string $mime = null);
 
     /**
      * Content type

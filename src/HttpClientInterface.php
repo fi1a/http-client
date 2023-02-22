@@ -26,7 +26,7 @@ interface HttpClientInterface
      *
      * @return $this
      */
-    public function withMiddleware(MiddlewareInterface $middleware, ?int $sort = null);
+    public function addMiddleware(MiddlewareInterface $middleware, ?int $sort = null);
 
     /**
      * Отправляет запрос
@@ -110,17 +110,22 @@ interface HttpClientInterface
      *
      * @return $this
      */
-    public function withUrlPrefix(?string $urlPrefix);
+    public function setUrlPrefix(?string $urlPrefix);
 
     /**
      * Использовать прокси для всех соединений
      *
      * @return $this
      */
-    public function withProxy(?ProxyInterface $proxy);
+    public function setProxy(?ProxyInterface $proxy);
 
     /**
      * Возвращает прокси
      */
     public function getProxy(): ?ProxyInterface;
+
+    /**
+     * Возвращает используемый запрос
+     */
+    public function getRequest(): ?RequestInterface;
 }

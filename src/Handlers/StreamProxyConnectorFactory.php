@@ -21,8 +21,8 @@ class StreamProxyConnectorFactory implements StreamProxyConnectorFactoryInterfac
     public function factory(
         $context,
         ConfigInterface $config,
-        RequestInterface $request,
-        ResponseInterface $response,
+        RequestInterface &$request,
+        ResponseInterface &$response,
         ProxyInterface $proxy
     ): StreamProxyConnectorInterface {
         if ($proxy->getType() === 'http') {

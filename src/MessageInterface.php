@@ -84,19 +84,18 @@ interface MessageInterface
     public function withHeader(string $name, string $value);
 
     /**
-     * Добавляет заголовок с определенным именем и значением и возвращает объект заголовка
-     */
-    public function withAddedHeader(string $name, string $value): HeaderInterface;
-
-    /**
      * Удаляет заголовок с определенным именем
+     *
+     * @return $this
      */
-    public function withoutHeader(string $name): bool;
+    public function withoutHeader(string $name);
 
     /**
      * Удаляет все заголовки
+     *
+     * @return $this
      */
-    public function clearHeaders(): bool;
+    public function clearHeaders();
 
     /**
      * Возвращает коллекцию cookies

@@ -35,24 +35,14 @@ class BasicAuthMiddleware extends AbstractMiddleware
     public function handleRequest(
         RequestInterface $request,
         ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        $request->withHeader(
+        HttpClientInterface $httpClient,
+        callable $next
+    ): RequestInterface {
+        $request = $request->withHeader(
             'Authorization',
             sprintf('Basic %s', base64_encode($this->username . ':' . $this->password))
         );
 
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function handleResponse(
-        RequestInterface $request,
-        ResponseInterface $response,
-        HttpClientInterface $httpClient
-    ) {
-        return true;
+        return $next($request, $response, $httpClient);
     }
 }
