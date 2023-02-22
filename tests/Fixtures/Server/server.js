@@ -189,7 +189,9 @@ app.post('/file-upload/', urlencodedParser, (req, res, next) => {
 });
 
 app.get('/encoding/', (req, res, next) => {
-    res.status(200).setHeader('Content-Encoding', 'unknown').send('success');
+    res.status(200);
+    res.setHeader('Content-Encoding', 'unknown');
+    res.send('success');
     next();
 });
 
